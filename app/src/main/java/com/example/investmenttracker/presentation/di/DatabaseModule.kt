@@ -16,7 +16,7 @@ class DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideNewsDatabase(app: Application): CoinDatabase{
+    fun provideCoinDatabase(app: Application): CoinDatabase{
         return Room.databaseBuilder(
             app,
             CoinDatabase::class.java,
@@ -26,7 +26,7 @@ class DatabaseModule {
     }
     @Singleton
     @Provides
-    fun provideArticleDAO(coinDatabase: CoinDatabase): CoinDAO{
+    fun provideCoinDAO(coinDatabase: CoinDatabase): CoinDAO{
         return coinDatabase.getCoinDAO()
     }
 
