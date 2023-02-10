@@ -7,9 +7,11 @@ import retrofit2.http.Query
 
 interface CoinSearchAPIService {
 
-    @GET("/v2/cryptocurrency/quotes/latest")
+    @GET("https://api.coingecko.com/api/v3/simple/price")
     suspend fun getCoinInfo(
-        @Query("slug")
-        slug: String
+        @Query("ids")
+        name: String,
+        @Query("vs_currencies")
+        currency: String
     ): Response<APIResponse>
 }
