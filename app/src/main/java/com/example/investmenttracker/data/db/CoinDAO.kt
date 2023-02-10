@@ -10,7 +10,7 @@ interface CoinDAO {
     suspend fun insert(coin: Coin)
 
     @Query("SELECT * FROM coins")
-    suspend fun getAllCoins(): Flow<List<Coin>>
+    suspend fun getAllCoins(): List<Coin>
 
     @Delete
     suspend fun deleteCoin(coin: Coin)
