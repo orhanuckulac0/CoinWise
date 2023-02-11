@@ -1,6 +1,6 @@
 package com.example.investmenttracker.data.repository
 
-import com.example.investmenttracker.data.model.APIResponse
+import com.example.investmenttracker.data.model.ApiResponse
 import com.example.investmenttracker.data.repository.datasource.CoinRemoteDataSource
 import com.example.investmenttracker.data.util.Resource
 import com.example.investmenttracker.domain.repository.CoinRepository
@@ -10,7 +10,7 @@ class CoinRepositoryImpl(
     private val coinRemoteDataSource: CoinRemoteDataSource
 ): CoinRepository {
 
-    private fun responseToResource(response: Response<APIResponse>) : Resource<APIResponse>{
+    private fun responseToResource(response: Response<ApiResponse>) : Resource<ApiResponse>{
         if (response.isSuccessful){
             response.body()?.let {
                     result->
@@ -20,8 +20,8 @@ class CoinRepositoryImpl(
         return Resource.Error(response.message())
     }
 
-    override suspend fun getCoin(name: String, currency: String): Resource<APIResponse> {
-        return responseToResource(coinRemoteDataSource.getCoin(name, currency))
+    override suspend fun getCoin(name: String): Resource<ApiResponse> {
+        return responseToResource(coinRemoteDataSource.getCoin(name))
     }
 
 }
