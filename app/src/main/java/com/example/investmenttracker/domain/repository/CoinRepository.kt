@@ -1,8 +1,8 @@
 package com.example.investmenttracker.domain.repository
 
-import com.example.investmenttracker.data.model.ApiResponse
-import com.example.investmenttracker.data.util.Resource
+import com.google.gson.JsonObject
+import retrofit2.Call
 
 interface CoinRepository {
-    suspend fun getCoin(name: String): Resource<ApiResponse>
+    suspend fun getCoinBySlug(name: String): Call<JsonObject>
 }

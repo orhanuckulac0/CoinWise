@@ -1,10 +1,10 @@
 package com.example.investmenttracker.data.repository.datasource
 
-import com.example.investmenttracker.data.model.ApiResponse
-import retrofit2.Response
+import com.google.gson.JsonObject
+import retrofit2.Call
 
 interface CoinRemoteDataSource {
 
-    suspend fun getCoin(name: String): Response<ApiResponse>
+    suspend fun getCoinBySlug(name: String): Call<JsonObject>
     
 }

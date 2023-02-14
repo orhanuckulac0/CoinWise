@@ -1,7 +1,7 @@
 package com.example.investmenttracker.presentation.di
 
 import com.example.investmenttracker.domain.repository.CoinRepository
-import com.example.investmenttracker.domain.use_case.GetCoinUseCase
+import com.example.investmenttracker.domain.use_case.GetCoinBySlugUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,7 +13,7 @@ import javax.inject.Singleton
 class UseCaseModule {
     @Singleton
     @Provides
-    fun provideGetCoinUseCase(coinRepository: CoinRepository): GetCoinUseCase{
-        return GetCoinUseCase(coinRepository)
+    fun provideGetCoinBySlugUseCase(coinRepository: CoinRepository): GetCoinBySlugUseCase{
+        return GetCoinBySlugUseCase(coinRepository)
     }
 }

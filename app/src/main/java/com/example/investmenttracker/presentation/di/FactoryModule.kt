@@ -1,8 +1,9 @@
 package com.example.investmenttracker.presentation.di
 
 import android.app.Application
-import com.example.investmenttracker.domain.use_case.GetCoinUseCase
+import com.example.investmenttracker.domain.use_case.GetCoinBySlugUseCase
 import com.example.investmenttracker.presentation.view_model.CoinViewModelFactory
+import com.example.investmenttracker.presentation.view_model.SearchCoinViewModelFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,8 +18,16 @@ class FactoryModule {
     @Provides
     fun provideCoinViewModelFactory(
         app: Application,
-        getCoinUseCase: GetCoinUseCase
     ): CoinViewModelFactory {
-        return CoinViewModelFactory(app, getCoinUseCase)
+        return CoinViewModelFactory(app)
+    }
+
+    @Singleton
+    @Provides
+    fun provideSearchCoinViewModelFactory(
+        app: Application,
+        getCoinBySlugUseCase: GetCoinBySlugUseCase
+    ): SearchCoinViewModelFactory {
+        return SearchCoinViewModelFactory(app, getCoinBySlugUseCase)
     }
 }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">InvestmentTracker</string>
+    <string name="search_a_coin">Search a coin</string>
 </resources>
