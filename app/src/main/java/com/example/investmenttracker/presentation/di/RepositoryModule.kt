@@ -1,6 +1,7 @@
 package com.example.investmenttracker.presentation.di
 
 import com.example.investmenttracker.data.repository.CoinRepositoryImpl
+import com.example.investmenttracker.data.repository.datasource.CoinLocalDataSource
 import com.example.investmenttracker.data.repository.datasource.CoinRemoteDataSource
 import com.example.investmenttracker.domain.repository.CoinRepository
 import dagger.Module
@@ -15,7 +16,10 @@ class RepositoryModule {
 
     @Singleton
     @Provides
-    fun provideCoinRepository(coinRemoteDataSource: CoinRemoteDataSource): CoinRepository{
-        return CoinRepositoryImpl(coinRemoteDataSource)
+    fun provideCoinRepository(
+        coinRemoteDataSource: CoinRemoteDataSource,
+        coinLocalDataSource: CoinLocalDataSource
+    ): CoinRepository{
+        return CoinRepositoryImpl(coinRemoteDataSource, coinLocalDataSource)
     }
 }
