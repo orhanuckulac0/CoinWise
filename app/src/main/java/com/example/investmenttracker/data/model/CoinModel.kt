@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class CoinModel(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
+    val cmcId: Int,
     val name: String,
 //    val slug: String,
     val symbol: String,

@@ -3,11 +3,13 @@ package com.example.investmenttracker
 import android.app.Dialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.view.View
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.util.Resource
 import com.example.investmenttracker.databinding.ActivitySearchCoinBinding
+import com.example.investmenttracker.presentation.adapter.SearchCoinAdapter
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModel
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,8 +20,10 @@ class SearchCoinActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchCoinBinding
     lateinit var viewModel: SearchCoinViewModel
     @Inject lateinit var factory: SearchCoinViewModelFactory
+    private lateinit var adapter: SearchCoinAdapter
 
     private var mProgressDialog: Dialog? = null
+    private var coin: CoinModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,21 +45,26 @@ class SearchCoinActivity : AppCompatActivity() {
 
         viewModel.coinSearched.observe(this){ result ->
             cancelProgressDialog()
-            var model: CoinModel? = null
+
             when(result) {
                 is Resource.Success -> {
                     result.data?.getAsJsonObject("data")?.asJsonObject?.asMap()?.forEach {
-                        model = CoinModel(
+                        coin = CoinModel(
                             0,
+                            cmcId = it.key.toInt(),
                             name = it.value.asJsonObject.get("name").toString(),
                             symbol = it.value.asJsonObject.get("symbol").toString(),
                             price = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("price").toString().toDouble(),
                             marketCap = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("market_cap").toString().toDouble()
                         )
                     }
+                    if (coin != null){
+                        setupView(coin!!)
+                    }
+
                     viewModel.coinSearchInputText.value = ""
-                    Log.i("MYTAG", "$model")
                     result.data?.asMap()?.clear()
+
                     cancelProgressDialog()
                 }
                 is Resource.Error -> {
@@ -67,6 +76,13 @@ class SearchCoinActivity : AppCompatActivity() {
             }
         }
         cancelProgressDialog()
+    }
+
+    private fun setupView(model: CoinModel) {
+        adapter = SearchCoinAdapter(this, model)
+        binding.rvCoinSearchResults.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.rvCoinSearchResults.adapter = adapter
+        binding.rvCoinSearchResults.visibility = View.VISIBLE
     }
 
     private fun showProgressDialog(){
