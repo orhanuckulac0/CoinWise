@@ -31,6 +31,7 @@ class SearchCoinActivity : AppCompatActivity() {
 
         binding = ActivitySearchCoinBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setupActionBar()
 
         viewModel = ViewModelProvider(this, factory)[SearchCoinViewModel::class.java]
 
@@ -76,6 +77,19 @@ class SearchCoinActivity : AppCompatActivity() {
             }
         }
         cancelProgressDialog()
+    }
+
+    private fun setupActionBar(){
+        setSupportActionBar(binding.toolbarSearchCoinActivity)
+        val actionBar = supportActionBar
+        if (actionBar != null){
+            actionBar.title = "Add Coin"
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setHomeAsUpIndicator(R.drawable.back_arrow_white)
+            binding.toolbarSearchCoinActivity.setNavigationOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
     }
 
     private fun setupView(model: CoinModel) {
