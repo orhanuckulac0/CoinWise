@@ -9,4 +9,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="divider_color">#EAEAEA</color>
 
+    <color name="mainColor">#0e1419</color>
+    <color name="searchCoinButtonColor">#0286ff</color>
 </resources>

@@ -1,8 +1,11 @@
 package com.example.investmenttracker
 
 import android.app.Dialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -49,11 +52,12 @@ class SearchCoinActivity : AppCompatActivity() {
 
             when(result) {
                 is Resource.Success -> {
+                    val regex = Regex("[^A-Za-z0-9 ]") // to remove "" coming with api result, otherwise name is "Bitcoin" instead of just Bitcoin
                     result.data?.getAsJsonObject("data")?.asJsonObject?.asMap()?.forEach {
                         coin = CoinModel(
                             0,
                             cmcId = it.key.toInt(),
-                            name = it.value.asJsonObject.get("name").toString(),
+                            name = regex.replace(it.value.asJsonObject.get("name").toString(), ""),
                             symbol = it.value.asJsonObject.get("symbol").toString(),
                             price = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("price").toString().toDouble(),
                             marketCap = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("market_cap").toString().toDouble()
@@ -108,4 +112,23 @@ class SearchCoinActivity : AppCompatActivity() {
     private fun cancelProgressDialog(){
         mProgressDialog?.dismiss()
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_information, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        return super.onPrepareOptionsMenu(menu)
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.actionAddCoinInformation -> {
+                // TODO create dialog for information on how to search coins properly
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 }
