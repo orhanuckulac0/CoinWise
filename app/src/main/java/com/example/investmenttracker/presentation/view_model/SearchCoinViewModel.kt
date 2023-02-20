@@ -4,28 +4,33 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
+import android.view.inputmethod.InputMethodSession.EventCallback
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.util.Resource
-import com.example.investmenttracker.domain.use_case.DeleteCoinUseCase
-import com.example.investmenttracker.domain.use_case.GetAllCoinsUseCase
-import com.example.investmenttracker.domain.use_case.GetCoinBySlugUseCase
-import com.example.investmenttracker.domain.use_case.SaveCoinUseCase
+import com.example.investmenttracker.domain.use_case.*
+import com.example.investmenttracker.presentation.events.UiEvent
+import com.example.investmenttracker.presentation.events.UiEventActions
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class SearchCoinViewModel(
     private val app: Application,
     private val getCoinBySlugUseCase: GetCoinBySlugUseCase,
+    private val getCoinBySymbolUseCase: GetCoinBySymbolUseCase,
     private val saveCoinUseCase: SaveCoinUseCase,
 ): AndroidViewModel(app) {
 
     private var _coinSearchInputText = MutableLiveData("")
     val coinSearchInputText = _coinSearchInputText
+
+    private val eventChannel = Channel<UiEvent>()
+    val eventFlow = eventChannel.receiveAsFlow()
 
     val coinSearched: MutableLiveData<Resource<JsonObject>> = MutableLiveData()
 
@@ -46,20 +51,33 @@ class SearchCoinViewModel(
         return result
     }
 
-    fun getSearchedCoin(name: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun getSearchedCoinBySlug(slug: String) = viewModelScope.launch(Dispatchers.IO) {
         coinSearched.postValue(Resource.Loading())
 
         if (isNetworkAvailable(app)){
-            val slugResponse = getCoinBySlugUseCase.execute(name).execute()
-            if (slugResponse.body() == null){
-                // TODO now search by name
-                // TODO if search by name is null, then search by symbol
-                // TODO if all returns null, show toast for the error
+            val slugResponse = getCoinBySlugUseCase.execute(slug).execute()
+            if (slugResponse.body() != null){
+                coinSearched.postValue(Resource.Success(slugResponse.body()!!))
+            }else {
+                coinSearched.postValue(Resource.Error(UiEventActions.COIN_ADDED_FAILED))
             }
-            coinSearched.postValue(Resource.Success(slugResponse.body()!!))
-
         }else {
-            coinSearched.postValue(Resource.Error("No Internet Connection Error"))
+            coinSearched.postValue(Resource.Error(UiEventActions.NO_INTERNET_CONNECTION))
+        }
+    }
+
+    fun getSearchCoinBySymbol(symbol: String) = viewModelScope.launch(Dispatchers.IO) {
+        coinSearched.postValue(Resource.Loading())
+
+        if (isNetworkAvailable(app)){
+            val symbolResponse = getCoinBySymbolUseCase.execute(symbol).execute()
+            if (symbolResponse.body() != null){
+                coinSearched.postValue(Resource.Success(symbolResponse.body()!!))
+            }else {
+                coinSearched.postValue(Resource.Error(UiEventActions.COIN_ADDED_FAILED))
+            }
+        }else {
+            coinSearched.postValue(Resource.Error(UiEventActions.NO_INTERNET_CONNECTION))
         }
     }
 
@@ -67,4 +85,11 @@ class SearchCoinViewModel(
         saveCoinUseCase.execute(coinModel)
     }
 
+    fun triggerUiEvent(message: String, action: String) = viewModelScope.launch(Dispatchers.Main) {
+        if (action == UiEventActions.COIN_ADDED) {
+            eventChannel.send(UiEvent.ShowCoinAddedSnackbar(message))
+        } else if (action == UiEventActions.COIN_ADDED_FAILED || action == UiEventActions.NO_INTERNET_CONNECTION) {
+            eventChannel.send(UiEvent.ShowErrorSnackbar(message))
+        }
+    }
 }

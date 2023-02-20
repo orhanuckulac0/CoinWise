@@ -2,6 +2,7 @@ package com.example.investmenttracker.presentation.di
 
 import android.app.Application
 import com.example.investmenttracker.domain.use_case.GetCoinBySlugUseCase
+import com.example.investmenttracker.domain.use_case.GetCoinBySymbolUseCase
 import com.example.investmenttracker.domain.use_case.SaveCoinUseCase
 import com.example.investmenttracker.presentation.view_model.CoinViewModelFactory
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModelFactory
@@ -28,8 +29,14 @@ class FactoryModule {
     fun provideSearchCoinViewModelFactory(
         app: Application,
         getCoinBySlugUseCase: GetCoinBySlugUseCase,
+        getCoinBySymbolUseCase: GetCoinBySymbolUseCase,
         saveCoinUseCase: SaveCoinUseCase
     ): SearchCoinViewModelFactory {
-        return SearchCoinViewModelFactory(app, getCoinBySlugUseCase, saveCoinUseCase)
+        return SearchCoinViewModelFactory(
+            app,
+            getCoinBySlugUseCase,
+            getCoinBySymbolUseCase,
+            saveCoinUseCase,
+        )
     }
 }

@@ -12,8 +12,12 @@ class CoinRepositoryImpl(
     private val coinRemoteDataSource: CoinRemoteDataSource,
     private val coinLocalDataSource: CoinLocalDataSource
 ): CoinRepository {
-    override suspend fun getCoinBySlug(name: String): Call<JsonObject> {
-        return coinRemoteDataSource.getCoinBySlug(name)
+    override suspend fun getCoinBySlug(slug: String): Call<JsonObject> {
+        return coinRemoteDataSource.getCoinBySlug(slug)
+    }
+
+    override suspend fun getCoinBySymbol(symbol: String): Call<JsonObject> {
+        return coinRemoteDataSource.getCoinBySymbol(symbol)
     }
 
     override suspend fun insertCoinToDB(coinModel: CoinModel) {

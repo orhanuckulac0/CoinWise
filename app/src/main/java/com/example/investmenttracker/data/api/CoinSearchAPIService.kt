@@ -15,4 +15,13 @@ interface CoinSearchAPIService {
         @Query("CMC_PRO_API_KEY")
         CMC_PRO_API_KEY: String = BuildConfig.API_KEY
     ): Call<JsonObject>
+
+    @GET("/v2/cryptocurrency/quotes/latest")
+    fun getCoinBySymbol(
+        @Query("symbol")
+        slug: String,
+        @Query("CMC_PRO_API_KEY")
+        CMC_PRO_API_KEY: String = BuildConfig.API_KEY
+    ): Call<JsonObject>
+
 }

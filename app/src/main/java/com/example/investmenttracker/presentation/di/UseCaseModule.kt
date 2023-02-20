@@ -1,10 +1,7 @@
 package com.example.investmenttracker.presentation.di
 
 import com.example.investmenttracker.domain.repository.CoinRepository
-import com.example.investmenttracker.domain.use_case.DeleteCoinUseCase
-import com.example.investmenttracker.domain.use_case.GetAllCoinsUseCase
-import com.example.investmenttracker.domain.use_case.GetCoinBySlugUseCase
-import com.example.investmenttracker.domain.use_case.SaveCoinUseCase
+import com.example.investmenttracker.domain.use_case.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,4 +35,9 @@ class UseCaseModule {
         return GetAllCoinsUseCase(coinRepository)
     }
 
+    @Singleton
+    @Provides
+    fun provideGetCoinBySymbolUseCase(coinRepository: CoinRepository): GetCoinBySymbolUseCase {
+        return GetCoinBySymbolUseCase(coinRepository)
+    }
 }

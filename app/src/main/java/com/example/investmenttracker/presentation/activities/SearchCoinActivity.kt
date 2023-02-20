@@ -8,14 +8,18 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.util.Resource
 import com.example.investmenttracker.databinding.ActivitySearchCoinBinding
 import com.example.investmenttracker.presentation.adapter.SearchCoinAdapter
+import com.example.investmenttracker.presentation.events.UiEvent
+import com.example.investmenttracker.presentation.events.UiEventActions
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModel
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModelFactory
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -39,15 +43,28 @@ class SearchCoinActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this, factory)[SearchCoinViewModel::class.java]
 
+        lifecycleScope.launchWhenStarted {
+            viewModel.eventFlow.collect {event->
+                when(event) {
+                    is UiEvent.ShowErrorSnackbar -> {
+                        Snackbar.make(binding.root, event.message, Snackbar.LENGTH_LONG).show()
+                    }
+                    is UiEvent.ShowCoinAddedSnackbar -> {
+                        Snackbar.make(binding.root, event.message, Snackbar.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
+
         binding.searchCoinBtn.setOnClickListener {
             viewModel.coinSearchInputText.value = binding.etSearchCoin.text.toString()
             binding.rvCoinSearchResults.visibility = View.VISIBLE
-            getCoin()
+            getCoinBySlug()
         }
     }
     // test function to see if all works well
-    private fun getCoin() {
-        viewModel.getSearchedCoin(viewModel.coinSearchInputText.value.toString())
+    private fun getCoinBySlug() {
+        viewModel.getSearchedCoinBySlug(viewModel.coinSearchInputText.value.toString())
 
         viewModel.coinSearched.observe(this){ result ->
             cancelProgressDialog()
@@ -79,31 +96,22 @@ class SearchCoinActivity : AppCompatActivity() {
 
                     cancelProgressDialog()
                 }
+
                 is Resource.Error -> {
                     cancelProgressDialog()
+                    if (result.data.toString() == "No Internet Connection Error"){
+                        viewModel.triggerUiEvent(UiEventActions.NO_INTERNET_CONNECTION, UiEventActions.NO_INTERNET_CONNECTION)
+                    }else {
+                        viewModel.triggerUiEvent(UiEventActions.COIN_ADDED_FAILED, UiEventActions.COIN_ADDED_FAILED)
+                    }
                 }
+
                 is Resource.Loading -> {
                     showProgressDialog()
                 }
             }
         }
         cancelProgressDialog()
-    }
-
-    private fun saveCoinToDB(coinModel: CoinModel){
-        // save coin to db
-
-        viewModel.saveCoinToDB(coinModel)
-
-        // refresh UI
-        binding.etSearchCoin.setText("")
-        binding.rvCoinSearchResults.visibility = View.INVISIBLE
-
-        Toast.makeText(
-            this,
-            "${coinModel.name} has been added!",
-            Toast.LENGTH_LONG
-        ).show()
     }
 
     private fun setupActionBar(){
@@ -128,7 +136,15 @@ class SearchCoinActivity : AppCompatActivity() {
 
         adapter.setOnClickListener(object: SearchCoinAdapter.OnClickListener {
             override fun onClick(position: Int, coinModel: CoinModel) {
-                saveCoinToDB(coinModel)
+                // save coin to db
+                viewModel.saveCoinToDB(coinModel)
+
+                // refresh UI
+                binding.etSearchCoin.setText("")
+                binding.rvCoinSearchResults.visibility = View.INVISIBLE
+
+                // trigger snackbar
+                viewModel.triggerUiEvent("${coinModel.name} added successfully!", UiEventActions.COIN_ADDED)
             }
         })
     }

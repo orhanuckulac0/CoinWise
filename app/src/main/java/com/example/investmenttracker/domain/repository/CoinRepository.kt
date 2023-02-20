@@ -7,7 +7,9 @@ import retrofit2.Call
 
 interface CoinRepository {
     // functions related to api calls
-    suspend fun getCoinBySlug(name: String): Call<JsonObject>
+    suspend fun getCoinBySlug(slug: String): Call<JsonObject>
+
+    suspend fun getCoinBySymbol(symbol: String): Call<JsonObject>
 
     // functions related to db
     suspend fun insertCoinToDB(coinModel: CoinModel)
