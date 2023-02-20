@@ -1,4 +1,4 @@
-package com.example.investmenttracker
+package com.example.investmenttracker.presentation.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.ViewModelProvider
+import com.example.investmenttracker.R
 import com.example.investmenttracker.databinding.ActivityMainBinding
 import com.example.investmenttracker.presentation.view_model.CoinViewModel
 import com.example.investmenttracker.presentation.view_model.CoinViewModelFactory

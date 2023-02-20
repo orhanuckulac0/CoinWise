@@ -15,6 +15,8 @@ class SearchCoinAdapter(
     private val coin: CoinModel
 ): RecyclerView.Adapter<SearchCoinAdapter.CoinsViewHolder>() {
 
+    private var onClickListener: OnClickListener? = null
+
     override fun onBindViewHolder(holder: SearchCoinAdapter.CoinsViewHolder, position: Int) {
         val model = coin
         val coinIcon = "https://s2.coinmarketcap.com/static/img/coins/64x64/"+"${coin.cmcId}"+".png"
@@ -30,6 +32,13 @@ class SearchCoinAdapter(
 
         holder.tvCoinName.text = model.name
         holder.tvCoinPrice.text = formatPrice(model.price)
+
+        // set onclick listener to add coin icon only
+        holder.ivAddCoin.setOnClickListener {
+            if (onClickListener != null){
+                onClickListener!!.onClick(position, model)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CoinsViewHolder {
@@ -44,5 +53,15 @@ class SearchCoinAdapter(
         val tvCoinName = binding.tvCoinName
         val tvCoinPrice = binding.tvCoinPrice
         val ivCoinSearchResultImage = binding.ivSearchedCoinResultImage
+        val ivAddCoin = binding.ivAddCoin
     }
+
+    interface OnClickListener{
+        fun onClick(position: Int, coinModel: CoinModel)
+    }
+
+    fun setOnClickListener(onClickListener: OnClickListener){
+        this.onClickListener = onClickListener
+    }
+
 }

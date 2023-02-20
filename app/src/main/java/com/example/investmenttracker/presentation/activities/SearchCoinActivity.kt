@@ -1,14 +1,15 @@
-package com.example.investmenttracker
+package com.example.investmenttracker.presentation.activities
 
 import android.app.Dialog
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.util.Resource
 import com.example.investmenttracker.databinding.ActivitySearchCoinBinding
@@ -40,6 +41,7 @@ class SearchCoinActivity : AppCompatActivity() {
 
         binding.searchCoinBtn.setOnClickListener {
             viewModel.coinSearchInputText.value = binding.etSearchCoin.text.toString()
+            binding.rvCoinSearchResults.visibility = View.VISIBLE
             getCoin()
         }
     }
@@ -55,12 +57,17 @@ class SearchCoinActivity : AppCompatActivity() {
                     val regex = Regex("[^A-Za-z0-9 ]") // to remove "" coming with api result, otherwise name is "Bitcoin" instead of just Bitcoin
                     result.data?.getAsJsonObject("data")?.asJsonObject?.asMap()?.forEach {
                         coin = CoinModel(
-                            0,
+                            id = it.key.toInt(),
                             cmcId = it.key.toInt(),
                             name = regex.replace(it.value.asJsonObject.get("name").toString(), ""),
+                            slug = it.value.asJsonObject.get("slug").toString(),
                             symbol = it.value.asJsonObject.get("symbol").toString(),
                             price = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("price").toString().toDouble(),
-                            marketCap = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("market_cap").toString().toDouble()
+                            marketCap = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("market_cap").toString().toDouble(),
+                            percentChange1h = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_1h").toString().toDouble(),
+                            percentChange24h = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_24h").toString().toDouble(),
+                            percentChange7d = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_7d").toString().toDouble(),
+                            percentChange30d = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_30d").toString().toDouble()
                         )
                     }
                     if (coin != null){
@@ -83,6 +90,22 @@ class SearchCoinActivity : AppCompatActivity() {
         cancelProgressDialog()
     }
 
+    private fun saveCoinToDB(coinModel: CoinModel){
+        // save coin to db
+
+        viewModel.saveCoinToDB(coinModel)
+
+        // refresh UI
+        binding.etSearchCoin.setText("")
+        binding.rvCoinSearchResults.visibility = View.INVISIBLE
+
+        Toast.makeText(
+            this,
+            "${coinModel.name} has been added!",
+            Toast.LENGTH_LONG
+        ).show()
+    }
+
     private fun setupActionBar(){
         setSupportActionBar(binding.toolbarSearchCoinActivity)
         val actionBar = supportActionBar
@@ -101,6 +124,13 @@ class SearchCoinActivity : AppCompatActivity() {
         binding.rvCoinSearchResults.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.rvCoinSearchResults.adapter = adapter
         binding.rvCoinSearchResults.visibility = View.VISIBLE
+
+
+        adapter.setOnClickListener(object: SearchCoinAdapter.OnClickListener {
+            override fun onClick(position: Int, coinModel: CoinModel) {
+                saveCoinToDB(coinModel)
+            }
+        })
     }
 
     private fun showProgressDialog(){

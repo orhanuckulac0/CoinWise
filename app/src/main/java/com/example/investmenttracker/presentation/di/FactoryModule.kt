@@ -2,6 +2,7 @@ package com.example.investmenttracker.presentation.di
 
 import android.app.Application
 import com.example.investmenttracker.domain.use_case.GetCoinBySlugUseCase
+import com.example.investmenttracker.domain.use_case.SaveCoinUseCase
 import com.example.investmenttracker.presentation.view_model.CoinViewModelFactory
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModelFactory
 import dagger.Module
@@ -26,8 +27,9 @@ class FactoryModule {
     @Provides
     fun provideSearchCoinViewModelFactory(
         app: Application,
-        getCoinBySlugUseCase: GetCoinBySlugUseCase
+        getCoinBySlugUseCase: GetCoinBySlugUseCase,
+        saveCoinUseCase: SaveCoinUseCase
     ): SearchCoinViewModelFactory {
-        return SearchCoinViewModelFactory(app, getCoinBySlugUseCase)
+        return SearchCoinViewModelFactory(app, getCoinBySlugUseCase, saveCoinUseCase)
     }
 }
