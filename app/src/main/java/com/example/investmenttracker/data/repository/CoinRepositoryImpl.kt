@@ -12,11 +12,11 @@ class CoinRepositoryImpl(
     private val coinRemoteDataSource: CoinRemoteDataSource,
     private val coinLocalDataSource: CoinLocalDataSource
 ): CoinRepository {
-    override suspend fun getCoinBySlug(slug: String): Call<JsonObject> {
+    override suspend fun getCoinBySlug(slug: String): JsonObject {
         return coinRemoteDataSource.getCoinBySlug(slug)
     }
 
-    override suspend fun getCoinBySymbol(symbol: String): Call<JsonObject> {
+    override suspend fun getCoinBySymbol(symbol: String): JsonObject {
         return coinRemoteDataSource.getCoinBySymbol(symbol)
     }
 

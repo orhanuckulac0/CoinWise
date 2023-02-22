@@ -1,14 +1,15 @@
 package com.example.investmenttracker.presentation.activities
 
 import android.app.Dialog
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
@@ -21,7 +22,9 @@ import com.example.investmenttracker.presentation.view_model.SearchCoinViewModel
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModelFactory
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import org.json.JSONObject
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class SearchCoinActivity : AppCompatActivity() {
@@ -29,6 +32,8 @@ class SearchCoinActivity : AppCompatActivity() {
     lateinit var viewModel: SearchCoinViewModel
     @Inject lateinit var factory: SearchCoinViewModelFactory
     private lateinit var adapter: SearchCoinAdapter
+
+    private var dividerCreated: Boolean = false
 
     private var mProgressDialog: Dialog? = null
     private var coin: CoinModel? = null
@@ -46,52 +51,69 @@ class SearchCoinActivity : AppCompatActivity() {
         lifecycleScope.launchWhenStarted {
             viewModel.eventFlow.collect {event->
                 when(event) {
-                    is UiEvent.ShowErrorSnackbar -> {
-                        Snackbar.make(binding.root, event.message, Snackbar.LENGTH_LONG).show()
-                    }
                     is UiEvent.ShowCoinAddedSnackbar -> {
+                        Snackbar.make(binding.root, event.message, Snackbar.LENGTH_SHORT).show()
+                    }
+                    is UiEvent.ShowErrorSnackbar -> {
                         Snackbar.make(binding.root, event.message, Snackbar.LENGTH_LONG).show()
                     }
                 }
             }
         }
 
-        binding.searchCoinBtn.setOnClickListener {
-            viewModel.coinSearchInputText.value = binding.etSearchCoin.text.toString()
-            binding.rvCoinSearchResults.visibility = View.VISIBLE
+        binding.searchCoinBtnSlug.setOnClickListener {
+            viewModel.coinSearchInputText.value = binding.etSearchCoin.text.toString().lowercase()
             getCoinBySlug()
         }
-    }
-    // test function to see if all works well
-    private fun getCoinBySlug() {
-        viewModel.getSearchedCoinBySlug(viewModel.coinSearchInputText.value.toString())
+        binding.searchCoinBtnSymbol.setOnClickListener {
+            viewModel.coinSearchInputText.value = binding.etSearchCoin.text.toString().uppercase()
+            getCoinBySymbol()
+        }
 
-        viewModel.coinSearched.observe(this){ result ->
+    }
+    // search coins by slug, bitcoin - ethereum
+    // returns jsonObject, only 1 coin
+    private fun getCoinBySlug() {
+        val searchInput = viewModel.coinSearchInputText.value.toString()
+        viewModel.getSearchedCoinBySlug(searchInput)
+
+        viewModel.coinSearchedBySlug.observe(this){ result ->
             cancelProgressDialog()
+            val responseList = arrayListOf<CoinModel>()
 
             when(result) {
                 is Resource.Success -> {
-                    val regex = Regex("[^A-Za-z0-9 ]") // to remove "" coming with api result, otherwise name is "Bitcoin" instead of just Bitcoin
-                    result.data?.getAsJsonObject("data")?.asJsonObject?.asMap()?.forEach {
-                        coin = CoinModel(
-                            id = it.key.toInt(),
-                            cmcId = it.key.toInt(),
-                            name = regex.replace(it.value.asJsonObject.get("name").toString(), ""),
-                            slug = it.value.asJsonObject.get("slug").toString(),
-                            symbol = it.value.asJsonObject.get("symbol").toString(),
-                            price = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("price").toString().toDouble(),
-                            marketCap = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("market_cap").toString().toDouble(),
-                            percentChange1h = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_1h").toString().toDouble(),
-                            percentChange24h = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_24h").toString().toDouble(),
-                            percentChange7d = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_7d").toString().toDouble(),
-                            percentChange30d = it.value.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_30d").toString().toDouble()
-                        )
-                    }
+                    // to remove "" coming with api result, otherwise name is "Bitcoin" instead of just Bitcoin
+                    val regex = Regex("[^A-Za-z0-9 ]")
+
+                    val jsonObject = JSONObject(result.data.toString())
+                    val dataObject = jsonObject.getJSONObject("data")
+                    val firstKey = dataObject.keys().next()  // use keys().next() because each firstKey is unique
+                    val resultCoinObject = dataObject.getJSONObject(firstKey)
+
+                    // Extract the "USD" object from the "quote" object
+                    val quoteObject = resultCoinObject.getJSONObject("quote")
+                    val usdObject = quoteObject.getJSONObject("USD")
+
+                    coin = CoinModel(
+                        id = resultCoinObject.getInt("id"),
+                        cmcId = resultCoinObject.getInt("id"),
+                        name = regex.replace(resultCoinObject.get("name").toString(), ""),
+                        slug = resultCoinObject.get("slug").toString(),
+                        symbol = resultCoinObject.get("symbol").toString(),
+                        price = usdObject.get("price").toString().toDouble(),
+                        marketCap = usdObject.get("market_cap").toString().toDouble(),
+                        percentChange1h = usdObject.get("percent_change_1h").toString().toDouble(),
+                        percentChange24h = usdObject.get("percent_change_24h").toString().toDouble(),
+                        percentChange7d = usdObject.get("percent_change_7d").toString().toDouble(),
+                        percentChange30d = usdObject.get("percent_change_30d").toString().toDouble()
+                    )
+
                     if (coin != null){
-                        setupView(coin!!)
+                        responseList.add(coin!!)
                     }
 
-                    viewModel.coinSearchInputText.value = ""
+                    setupView(responseList)
                     result.data?.asMap()?.clear()
 
                     cancelProgressDialog()
@@ -102,7 +124,8 @@ class SearchCoinActivity : AppCompatActivity() {
                     if (result.data.toString() == "No Internet Connection Error"){
                         viewModel.triggerUiEvent(UiEventActions.NO_INTERNET_CONNECTION, UiEventActions.NO_INTERNET_CONNECTION)
                     }else {
-                        viewModel.triggerUiEvent(UiEventActions.COIN_ADDED_FAILED, UiEventActions.COIN_ADDED_FAILED)
+                        responseList.clear() // clear response here
+                        setupView(responseList)
                     }
                 }
 
@@ -113,6 +136,65 @@ class SearchCoinActivity : AppCompatActivity() {
         }
         cancelProgressDialog()
     }
+
+    // search coins by symbol, BTC - ETH
+    // returns a jsonArray because symbols are not unique
+    private fun getCoinBySymbol() {
+        val searchInput = viewModel.coinSearchInputText.value.toString()
+        viewModel.getSearchCoinBySymbol(searchInput)
+
+        viewModel.coinSearchedBySymbol.observe(this){ result ->
+            cancelProgressDialog()
+            val responseList = arrayListOf<CoinModel>()
+
+            when(result) {
+                is Resource.Success -> {
+                    // to remove "" coming with api result, otherwise name is "Bitcoin" instead of just Bitcoin
+                    val regex = Regex("[^A-Za-z0-9 ]")
+
+                    val response = result.data?.getAsJsonObject("data")?.get(searchInput)?.asJsonArray
+
+                    if (response != null){
+                        for (c in response.asJsonArray){
+                            coin = CoinModel(
+                                id = c.asJsonObject.get("id").toString().toInt(),
+                                cmcId = c.asJsonObject.get("id").toString().toInt(),
+                                name = regex.replace(c.asJsonObject.get("name").toString(), ""),
+                                slug = c.asJsonObject.get("slug").toString(),
+                                symbol = c.asJsonObject.get("symbol").toString(),
+                                price = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("price").toString().toDouble(),
+                                marketCap = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("market_cap").toString().toDouble(),
+                                percentChange1h = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_1h").toString().toDouble(),
+                                percentChange24h = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_24h").toString().toDouble(),
+                                percentChange7d = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_7d").toString().toDouble(),
+                                percentChange30d = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_30d").toString().toDouble()
+                            )
+                            responseList.add(coin!!)
+                        }
+                    }
+
+                    setupView(responseList)
+                    cancelProgressDialog()
+                }
+
+                is Resource.Error -> {
+                    cancelProgressDialog()
+                    if (result.data.toString() == "No Internet Connection Error"){
+                        viewModel.triggerUiEvent(UiEventActions.NO_INTERNET_CONNECTION, UiEventActions.NO_INTERNET_CONNECTION)
+                    }else {
+                        responseList.clear() // clear response here
+                        setupView(responseList)
+                    }
+                }
+
+                is Resource.Loading -> {
+                    showProgressDialog()
+                }
+            }
+        }
+        cancelProgressDialog()
+    }
+
 
     private fun setupActionBar(){
         setSupportActionBar(binding.toolbarSearchCoinActivity)
@@ -127,26 +209,48 @@ class SearchCoinActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupView(model: CoinModel) {
-        adapter = SearchCoinAdapter(this, model)
-        binding.rvCoinSearchResults.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        binding.rvCoinSearchResults.adapter = adapter
-        binding.rvCoinSearchResults.visibility = View.VISIBLE
+    private fun setupView(coinList: ArrayList<CoinModel>) {
+        if (coinList.isNotEmpty()){
+            adapter = SearchCoinAdapter(this)
+            adapter.differ.submitList(coinList)
 
+            val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            val rvCoinSearchResults = binding.rvCoinSearchResults
 
-        adapter.setOnClickListener(object: SearchCoinAdapter.OnClickListener {
-            override fun onClick(position: Int, coinModel: CoinModel) {
-                // save coin to db
-                viewModel.saveCoinToDB(coinModel)
+            binding.tvNoResults.visibility = View.GONE
+            rvCoinSearchResults.visibility = View.VISIBLE
+            rvCoinSearchResults.layoutManager = layoutManager
+            rvCoinSearchResults.adapter = adapter
+            rvCoinSearchResults.setHasFixedSize(true)
 
-                // refresh UI
-                binding.etSearchCoin.setText("")
-                binding.rvCoinSearchResults.visibility = View.INVISIBLE
+            adapter.setOnClickListener(object: SearchCoinAdapter.OnClickListener {
+                override fun onClick(position: Int, coinModel: CoinModel) {
+                    // save coin to db
+                    viewModel.saveCoinToDB(coinModel)
+                    coinList.removeAt(position)
+                    adapter.notifyDataSetChanged()
 
-                // trigger snackbar
-                viewModel.triggerUiEvent("${coinModel.name} added successfully!", UiEventActions.COIN_ADDED)
+                    // refresh UI
+                    binding.etSearchCoin.setText("")
+                    if (coinList.isEmpty()){
+                        binding.rvCoinSearchResults.visibility = View.INVISIBLE
+                    }
+
+                    // trigger snackbar
+                    viewModel.triggerUiEvent("${coinModel.name} added successfully!", UiEventActions.COIN_ADDED)
+                }
+            })
+            if (!dividerCreated && coinList.size > 1){
+                val decorator = DividerItemDecoration(applicationContext, LinearLayoutManager.VERTICAL)
+                decorator.setDrawable(ContextCompat.getDrawable(applicationContext, R.drawable.line_divider)!!)
+                rvCoinSearchResults.addItemDecoration(decorator)
+                dividerCreated = true
             }
-        })
+
+        }else{
+            binding.tvNoResults.visibility = View.VISIBLE
+            binding.rvCoinSearchResults.visibility = View.GONE
+        }
     }
 
     private fun showProgressDialog(){

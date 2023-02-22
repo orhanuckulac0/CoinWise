@@ -3,6 +3,8 @@ package com.example.investmenttracker.presentation.adapter
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.investmenttracker.R
@@ -12,33 +14,30 @@ import com.example.investmenttracker.databinding.SearchCoinSingleItemBinding
 
 class SearchCoinAdapter(
     private val context: Context,
-    private val coin: CoinModel
 ): RecyclerView.Adapter<SearchCoinAdapter.CoinsViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
 
-    override fun onBindViewHolder(holder: SearchCoinAdapter.CoinsViewHolder, position: Int) {
-        val model = coin
-        val coinIcon = "https://s2.coinmarketcap.com/static/img/coins/64x64/"+"${coin.cmcId}"+".png"
-
-        Glide
-            .with(context)
-            .load(coinIcon)
-            .thumbnail(Glide.with(context).load(R.drawable.spinner))
-            .centerCrop()
-            .placeholder(R.drawable.coin_place_holder)
-            .into(holder.ivCoinSearchResultImage)
-
-
-        holder.tvCoinName.text = model.name
-        holder.tvCoinPrice.text = formatPrice(model.price)
-
-        // set onclick listener to add coin icon only
-        holder.ivAddCoin.setOnClickListener {
-            if (onClickListener != null){
-                onClickListener!!.onClick(position, model)
-            }
+    //This class finds the difference between two lists and provides the updated list as an output.
+    // This class is used to notify updates to a RecyclerView Adapter.
+    private val callback = object : DiffUtil.ItemCallback<CoinModel>(){
+        override fun areItemsTheSame(oldItem: CoinModel, newItem: CoinModel): Boolean {
+            return oldItem.cmcId == newItem.cmcId
         }
+
+        override fun areContentsTheSame(oldItem: CoinModel, newItem: CoinModel): Boolean {
+            return oldItem == newItem
+        }
+    }
+
+    // AsyncListDiffer is a helper for computing the difference between two lists via DiffUtil on a background thread.
+    // will signal the adapter of changes between submitted lists
+    val differ = AsyncListDiffer(this, callback)
+
+
+    override fun onBindViewHolder(holder: SearchCoinAdapter.CoinsViewHolder, position: Int) {
+        val model = differ.currentList[position]
+        holder.bind(model)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CoinsViewHolder {
@@ -46,14 +45,32 @@ class SearchCoinAdapter(
     }
 
     override fun getItemCount(): Int {
-        return 1
+        return differ.currentList.size
     }
 
-    inner class CoinsViewHolder(binding: SearchCoinSingleItemBinding) : RecyclerView.ViewHolder(binding.root){
-        val tvCoinName = binding.tvCoinName
-        val tvCoinPrice = binding.tvCoinPrice
-        val ivCoinSearchResultImage = binding.ivSearchedCoinResultImage
-        val ivAddCoin = binding.ivAddCoin
+    inner class CoinsViewHolder(private val binding: SearchCoinSingleItemBinding) : RecyclerView.ViewHolder(binding.root){
+        fun bind(coinModel: CoinModel){
+            val coinIcon = "https://s2.coinmarketcap.com/static/img/coins/64x64/"+"${differ.currentList[position].cmcId}"+".png"
+
+            binding.tvCoinName.text = coinModel.name
+            binding.tvCoinPrice.text = formatPrice(coinModel.price)
+
+            Glide
+                .with(context)
+                .load(coinIcon)
+                .thumbnail(Glide.with(context).load(R.drawable.spinner))
+                .centerCrop()
+                .placeholder(R.drawable.coin_place_holder)
+                .into(binding.ivSearchedCoinResultImage)
+
+            // set onclick listener to add coin icon only
+            binding.ivAddCoin.setOnClickListener {
+                if (onClickListener != null){
+                    onClickListener!!.onClick(position, coinModel)
+                }
+            }
+
+        }
     }
 
     interface OnClickListener{
@@ -63,5 +80,4 @@ class SearchCoinAdapter(
     fun setOnClickListener(onClickListener: OnClickListener){
         this.onClickListener = onClickListener
     }
-
 }

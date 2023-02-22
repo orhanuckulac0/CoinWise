@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.view.inputmethod.InputMethodSession.EventCallback
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -32,7 +32,8 @@ class SearchCoinViewModel(
     private val eventChannel = Channel<UiEvent>()
     val eventFlow = eventChannel.receiveAsFlow()
 
-    val coinSearched: MutableLiveData<Resource<JsonObject>> = MutableLiveData()
+    val coinSearchedBySlug: MutableLiveData<Resource<JsonObject>> = MutableLiveData()
+    val coinSearchedBySymbol: MutableLiveData<Resource<JsonObject>> = MutableLiveData()
 
     @Suppress("DEPRECATION")
     fun isNetworkAvailable(context: Context): Boolean {
@@ -52,32 +53,32 @@ class SearchCoinViewModel(
     }
 
     fun getSearchedCoinBySlug(slug: String) = viewModelScope.launch(Dispatchers.IO) {
-        coinSearched.postValue(Resource.Loading())
+        coinSearchedBySlug.postValue(Resource.Loading())
 
-        if (isNetworkAvailable(app)){
-            val slugResponse = getCoinBySlugUseCase.execute(slug).execute()
-            if (slugResponse.body() != null){
-                coinSearched.postValue(Resource.Success(slugResponse.body()!!))
+        try {
+            if (isNetworkAvailable(app)){
+                val slugResponse = getCoinBySlugUseCase.execute(slug)
+                coinSearchedBySlug.postValue(Resource.Success(slugResponse))
             }else {
-                coinSearched.postValue(Resource.Error(UiEventActions.COIN_ADDED_FAILED))
+                coinSearchedBySlug.postValue(Resource.Error(UiEventActions.NO_INTERNET_CONNECTION))
             }
-        }else {
-            coinSearched.postValue(Resource.Error(UiEventActions.NO_INTERNET_CONNECTION))
+        }catch (e:java.lang.Exception){
+            coinSearchedBySlug.postValue(Resource.Error("No search results. Check your spelling."))
         }
     }
 
     fun getSearchCoinBySymbol(symbol: String) = viewModelScope.launch(Dispatchers.IO) {
-        coinSearched.postValue(Resource.Loading())
+        coinSearchedBySymbol.postValue(Resource.Loading())
 
-        if (isNetworkAvailable(app)){
-            val symbolResponse = getCoinBySymbolUseCase.execute(symbol).execute()
-            if (symbolResponse.body() != null){
-                coinSearched.postValue(Resource.Success(symbolResponse.body()!!))
+        try {
+            if (isNetworkAvailable(app)){
+                val symbolResponse = getCoinBySymbolUseCase.execute(symbol)
+                coinSearchedBySymbol.postValue(Resource.Success(symbolResponse))
             }else {
-                coinSearched.postValue(Resource.Error(UiEventActions.COIN_ADDED_FAILED))
+                coinSearchedBySymbol.postValue(Resource.Error(UiEventActions.NO_INTERNET_CONNECTION))
             }
-        }else {
-            coinSearched.postValue(Resource.Error(UiEventActions.NO_INTERNET_CONNECTION))
+        }catch (e:java.lang.Exception){
+            coinSearchedBySymbol.postValue(Resource.Error("No search results. Check your spelling."))
         }
     }
 
@@ -88,7 +89,7 @@ class SearchCoinViewModel(
     fun triggerUiEvent(message: String, action: String) = viewModelScope.launch(Dispatchers.Main) {
         if (action == UiEventActions.COIN_ADDED) {
             eventChannel.send(UiEvent.ShowCoinAddedSnackbar(message))
-        } else if (action == UiEventActions.COIN_ADDED_FAILED || action == UiEventActions.NO_INTERNET_CONNECTION) {
+        } else if (action == UiEventActions.NO_INTERNET_CONNECTION) {
             eventChannel.send(UiEvent.ShowErrorSnackbar(message))
         }
     }

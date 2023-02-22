@@ -5,7 +5,7 @@ import com.google.gson.JsonObject
 import retrofit2.Call
 
 class GetCoinBySlugUseCase(private val coinRepository: CoinRepository) {
-    suspend fun execute(slug: String): Call<JsonObject> {
+    suspend fun execute(slug: String): JsonObject {
         return coinRepository.getCoinBySlug(slug)
     }
 }

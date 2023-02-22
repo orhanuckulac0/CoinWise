@@ -9,19 +9,19 @@ import retrofit2.http.Query
 interface CoinSearchAPIService {
 
     @GET("/v2/cryptocurrency/quotes/latest")
-    fun getCoinBySlug(
+    suspend fun getCoinBySlug(
         @Query("slug")
         slug: String,
         @Query("CMC_PRO_API_KEY")
         CMC_PRO_API_KEY: String = BuildConfig.API_KEY
-    ): Call<JsonObject>
+    ): JsonObject
 
     @GET("/v2/cryptocurrency/quotes/latest")
-    fun getCoinBySymbol(
+    suspend fun getCoinBySymbol(
         @Query("symbol")
         slug: String,
         @Query("CMC_PRO_API_KEY")
         CMC_PRO_API_KEY: String = BuildConfig.API_KEY
-    ): Call<JsonObject>
+    ): JsonObject
 
 }

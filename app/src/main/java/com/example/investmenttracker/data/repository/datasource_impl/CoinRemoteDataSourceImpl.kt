@@ -9,11 +9,11 @@ class CoinRemoteDataSourceImpl(
     private val coinSearchAPIService: CoinSearchAPIService,
 ): CoinRemoteDataSource {
 
-    override suspend fun getCoinBySlug(slug: String): Call<JsonObject> {
+    override suspend fun getCoinBySlug(slug: String): JsonObject {
         return coinSearchAPIService.getCoinBySlug(slug)
     }
 
-    override suspend fun getCoinBySymbol(symbol: String): Call<JsonObject> {
+    override suspend fun getCoinBySymbol(symbol: String): JsonObject {
         return coinSearchAPIService.getCoinBySymbol(symbol)
     }
 

@@ -6,7 +6,7 @@ import retrofit2.Call
 
 class GetCoinBySymbolUseCase(private val coinRepository: CoinRepository) {
 
-    suspend fun execute(symbol: String): Call<JsonObject> {
+    suspend fun execute(symbol: String): JsonObject {
         return coinRepository.getCoinBySymbol(symbol)
     }
 
