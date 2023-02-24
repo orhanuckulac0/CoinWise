@@ -1,10 +1,39 @@
 package com.example.investmenttracker.presentation.view_model
 
 import android.app.Application
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.liveData
+import com.example.investmenttracker.domain.use_case.GetAllCoinsUseCase
+import kotlinx.coroutines.flow.collect
 
 class CoinViewModel(
-    private val app:Application
+    private val app:Application,
+    private val getAllCoinsUseCase: GetAllCoinsUseCase
 ): AndroidViewModel(app) {
 
+    @Suppress("DEPRECATION")
+    fun isNetworkAvailable(context: Context): Boolean {
+        var result = false
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        connectivityManager?.run {
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)?.run {
+                result = when {
+                    hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                    hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                    hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+                    else -> false
+                }
+            }
+        }
+        return result
+    }
+
+    fun getTokensFromWallet() = liveData {
+        getAllCoinsUseCase.execute().collect(){
+            emit(it)
+        }
+    }
 }

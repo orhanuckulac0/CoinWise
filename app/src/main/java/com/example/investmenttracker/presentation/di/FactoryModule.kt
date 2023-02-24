@@ -1,6 +1,7 @@
 package com.example.investmenttracker.presentation.di
 
 import android.app.Application
+import com.example.investmenttracker.domain.use_case.GetAllCoinsUseCase
 import com.example.investmenttracker.domain.use_case.GetCoinBySlugUseCase
 import com.example.investmenttracker.domain.use_case.GetCoinBySymbolUseCase
 import com.example.investmenttracker.domain.use_case.SaveCoinUseCase
@@ -20,8 +21,9 @@ class FactoryModule {
     @Provides
     fun provideCoinViewModelFactory(
         app: Application,
+        getAllCoinsUseCase: GetAllCoinsUseCase
     ): CoinViewModelFactory {
-        return CoinViewModelFactory(app)
+        return CoinViewModelFactory(app, getAllCoinsUseCase)
     }
 
     @Singleton
