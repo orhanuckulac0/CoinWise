@@ -40,4 +40,10 @@ class UseCaseModule {
     fun provideGetCoinBySymbolUseCase(coinRepository: CoinRepository): GetCoinBySymbolUseCase {
         return GetCoinBySymbolUseCase(coinRepository)
     }
+
+    @Singleton
+    @Provides
+    fun provideGetSingleCoinById(coinRepository: CoinRepository): GetSingleCoinByIdUseCase {
+        return GetSingleCoinByIdUseCase(coinRepository)
+    }
 }

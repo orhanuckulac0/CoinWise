@@ -13,9 +13,9 @@ import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.util.formatPrice
 import com.example.investmenttracker.databinding.WalletTokenSingleItemBinding
 
-class WalletAdapter(
+class MainActivityAdapter(
     private val context: Context,
-    ): RecyclerView.Adapter<WalletAdapter.WalletViewHolder>() {
+    ): RecyclerView.Adapter<MainActivityAdapter.WalletViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
 
@@ -43,6 +43,12 @@ class WalletAdapter(
     override fun onBindViewHolder(holder: WalletViewHolder, position: Int) {
         val model = differ.currentList[position]
         holder.bind(model)
+
+        holder.itemView.setOnClickListener {
+            if (onClickListener != null){
+                onClickListener!!.onClick(position, model)
+            }
+        }
     }
 
     override fun getItemCount(): Int {
@@ -57,8 +63,14 @@ class WalletAdapter(
 
             binding.tvCoinName.text = coinModel.name
             binding.tvCoinPrice.text = "$${formatPrice(coinModel.price)}"
-            binding.tvTokenHeldAmount.text = "10" // dummy text for now
+            binding.tvTokenHeldAmount.text = coinModel.totalTokenHeldAmount.toString() // dummy text for now
             binding.tvTokenTotalValue.text = "$${formatPrice(coinModel.price)}"
+
+            if (coinModel.percentChange24h.toString().contains("-")){
+                binding.tvCoinPriceChangeDaily.setTextColor(context.getColor(R.color.redColorPercentage))
+            }else {
+                binding.tvCoinPriceChangeDaily.setTextColor(context.getColor(R.color.greenColorPercentage))
+            }
             binding.tvCoinPriceChangeDaily.text = String.format("%.2f", coinModel.percentChange24h)+"%"
 
             Glide
@@ -68,13 +80,6 @@ class WalletAdapter(
                 .centerCrop()
                 .placeholder(R.drawable.coin_place_holder)
                 .into(binding.ivSearchedCoinResultImage)
-
-            // set onclick listener to icon only, for now
-            binding.ivSearchedCoinResultImage.setOnClickListener {
-                if (onClickListener != null) {
-                    onClickListener!!.onClick(position, coinModel)
-                }
-            }
         }
     }
 

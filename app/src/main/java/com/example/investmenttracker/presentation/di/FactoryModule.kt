@@ -1,12 +1,10 @@
 package com.example.investmenttracker.presentation.di
 
 import android.app.Application
-import com.example.investmenttracker.domain.use_case.GetAllCoinsUseCase
-import com.example.investmenttracker.domain.use_case.GetCoinBySlugUseCase
-import com.example.investmenttracker.domain.use_case.GetCoinBySymbolUseCase
-import com.example.investmenttracker.domain.use_case.SaveCoinUseCase
+import com.example.investmenttracker.domain.use_case.*
 import com.example.investmenttracker.presentation.view_model.CoinViewModelFactory
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModelFactory
+import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModelFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,6 +37,20 @@ class FactoryModule {
             getCoinBySlugUseCase,
             getCoinBySymbolUseCase,
             saveCoinUseCase,
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideTokenDetailsViewModelFactory(
+        app: Application,
+        getSingleCoinByIdUseCase: GetSingleCoinByIdUseCase,
+        deleteCoinUseCase: DeleteCoinUseCase
+    ): TokenDetailsViewModelFactory {
+        return TokenDetailsViewModelFactory(
+            app,
+            getSingleCoinByIdUseCase,
+            deleteCoinUseCase
         )
     }
 }

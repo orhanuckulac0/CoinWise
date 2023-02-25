@@ -12,6 +12,9 @@ interface CoinDAO {
     @Query("SELECT * FROM coins")
     fun getAllCoins(): Flow<List<CoinModel>>
 
+    @Query("SELECT * FROM coins where id=:id")
+    fun getSingleCoinById(id: Int): Flow<CoinModel>
+
     @Delete
     suspend fun deleteCoin(coin: CoinModel)
 }

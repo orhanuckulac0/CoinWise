@@ -11,4 +11,6 @@
 
     <color name="mainColor">#0e1419</color>
     <color name="searchCoinButtonColor">#0286ff</color>
+    <color name="redColorPercentage">#bd2729</color>
+    <color name="greenColorPercentage">#03764f</color>
 </resources>

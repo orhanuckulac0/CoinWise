@@ -106,7 +106,9 @@ class SearchCoinActivity : AppCompatActivity() {
                         percentChange1h = usdObject.get("percent_change_1h").toString().toDouble(),
                         percentChange24h = usdObject.get("percent_change_24h").toString().toDouble(),
                         percentChange7d = usdObject.get("percent_change_7d").toString().toDouble(),
-                        percentChange30d = usdObject.get("percent_change_30d").toString().toDouble()
+                        percentChange30d = usdObject.get("percent_change_30d").toString().toDouble(),
+                        totalTokenHeldAmount = 0.toDouble(),
+                        totalInvestmentAmount = 0.toDouble()
                     )
 
                     if (coin != null){
@@ -167,7 +169,9 @@ class SearchCoinActivity : AppCompatActivity() {
                                 percentChange1h = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_1h").toString().toDouble(),
                                 percentChange24h = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_24h").toString().toDouble(),
                                 percentChange7d = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_7d").toString().toDouble(),
-                                percentChange30d = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_30d").toString().toDouble()
+                                percentChange30d = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_30d").toString().toDouble(),
+                                totalTokenHeldAmount = 0.toDouble(),
+                                totalInvestmentAmount = 0.toDouble()
                             )
                             responseList.add(coin!!)
                         }

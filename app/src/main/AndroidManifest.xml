@@ -16,6 +16,9 @@
         android:theme="@style/Theme.InvestmentTracker"
         tools:targetApi="31">
         <activity
+            android:name=".presentation.activities.TokenDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.activities.SearchCoinActivity"
             android:exported="false" />
         <activity

@@ -15,6 +15,10 @@ class CoinLocalDataSourceImpl(private val coinDAO: CoinDAO): CoinLocalDataSource
         return coinDAO.getAllCoins()
     }
 
+    override fun getSingleCoinById(id: Int): Flow<CoinModel> {
+        return coinDAO.getSingleCoinById(id)
+    }
+
     override suspend fun deleteCoinFromDB(coin: CoinModel) {
         return coinDAO.deleteCoin(coin)
     }

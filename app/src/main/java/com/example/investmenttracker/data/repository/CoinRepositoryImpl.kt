@@ -28,6 +28,10 @@ class CoinRepositoryImpl(
         return coinLocalDataSource.deleteCoinFromDB(coin)
     }
 
+    override fun getSingleCoinById(id: Int): Flow<CoinModel> {
+        return coinLocalDataSource.getSingleCoinById(id)
+    }
+
     override fun getAllCoinsFromDB(): Flow<List<CoinModel>> {
         return coinLocalDataSource.getAllCoinsFromDB()
     }

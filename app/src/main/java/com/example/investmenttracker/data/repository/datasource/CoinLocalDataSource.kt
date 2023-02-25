@@ -8,5 +8,7 @@ interface CoinLocalDataSource {
 
     fun getAllCoinsFromDB(): Flow<List<CoinModel>>
 
+    fun getSingleCoinById(id: Int): Flow<CoinModel>
+
     suspend fun deleteCoinFromDB(coin: CoinModel)
 }

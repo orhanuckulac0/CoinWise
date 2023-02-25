@@ -14,6 +14,8 @@ interface CoinRepository {
     // functions related to db
     suspend fun insertCoinToDB(coinModel: CoinModel)
     suspend fun deleteCoinFromDB(coin: CoinModel)
+
+    fun getSingleCoinById(id: Int): Flow<CoinModel>
     fun getAllCoinsFromDB(): Flow<List<CoinModel>>
 
 }

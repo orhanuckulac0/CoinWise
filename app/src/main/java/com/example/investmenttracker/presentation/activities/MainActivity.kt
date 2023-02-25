@@ -8,8 +8,10 @@ import android.view.MenuItem
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.investmenttracker.R
+import com.example.investmenttracker.data.model.CoinModel
+import com.example.investmenttracker.data.util.Constants
 import com.example.investmenttracker.databinding.ActivityMainBinding
-import com.example.investmenttracker.presentation.adapter.WalletAdapter
+import com.example.investmenttracker.presentation.adapter.MainActivityAdapter
 import com.example.investmenttracker.presentation.view_model.CoinViewModel
 import com.example.investmenttracker.presentation.view_model.CoinViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     @Inject lateinit var factory: CoinViewModelFactory
     lateinit var viewModel: CoinViewModel
-    private lateinit var walletAdapter: WalletAdapter
+    private lateinit var walletAdapter: MainActivityAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         viewModel = ViewModelProvider(this, factory)[CoinViewModel::class.java]
-        walletAdapter = WalletAdapter(this)
+        walletAdapter = MainActivityAdapter(this)
 
         setupActionBar()
         initRecyclerView()
@@ -46,6 +48,13 @@ class MainActivity : AppCompatActivity() {
         viewModel.getTokensFromWallet().observe(this){
             walletAdapter.differ.submitList(it)
         }
+        walletAdapter.setOnClickListener(object: MainActivityAdapter.OnClickListener {
+            override fun onClick(position: Int, coinModel: CoinModel) {
+                val intent = Intent(this@MainActivity, TokenDetailsActivity::class.java)
+                intent.putExtra(Constants.PASSED_COIN, coinModel)
+                startActivity(intent)
+            }
+        })
     }
 
     private fun setupActionBar(){
