@@ -44,12 +44,12 @@ class FactoryModule {
     @Provides
     fun provideTokenDetailsViewModelFactory(
         app: Application,
-        getSingleCoinByIdUseCase: GetSingleCoinByIdUseCase,
+        updateCoinUseCase: UpdateCoinUseCase,
         deleteCoinUseCase: DeleteCoinUseCase
     ): TokenDetailsViewModelFactory {
         return TokenDetailsViewModelFactory(
             app,
-            getSingleCoinByIdUseCase,
+            updateCoinUseCase,
             deleteCoinUseCase
         )
     }

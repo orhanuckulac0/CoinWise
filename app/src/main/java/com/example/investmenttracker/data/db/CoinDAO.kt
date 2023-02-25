@@ -9,6 +9,12 @@ interface CoinDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCoin(coin: CoinModel)
 
+    @Query(
+        "UPDATE coins SET totalTokenHeldAmount = :totalTokenHeldAmount," +
+                " totalInvestmentAmount = :totalInvestmentAmount" +
+                " WHERE id = :id")
+    suspend fun updateCoin(id: Int, totalTokenHeldAmount: Double ,totalInvestmentAmount: Double)
+
     @Query("SELECT * FROM coins")
     fun getAllCoins(): Flow<List<CoinModel>>
 

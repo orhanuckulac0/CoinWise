@@ -24,6 +24,10 @@ class CoinRepositoryImpl(
         return coinLocalDataSource.insertCoinToDB(coinModel)
     }
 
+    override suspend fun updateCoin(id: Int, totalTokenHeldAmount: Double ,totalInvestmentAmount: Double) {
+        return coinLocalDataSource.updateCoin(id, totalTokenHeldAmount, totalInvestmentAmount)
+    }
+
     override suspend fun deleteCoinFromDB(coin: CoinModel) {
         return coinLocalDataSource.deleteCoinFromDB(coin)
     }

@@ -11,6 +11,10 @@ class CoinLocalDataSourceImpl(private val coinDAO: CoinDAO): CoinLocalDataSource
         return coinDAO.insertCoin(coin)
     }
 
+    override suspend fun updateCoin(id: Int, totalTokenHeldAmount: Double ,totalInvestmentAmount: Double) {
+        return coinDAO.updateCoin(id, totalTokenHeldAmount, totalInvestmentAmount)
+    }
+
     override fun getAllCoinsFromDB(): Flow<List<CoinModel>> {
         return coinDAO.getAllCoins()
     }

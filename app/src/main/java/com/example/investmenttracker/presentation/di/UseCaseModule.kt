@@ -46,4 +46,10 @@ class UseCaseModule {
     fun provideGetSingleCoinById(coinRepository: CoinRepository): GetSingleCoinByIdUseCase {
         return GetSingleCoinByIdUseCase(coinRepository)
     }
+
+    @Singleton
+    @Provides
+    fun provideUpdateCoin(coinRepository: CoinRepository): UpdateCoinUseCase {
+        return UpdateCoinUseCase(coinRepository)
+    }
 }

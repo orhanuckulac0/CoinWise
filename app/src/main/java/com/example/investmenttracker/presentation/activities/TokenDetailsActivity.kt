@@ -1,22 +1,31 @@
 package com.example.investmenttracker.presentation.activities
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.util.Constants
 import com.example.investmenttracker.databinding.ActivityTokenDetailsBinding
+import com.example.investmenttracker.presentation.events.UiEvent
+import com.example.investmenttracker.presentation.events.UiEventActions
 import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModel
 import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModelFactory
+import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class TokenDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTokenDetailsBinding
     lateinit var viewModel: TokenDetailsViewModel
-    @Inject lateinit var factory: TokenDetailsViewModelFactory
+    @Inject
+    lateinit var factory: TokenDetailsViewModelFactory
     private lateinit var currentCoin: CoinModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,10 +33,41 @@ class TokenDetailsActivity : AppCompatActivity() {
         binding = ActivityTokenDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        viewModel = ViewModelProvider(this, factory)[TokenDetailsViewModel::class.java]
+
         currentCoin = intent.getSerializableExtra(Constants.PASSED_COIN) as CoinModel
         setupActionBar()
         setupView()
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.eventFlow.collect {event->
+                when(event) {
+                    is UiEvent.ShowErrorSnackbar -> {
+                        Snackbar.make(binding.root, event.message, Snackbar.LENGTH_LONG).show()
+                    }else -> {}
+                }
+            }
+        }
+
+        binding.tokenDetailUpdateBtn.setOnClickListener {
+            val totalTokenHeld = binding.etTokenHeldAmount.text
+            val totalInvestment = binding.etTokenInvestmentAmount.text
+
+            if (totalTokenHeld.isEmpty()){
+                viewModel.triggerUiEvent(UiEventActions.TOTAL_TOKEN_HELD_EMPTY, UiEventActions.TOTAL_TOKEN_HELD_EMPTY)
+            }else if (totalInvestment.isEmpty()){
+                viewModel.triggerUiEvent(UiEventActions.TOTAL_INVESTMENT_EMPTY, UiEventActions.TOTAL_INVESTMENT_EMPTY)
+            }else{
+                updateTokenDetails(totalTokenHeld.toString().toDouble(), totalInvestment.toString().toDouble())
+            }
+        }
     }
+
+    private fun updateTokenDetails(totalTokenHeld: Double, totalInvestment: Double){
+        viewModel.updateTokenDetails(currentCoin.cmcId, totalTokenHeld, totalInvestment)
+        startActivity(Intent(this, MainActivity::class.java))
+    }
+
 
     private fun setupView(){
         val coinIcon = "https://s2.coinmarketcap.com/static/img/coins/64x64/"+"${currentCoin.cmcId}"+".png"
@@ -68,7 +108,9 @@ class TokenDetailsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.actionDeleteCoin -> {
-                return true
+                // TODO add dialog for this before deleting token
+                viewModel.deleteTokenFromDB(currentCoin)
+                startActivity(Intent(this, MainActivity::class.java))
             }
         }
         return super.onOptionsItemSelected(item)

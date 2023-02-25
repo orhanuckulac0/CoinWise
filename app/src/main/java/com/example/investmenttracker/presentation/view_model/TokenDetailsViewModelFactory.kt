@@ -7,13 +7,13 @@ import com.example.investmenttracker.domain.use_case.*
 
 class TokenDetailsViewModelFactory(
     private val app: Application,
-    private val getSingleCoinByIdUseCase: GetSingleCoinByIdUseCase,
+    private val updateCoinUseCase: UpdateCoinUseCase,
     private val deleteCoinUseCase: DeleteCoinUseCase
 ): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return TokenDetailsViewModel(
             app,
-            getSingleCoinByIdUseCase,
+            updateCoinUseCase,
             deleteCoinUseCase
         ) as T
     }
