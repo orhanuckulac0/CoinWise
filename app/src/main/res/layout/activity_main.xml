@@ -65,56 +65,60 @@
 
     <View
         android:id="@+id/viewDivider"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="2dp"
         android:background="#5c5e5f"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
-        app:layout_constraintVertical_bias="0.298"
-        tools:layout_editor_absoluteX="0dp" />
+        app:layout_constraintVertical_bias="0.298" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/viewDivider"
         android:orientation="vertical"
         android:padding="10dp"
-        >
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/viewDivider">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tokens"
                 android:textColor="#f6f6f6"
-                android:textSize="20sp"
-                />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/tvSortTokensByValue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Sort "
-                android:gravity="end"
-                android:textColor="#5d5e5e"
-                android:textSize="14sp"
                 android:drawableRight="@drawable/sort_vector"
-                />
+                android:gravity="end"
+                android:text="Sort "
+                android:textColor="#5d5e5e"
+                android:textSize="14sp" />
 
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvTokens"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-
-
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTokens"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
