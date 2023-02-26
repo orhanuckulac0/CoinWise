@@ -11,6 +11,8 @@ import com.bumptech.glide.Glide
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.util.formatPrice
+import com.example.investmenttracker.data.util.formatTokenHeldAmount
+import com.example.investmenttracker.data.util.formatTokenTotalValue
 import com.example.investmenttracker.databinding.WalletTokenSingleItemBinding
 
 class MainActivityAdapter(
@@ -63,8 +65,8 @@ class MainActivityAdapter(
 
             binding.tvCoinName.text = coinModel.name
             binding.tvCoinPrice.text = "$${formatPrice(coinModel.price)}"
-            binding.tvTokenHeldAmount.text = coinModel.totalTokenHeldAmount.toString() // dummy text for now
-            binding.tvTokenTotalValue.text = "$${formatPrice(coinModel.price)}"
+            binding.tvTokenHeldAmount.text = formatTokenHeldAmount(coinModel.totalTokenHeldAmount)
+            binding.tvTokenTotalValue.text = "$${formatTokenTotalValue(coinModel.price, coinModel.totalInvestmentAmount)}"
 
             if (coinModel.percentChange24h.toString().contains("-")){
                 binding.tvCoinPriceChangeDaily.setTextColor(context.getColor(R.color.redColorPercentage))

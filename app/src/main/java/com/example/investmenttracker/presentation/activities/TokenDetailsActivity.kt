@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.util.Constants
+import com.example.investmenttracker.data.util.setDecimalInput
 import com.example.investmenttracker.databinding.ActivityTokenDetailsBinding
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.events.UiEventActions
@@ -48,6 +49,10 @@ class TokenDetailsActivity : AppCompatActivity() {
                 }
             }
         }
+
+        // to prevent copy pasting
+        binding.etTokenHeldAmount.setDecimalInput()
+        binding.etTokenInvestmentAmount.setDecimalInput()
 
         binding.tokenDetailUpdateBtn.setOnClickListener {
             val totalTokenHeld = binding.etTokenHeldAmount.text

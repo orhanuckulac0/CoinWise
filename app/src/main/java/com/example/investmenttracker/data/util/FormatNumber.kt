@@ -1,5 +1,7 @@
 package com.example.investmenttracker.data.util
 
+import java.text.DecimalFormat
+
 
 fun formatPrice(number: Double): String {
     return when {
@@ -20,4 +22,20 @@ fun convertScientificNotationToString(number: Double): String {
     } else {
         String.format("%.2f", number)
     }
+}
+
+fun formatTokenHeldAmount(number: Double): String {
+    return if (number < 0 || number.toString().startsWith("0.")) {
+        number.toString()
+    } else {
+        // when user input for token held amount is too much, for example: 2500000000000
+        // room converts it to scientific notation
+        // this will convert it to a double
+        val df = DecimalFormat("#,##0.################")
+        df.format(number)
+    }
+}
+
+fun formatTokenTotalValue(coinPrice: Double, totalInvestment: Double): String {
+    return String.format("%,.2f", coinPrice*totalInvestment)
 }

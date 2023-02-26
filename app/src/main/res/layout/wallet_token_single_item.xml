@@ -82,7 +82,7 @@
                 android:id="@+id/tvTokenHeldAmount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 android:textColor="#d5d6d7"
                 android:gravity="end"
                 tools:text="Coin Name" />
