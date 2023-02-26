@@ -2,8 +2,9 @@ package com.example.investmenttracker.presentation.di
 
 import android.app.Application
 import androidx.room.Room
+import com.example.investmenttracker.data.db.UserDataDAO
 import com.example.investmenttracker.data.db.CoinDAO
-import com.example.investmenttracker.data.db.CoinDatabase
+import com.example.investmenttracker.data.db.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,18 +17,24 @@ class DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideCoinDatabase(app: Application): CoinDatabase{
+    fun provideCoinDatabase(app: Application): AppDatabase{
         return Room.databaseBuilder(
             app,
-            CoinDatabase::class.java,
-            "coins_db")
+            AppDatabase::class.java,
+            "app_db")
             .fallbackToDestructiveMigration()
             .build()
     }
     @Singleton
     @Provides
-    fun provideCoinDAO(coinDatabase: CoinDatabase): CoinDAO{
-        return coinDatabase.getCoinDAO()
+    fun provideCoinDAO(appDatabase: AppDatabase): CoinDAO{
+        return appDatabase.getCoinDAO()
+    }
+
+    @Singleton
+    @Provides
+    fun provideUserDataDAO(appDatabase: AppDatabase): UserDataDAO {
+        return appDatabase.getUserDataDAO()
     }
 
 }
