@@ -2,6 +2,7 @@ package com.example.investmenttracker.presentation.di
 
 import android.app.Application
 import com.example.investmenttracker.domain.use_case.*
+import com.example.investmenttracker.domain.use_case.coin.*
 import com.example.investmenttracker.presentation.view_model.CoinViewModelFactory
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModelFactory
 import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModelFactory

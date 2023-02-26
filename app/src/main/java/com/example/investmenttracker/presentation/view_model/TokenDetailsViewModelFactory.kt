@@ -3,7 +3,8 @@ package com.example.investmenttracker.presentation.view_model
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.investmenttracker.domain.use_case.*
+import com.example.investmenttracker.domain.use_case.coin.DeleteCoinUseCase
+import com.example.investmenttracker.domain.use_case.coin.UpdateCoinUseCase
 
 class TokenDetailsViewModelFactory(
     private val app: Application,

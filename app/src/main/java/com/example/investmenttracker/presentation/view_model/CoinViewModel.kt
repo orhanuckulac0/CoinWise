@@ -6,8 +6,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.liveData
-import com.example.investmenttracker.domain.use_case.GetAllCoinsUseCase
-import kotlinx.coroutines.flow.collect
+import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
 
 class CoinViewModel(
     private val app:Application,

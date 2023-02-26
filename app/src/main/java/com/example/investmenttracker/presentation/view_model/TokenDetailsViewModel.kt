@@ -7,8 +7,8 @@ import android.net.NetworkCapabilities
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.investmenttracker.data.model.CoinModel
-import com.example.investmenttracker.domain.use_case.DeleteCoinUseCase
-import com.example.investmenttracker.domain.use_case.UpdateCoinUseCase
+import com.example.investmenttracker.domain.use_case.coin.DeleteCoinUseCase
+import com.example.investmenttracker.domain.use_case.coin.UpdateCoinUseCase
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.events.UiEventActions
 import kotlinx.coroutines.Dispatchers

@@ -3,9 +3,9 @@ package com.example.investmenttracker.presentation.view_model
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.investmenttracker.domain.use_case.GetCoinBySlugUseCase
-import com.example.investmenttracker.domain.use_case.GetCoinBySymbolUseCase
-import com.example.investmenttracker.domain.use_case.SaveCoinUseCase
+import com.example.investmenttracker.domain.use_case.coin.GetCoinBySlugUseCase
+import com.example.investmenttracker.domain.use_case.coin.GetCoinBySymbolUseCase
+import com.example.investmenttracker.domain.use_case.coin.SaveCoinUseCase
 
 class SearchCoinViewModelFactory(
     private val app: Application,

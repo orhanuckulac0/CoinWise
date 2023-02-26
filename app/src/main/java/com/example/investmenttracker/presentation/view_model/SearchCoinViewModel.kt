@@ -4,13 +4,15 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.util.Resource
 import com.example.investmenttracker.domain.use_case.*
+import com.example.investmenttracker.domain.use_case.coin.GetCoinBySlugUseCase
+import com.example.investmenttracker.domain.use_case.coin.GetCoinBySymbolUseCase
+import com.example.investmenttracker.domain.use_case.coin.SaveCoinUseCase
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.events.UiEventActions
 import com.google.gson.JsonObject
