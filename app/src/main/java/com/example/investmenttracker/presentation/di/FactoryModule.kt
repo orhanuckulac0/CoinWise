@@ -3,6 +3,8 @@ package com.example.investmenttracker.presentation.di
 import android.app.Application
 import com.example.investmenttracker.domain.use_case.*
 import com.example.investmenttracker.domain.use_case.coin.*
+import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
+import com.example.investmenttracker.domain.use_case.user.InsertUserDataUseCase
 import com.example.investmenttracker.presentation.view_model.CoinViewModelFactory
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModelFactory
 import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModelFactory
@@ -20,9 +22,16 @@ class FactoryModule {
     @Provides
     fun provideCoinViewModelFactory(
         app: Application,
-        getAllCoinsUseCase: GetAllCoinsUseCase
+        getAllCoinsUseCase: GetAllCoinsUseCase,
+        insertUserDataUseCase: InsertUserDataUseCase,
+        getUserDataUseCase: GetUserDataUseCase
     ): CoinViewModelFactory {
-        return CoinViewModelFactory(app, getAllCoinsUseCase)
+        return CoinViewModelFactory(
+            app,
+            getAllCoinsUseCase,
+            insertUserDataUseCase,
+            getUserDataUseCase
+        )
     }
 
     @Singleton

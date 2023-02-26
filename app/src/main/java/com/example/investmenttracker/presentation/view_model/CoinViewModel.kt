@@ -7,10 +7,14 @@ import android.net.NetworkCapabilities
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.liveData
 import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
+import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
+import com.example.investmenttracker.domain.use_case.user.InsertUserDataUseCase
 
 class CoinViewModel(
     private val app:Application,
-    private val getAllCoinsUseCase: GetAllCoinsUseCase
+    private val getAllCoinsUseCase: GetAllCoinsUseCase,
+    private val insertUserDataUseCase: InsertUserDataUseCase,
+    private val getUserDataUseCase: GetUserDataUseCase
 ): AndroidViewModel(app) {
 
     @Suppress("DEPRECATION")

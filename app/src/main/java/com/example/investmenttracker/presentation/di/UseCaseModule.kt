@@ -1,8 +1,12 @@
 package com.example.investmenttracker.presentation.di
 
 import com.example.investmenttracker.domain.repository.CoinRepository
+import com.example.investmenttracker.domain.repository.UserDataRepository
 import com.example.investmenttracker.domain.use_case.*
 import com.example.investmenttracker.domain.use_case.coin.*
+import com.example.investmenttracker.domain.use_case.user.DeleteUserDataUseCase
+import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
+import com.example.investmenttracker.domain.use_case.user.InsertUserDataUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -57,5 +61,20 @@ class UseCaseModule {
     }
 
     // User Related UseCases
+    @Singleton
+    @Provides
+    fun provideInsertUserData(userDataRepository: UserDataRepository): InsertUserDataUseCase {
+        return InsertUserDataUseCase(userDataRepository)
+    }
+    @Singleton
+    @Provides
+    fun provideDeleteUserData(userDataRepository: UserDataRepository): DeleteUserDataUseCase {
+        return DeleteUserDataUseCase(userDataRepository)
+    }
+    @Singleton
+    @Provides
+    fun provideGetUserData(userDataRepository: UserDataRepository): GetUserDataUseCase {
+        return GetUserDataUseCase(userDataRepository)
+    }
 
 }
