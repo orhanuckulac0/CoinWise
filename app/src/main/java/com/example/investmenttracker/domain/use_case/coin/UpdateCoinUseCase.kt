@@ -7,7 +7,8 @@ class UpdateCoinUseCase(private val coinsRepository: CoinRepository) {
     suspend fun execute(
         id: Int,
         totalTokenHeldAmount: Double,
-        totalInvestmentAmount: Double
-    ) = coinsRepository.updateCoin(id, totalTokenHeldAmount, totalInvestmentAmount)
+        totalInvestmentAmount: Double,
+        totalInvestmentWorth: Double
+    ) = coinsRepository.updateCoin(id, totalTokenHeldAmount, totalInvestmentAmount, totalInvestmentWorth)
 
 }

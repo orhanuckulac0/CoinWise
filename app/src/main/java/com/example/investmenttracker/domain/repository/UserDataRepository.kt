@@ -6,8 +6,9 @@ import kotlinx.coroutines.flow.Flow
 interface UserDataRepository {
 
     suspend fun insertData(data: UserData)
+    suspend fun updateData(data: UserData)
 
-    fun getAllData(): Flow<List<UserData>>
+    fun getData(id: Int): Flow<UserData>
 
     suspend fun deleteData(data: UserData)
 

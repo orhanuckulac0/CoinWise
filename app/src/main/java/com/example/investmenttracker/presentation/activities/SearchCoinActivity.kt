@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.util.Resource
+import com.example.investmenttracker.data.util.formatPrice
 import com.example.investmenttracker.databinding.ActivitySearchCoinBinding
 import com.example.investmenttracker.presentation.adapter.SearchCoinAdapter
 import com.example.investmenttracker.presentation.events.UiEvent
@@ -108,12 +109,11 @@ class SearchCoinActivity : AppCompatActivity() {
                         percentChange7d = usdObject.get("percent_change_7d").toString().toDouble(),
                         percentChange30d = usdObject.get("percent_change_30d").toString().toDouble(),
                         totalTokenHeldAmount = 0.toDouble(),
-                        totalInvestmentAmount = 0.toDouble()
+                        totalInvestmentAmount = 0.toDouble(),
+                        totalInvestmentWorth = 0.toDouble()
                     )
 
-                    if (coin != null){
-                        responseList.add(coin!!)
-                    }
+                    responseList.add(coin!!)
 
                     setupView(responseList)
                     result.data?.asMap()?.clear()
@@ -155,6 +155,7 @@ class SearchCoinActivity : AppCompatActivity() {
                     val regex = Regex("[^A-Za-z0-9 ]")
 
                     val response = result.data?.getAsJsonObject("data")?.get(searchInput)?.asJsonArray
+                    println(response)
 
                     if (response != null){
                         for (c in response.asJsonArray){
@@ -171,7 +172,8 @@ class SearchCoinActivity : AppCompatActivity() {
                                 percentChange7d = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_7d").toString().toDouble(),
                                 percentChange30d = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_30d").toString().toDouble(),
                                 totalTokenHeldAmount = 0.toDouble(),
-                                totalInvestmentAmount = 0.toDouble()
+                                totalInvestmentAmount = 0.toDouble(),
+                                totalInvestmentWorth =0.toDouble()
                             )
                             responseList.add(coin!!)
                         }
@@ -230,7 +232,24 @@ class SearchCoinActivity : AppCompatActivity() {
             adapter.setOnClickListener(object: SearchCoinAdapter.OnClickListener {
                 override fun onClick(position: Int, coinModel: CoinModel) {
                     // save coin to db
-                    viewModel.saveCoinToDB(coinModel)
+                    viewModel.saveCoinToDB(
+                        CoinModel(
+                            id = coinModel.cmcId,
+                            cmcId = coinModel.cmcId,
+                            name = coinModel.name,
+                            slug = coinModel.slug,
+                            symbol = coinModel.symbol,
+                            price = formatPrice(coinModel.price).toDouble(),
+                            marketCap = formatPrice(coinModel.marketCap).toDouble(),
+                            percentChange1h = coinModel.percentChange1h,
+                            percentChange24h = coinModel.percentChange24h,
+                            percentChange7d = coinModel.percentChange7d,
+                            percentChange30d = coinModel.percentChange30d,
+                            0.0,
+                            0.0,
+                            0.0
+                        )
+                    )
                     coinList.removeAt(position)
                     adapter.notifyDataSetChanged()
 

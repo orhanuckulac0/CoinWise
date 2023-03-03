@@ -42,10 +42,10 @@ class TokenDetailsViewModel(
         return result
     }
 
-    fun updateTokenDetails(id: Int, totalTokenHeldAmount: Double, totalInvestmentAmount: Double){
+    fun updateTokenDetails(id: Int, totalTokenHeldAmount: Double, totalInvestmentAmount: Double, totalInvestmentWorth: Double){
         if (isNetworkAvailable(app)){
             viewModelScope.launch {
-                updateCoinUseCase.execute(id, totalTokenHeldAmount, totalInvestmentAmount)
+                updateCoinUseCase.execute(id, totalTokenHeldAmount, totalInvestmentAmount, totalInvestmentWorth)
             }
         }else{
             triggerUiEvent(UiEventActions.NO_INTERNET_CONNECTION, UiEventActions.NO_INTERNET_CONNECTION)

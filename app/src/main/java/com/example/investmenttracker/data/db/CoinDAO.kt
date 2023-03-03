@@ -10,10 +10,12 @@ interface CoinDAO {
     suspend fun insertCoin(coin: CoinModel)
 
     @Query(
-        "UPDATE coins SET totalTokenHeldAmount = :totalTokenHeldAmount," +
-                " totalInvestmentAmount = :totalInvestmentAmount" +
+        "UPDATE coins SET" +
+                " totalTokenHeldAmount = :totalTokenHeldAmount," +
+                " totalInvestmentAmount = :totalInvestmentAmount," +
+                " totalInvestmentWorth = :totalInvestmentWorth" +
                 " WHERE id = :id")
-    suspend fun updateCoin(id: Int, totalTokenHeldAmount: Double ,totalInvestmentAmount: Double)
+    suspend fun updateCoin(id: Int, totalTokenHeldAmount: Double ,totalInvestmentAmount: Double, totalInvestmentWorth: Double)
 
     @Query("SELECT * FROM coins")
     fun getAllCoins(): Flow<List<CoinModel>>

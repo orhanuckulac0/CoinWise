@@ -7,7 +7,9 @@ interface UserDataLocalDataSource {
 
     suspend fun insertData(data: UserData)
 
-    fun getAllData(): Flow<List<UserData>>
+    suspend fun updateData(data: UserData)
+
+    fun getData(id: Int): Flow<UserData>
 
     suspend fun deleteData(data: UserData)
 

@@ -18,5 +18,6 @@ data class CoinModel(
     val percentChange7d: Double,
     val percentChange30d: Double,
     val totalTokenHeldAmount: Double,
-    val totalInvestmentAmount: Double
+    val totalInvestmentAmount: Double,
+    val totalInvestmentWorth: Double
 ): java.io.Serializable

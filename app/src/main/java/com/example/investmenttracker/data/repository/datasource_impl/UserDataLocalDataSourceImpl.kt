@@ -10,8 +10,12 @@ class UserDataLocalDataSourceImpl(private val userDataDAO: UserDataDAO): UserDat
         return userDataDAO.insertData(data)
     }
 
-    override fun getAllData(): Flow<List<UserData>> {
-        return userDataDAO.getAllData()
+    override suspend fun updateData(data: UserData) {
+        return userDataDAO.updateData(data)
+    }
+
+    override fun getData(id: Int): Flow<UserData> {
+        return userDataDAO.getData(id)
     }
 
     override suspend fun deleteData(data: UserData) {

@@ -10,8 +10,12 @@ class UserDataRepositoryImpl(private val userDataLocalDataSource: UserDataLocalD
         return userDataLocalDataSource.insertData(data)
     }
 
-    override fun getAllData(): Flow<List<UserData>> {
-        return userDataLocalDataSource.getAllData()
+    override suspend fun updateData(data: UserData) {
+        return userDataLocalDataSource.updateData(data)
+    }
+
+    override fun getData(id: Int): Flow<UserData> {
+        return userDataLocalDataSource.getData(id)
     }
 
     override suspend fun deleteData(data: UserData) {

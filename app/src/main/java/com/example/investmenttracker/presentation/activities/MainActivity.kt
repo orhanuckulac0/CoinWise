@@ -9,7 +9,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
-import com.example.investmenttracker.data.util.Constants
+import com.example.investmenttracker.data.model.UserData
+import com.example.investmenttracker.data.util.*
 import com.example.investmenttracker.databinding.ActivityMainBinding
 import com.example.investmenttracker.presentation.adapter.MainActivityAdapter
 import com.example.investmenttracker.presentation.view_model.CoinViewModel
@@ -24,27 +25,31 @@ class MainActivity : AppCompatActivity() {
     lateinit var viewModel: CoinViewModel
     private lateinit var walletAdapter: MainActivityAdapter
 
+    var totalInvestment: Double = 0.0
+    var userTotalBalanceWorth: Double = 0.0
+    var totalInvestmentWorth: Double = 0.0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         viewModel = ViewModelProvider(this, factory)[CoinViewModel::class.java]
         walletAdapter = MainActivityAdapter(this)
 
         setupActionBar()
-        initRecyclerView()
         setupView()
+        updateUserData()
     }
 
-    private fun initRecyclerView(){
+
+    private fun setupView(){
         binding.rvTokens.apply {
             adapter = walletAdapter
             layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.VERTICAL, false)
         }
-    }
 
-    private fun setupView(){
         viewModel.getTokensFromWallet().observe(this){
             walletAdapter.differ.submitList(it)
         }
@@ -55,6 +60,44 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         })
+    }
+
+    private fun updateUserData(){
+        viewModel.getTokensFromWallet().observe(this){coinsList->
+            if (!coinsList.isNullOrEmpty()) {
+                for (coin in coinsList){
+                    totalInvestment += coin.totalInvestmentAmount
+                    totalInvestmentWorth += coin.price*coin.totalTokenHeldAmount
+                }
+                userTotalBalanceWorth = formatTotalBalanceValue(totalInvestmentWorth).toDouble()
+                viewModel.getUserData(1).observe(this) {
+                    it.userTotalLoss = 0.0 // dummy for now
+                    it.userTotalInvestment = totalInvestment
+                    it.userTotalBalanceWorth = String.format("%.2f",userTotalBalanceWorth).toDouble()
+                    it.userTotalCoinInvestedQuantity = coinsList.size
+
+                    binding.tvTotalBalance.text = String.format("%,.2f", userTotalBalanceWorth)
+
+                    viewModel.userData = it
+                    viewModel.updateUserdata()
+                }
+            }else{
+                // dummy data for new users opening the app for the first time
+                viewModel.insertUserData(
+                    UserData(
+                        1,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0
+                    )
+                )
+            }
+        }
     }
 
     private fun setupActionBar(){

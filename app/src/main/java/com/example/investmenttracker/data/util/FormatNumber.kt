@@ -4,10 +4,7 @@ import java.text.DecimalFormat
 
 
 fun formatPrice(number: Double): String {
-    return when {
-        number % 1 == 0.0 -> number.toInt().toString()
-        else -> convertScientificNotationToString(number)
-    }
+    return convertScientificNotationToString(number)
 }
 
 fun convertScientificNotationToString(number: Double): String {
@@ -20,10 +17,18 @@ fun convertScientificNotationToString(number: Double): String {
         val coeffWithDecimal = "0." + "0".repeat(exp - 1) + coeffStr
         String.format("%.10f", coeffWithDecimal.toDouble())
     } else {
-        String.format("%.2f", number)
+        val decimalPlaces = if (numberStr.contains(".")) {
+            numberStr.split(".")[1].length
+        } else {
+            0
+        }
+        if (decimalPlaces > 4) {
+            String.format("%.5f", number)
+        } else {
+            String.format("%.${decimalPlaces}f", number)
+        }
     }
 }
-
 fun formatTokenHeldAmount(number: Double): String {
     return if (number < 0 || number.toString().startsWith("0.")) {
         number.toString()
@@ -38,4 +43,8 @@ fun formatTokenHeldAmount(number: Double): String {
 
 fun formatTokenTotalValue(coinPrice: Double, totalInvestment: Double): String {
     return String.format("%,.2f", coinPrice*totalInvestment)
+}
+
+fun formatTotalBalanceValue(totalInvestment: Double): String {
+    return String.format("%.2f", totalInvestment)
 }

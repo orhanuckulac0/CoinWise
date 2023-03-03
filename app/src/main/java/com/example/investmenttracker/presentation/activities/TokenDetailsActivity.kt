@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.util.Constants
+import com.example.investmenttracker.data.util.formatTokenTotalValue
 import com.example.investmenttracker.data.util.setDecimalInput
 import com.example.investmenttracker.databinding.ActivityTokenDetailsBinding
 import com.example.investmenttracker.presentation.events.UiEvent
@@ -55,21 +56,22 @@ class TokenDetailsActivity : AppCompatActivity() {
         binding.etTokenInvestmentAmount.setDecimalInput()
 
         binding.tokenDetailUpdateBtn.setOnClickListener {
-            val totalTokenHeld = binding.etTokenHeldAmount.text
-            val totalInvestment = binding.etTokenInvestmentAmount.text
+            val totalTokenHeld = binding.etTokenHeldAmount.text.toString()
+            val totalInvestment = binding.etTokenInvestmentAmount.text.toString()
+            val totalInvestmentWorth = formatTokenTotalValue(currentCoin.price, totalTokenHeld.toDouble()).replace(",", "").toDouble()
 
             if (totalTokenHeld.isEmpty()){
                 viewModel.triggerUiEvent(UiEventActions.TOTAL_TOKEN_HELD_EMPTY, UiEventActions.TOTAL_TOKEN_HELD_EMPTY)
             }else if (totalInvestment.isEmpty()){
                 viewModel.triggerUiEvent(UiEventActions.TOTAL_INVESTMENT_EMPTY, UiEventActions.TOTAL_INVESTMENT_EMPTY)
             }else{
-                updateTokenDetails(totalTokenHeld.toString().toDouble(), totalInvestment.toString().toDouble())
+                updateTokenDetails(totalTokenHeld.toDouble(), totalInvestment.toDouble(), totalInvestmentWorth)
             }
         }
     }
 
-    private fun updateTokenDetails(totalTokenHeld: Double, totalInvestment: Double){
-        viewModel.updateTokenDetails(currentCoin.cmcId, totalTokenHeld, totalInvestment)
+    private fun updateTokenDetails(totalTokenHeld: Double, totalInvestment: Double, totalInvestmentWorth: Double){
+        viewModel.updateTokenDetails(currentCoin.cmcId, totalTokenHeld, totalInvestment, totalInvestmentWorth)
         startActivity(Intent(this, MainActivity::class.java))
     }
 

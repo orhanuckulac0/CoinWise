@@ -66,7 +66,7 @@ class MainActivityAdapter(
             binding.tvCoinName.text = coinModel.name
             binding.tvCoinPrice.text = "$${formatPrice(coinModel.price)}"
             binding.tvTokenHeldAmount.text = formatTokenHeldAmount(coinModel.totalTokenHeldAmount)
-            binding.tvTokenTotalValue.text = "$${formatTokenTotalValue(coinModel.price, coinModel.totalInvestmentAmount)}"
+            binding.tvTokenTotalValue.text = "$${formatTokenTotalValue(coinModel.price, coinModel.totalTokenHeldAmount)}"
 
             if (coinModel.percentChange24h.toString().contains("-")){
                 binding.tvCoinPriceChangeDaily.setTextColor(context.getColor(R.color.redColorPercentage))

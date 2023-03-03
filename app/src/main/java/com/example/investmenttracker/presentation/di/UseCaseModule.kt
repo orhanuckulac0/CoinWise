@@ -7,6 +7,7 @@ import com.example.investmenttracker.domain.use_case.coin.*
 import com.example.investmenttracker.domain.use_case.user.DeleteUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.InsertUserDataUseCase
+import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -75,6 +76,12 @@ class UseCaseModule {
     @Provides
     fun provideGetUserData(userDataRepository: UserDataRepository): GetUserDataUseCase {
         return GetUserDataUseCase(userDataRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideUpdateUserdata(userDataRepository: UserDataRepository): UpdateUserDataUseCase {
+        return UpdateUserDataUseCase(userDataRepository)
     }
 
 }

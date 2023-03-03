@@ -7,12 +7,12 @@ import androidx.room.PrimaryKey
 data class UserData(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
-    val userTotalInvestment: Double,
-    val userTotalBalanceWorth: Double,
-    val userTotalProfit: Double,
-    val userTotalLoss: Double,
-    val userBalanceDailyChange: Double,
-    val userBalanceWeeklyChange: Double,
-    val userBalanceMonthlyChange: Double,
-    val userTotalCoinInvestedQuantity: Int
+    var userTotalInvestment: Double,
+    var userTotalBalanceWorth: Double,
+    var userTotalProfit: Double,
+    var userTotalLoss: Double,
+    var userBalanceDailyChange: Double,
+    var userBalanceWeeklyChange: Double,
+    var userBalanceMonthlyChange: Double,
+    var userTotalCoinInvestedQuantity: Int
 ): java.io.Serializable
