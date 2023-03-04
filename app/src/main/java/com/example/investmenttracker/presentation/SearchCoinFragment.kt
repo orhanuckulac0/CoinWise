@@ -1,21 +1,25 @@
-package com.example.investmenttracker.presentation.activities
+package com.example.investmenttracker.presentation
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.util.Resource
 import com.example.investmenttracker.data.util.formatPrice
-import com.example.investmenttracker.databinding.ActivitySearchCoinBinding
+import com.example.investmenttracker.databinding.FragmentSearchCoinBinding
 import com.example.investmenttracker.presentation.adapter.SearchCoinAdapter
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.events.UiEventActions
@@ -26,28 +30,54 @@ import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONObject
 import javax.inject.Inject
 
-
 @AndroidEntryPoint
-class SearchCoinActivity : AppCompatActivity() {
-    private var binding: ActivitySearchCoinBinding? = null
-    lateinit var viewModel: SearchCoinViewModel
-    @Inject lateinit var factory: SearchCoinViewModelFactory
-    private lateinit var adapter: SearchCoinAdapter
+class SearchCoinFragment : Fragment() {
+
+    private var binding: FragmentSearchCoinBinding? = null
+    @Inject
+    lateinit var factory: SearchCoinViewModelFactory
+    private lateinit var viewModel: SearchCoinViewModel
+    private var adapter: SearchCoinAdapter? = null
 
     private var dividerCreated: Boolean = false
 
     private var mProgressDialog: Dialog? = null
     private var coin: CoinModel? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search_coin)
 
-        binding = ActivitySearchCoinBinding.inflate(layoutInflater)
-        setContentView(binding?.root)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_search_coin, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentSearchCoinBinding.bind(view)
+
         setupActionBar()
 
         viewModel = ViewModelProvider(this, factory)[SearchCoinViewModel::class.java]
+        adapter = SearchCoinAdapter(requireContext())
+        val menuHost: MenuHost = requireActivity()
+
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                // Add menu items here
+                menuInflater.inflate(R.menu.menu_information, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when(menuItem.itemId) {
+                    R.id.actionAddCoinInformation -> {
+                        return false
+                    }
+                }
+                return true
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         lifecycleScope.launchWhenStarted {
             viewModel.eventFlow.collect {event->
@@ -71,14 +101,20 @@ class SearchCoinActivity : AppCompatActivity() {
             getCoinBySymbol()
         }
 
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                findNavController().navigate(R.id.action_searchCoinFragment_to_mainFragment)
+            }
+        })
     }
+
     // search coins by slug, bitcoin - ethereum
     // returns jsonObject, only 1 coin
     private fun getCoinBySlug() {
         val searchInput = viewModel.coinSearchInputText.value.toString()
         viewModel.getSearchedCoinBySlug(searchInput)
 
-        viewModel.coinSearchedBySlug.observe(this){ result ->
+        viewModel.coinSearchedBySlug.observe(viewLifecycleOwner){ result ->
             cancelProgressDialog()
             val responseList = arrayListOf<CoinModel>()
 
@@ -145,7 +181,7 @@ class SearchCoinActivity : AppCompatActivity() {
         val searchInput = viewModel.coinSearchInputText.value.toString()
         viewModel.getSearchCoinBySymbol(searchInput)
 
-        viewModel.coinSearchedBySymbol.observe(this){ result ->
+        viewModel.coinSearchedBySymbol.observe(requireActivity()){ result ->
             cancelProgressDialog()
             val responseList = arrayListOf<CoinModel>()
 
@@ -201,26 +237,12 @@ class SearchCoinActivity : AppCompatActivity() {
         cancelProgressDialog()
     }
 
-
-    private fun setupActionBar(){
-        setSupportActionBar(binding?.toolbarSearchCoinActivity)
-        val actionBar = supportActionBar
-        if (actionBar != null){
-            actionBar.title = "Add Coin"
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.setHomeAsUpIndicator(R.drawable.back_arrow_white)
-            binding!!.toolbarSearchCoinActivity.setNavigationOnClickListener {
-                onBackPressedDispatcher.onBackPressed()
-            }
-        }
-    }
-
     private fun setupView(coinList: ArrayList<CoinModel>) {
         if (coinList.isNotEmpty()){
-            adapter = SearchCoinAdapter(this)
-            adapter.differ.submitList(coinList)
+            adapter = SearchCoinAdapter(requireContext())
+            adapter?.differ?.submitList(coinList)
 
-            val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             val rvCoinSearchResults = binding!!.rvCoinSearchResults
 
             binding!!.tvNoResults.visibility = View.GONE
@@ -229,7 +251,7 @@ class SearchCoinActivity : AppCompatActivity() {
             rvCoinSearchResults.adapter = adapter
             rvCoinSearchResults.setHasFixedSize(true)
 
-            adapter.setOnClickListener(object: SearchCoinAdapter.OnClickListener {
+            adapter?.setOnClickListener(object: SearchCoinAdapter.OnClickListener {
                 override fun onClick(position: Int, coinModel: CoinModel) {
                     // save coin to db
                     viewModel.saveCoinToDB(
@@ -251,7 +273,7 @@ class SearchCoinActivity : AppCompatActivity() {
                         )
                     )
                     coinList.removeAt(position)
-                    adapter.notifyDataSetChanged()
+                    adapter?.notifyDataSetChanged()
 
                     // refresh UI
                     binding!!.etSearchCoin.setText("")
@@ -264,8 +286,8 @@ class SearchCoinActivity : AppCompatActivity() {
                 }
             })
             if (!dividerCreated && coinList.size > 1){
-                val decorator = DividerItemDecoration(applicationContext, LinearLayoutManager.VERTICAL)
-                decorator.setDrawable(ContextCompat.getDrawable(applicationContext, R.drawable.line_divider)!!)
+                val decorator = DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
+                decorator.setDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.line_divider)!!)
                 rvCoinSearchResults.addItemDecoration(decorator)
                 dividerCreated = true
             }
@@ -276,8 +298,21 @@ class SearchCoinActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupActionBar() {
+        (requireActivity() as AppCompatActivity).setSupportActionBar(binding!!.toolbarSearchCoinActivity)
+        val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
+        if (actionBar != null){
+            actionBar.title = "Add Coin"
+            actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_white)
+            binding!!.toolbarSearchCoinActivity.setNavigationOnClickListener {
+                findNavController().navigate(R.id.action_searchCoinFragment_to_mainFragment)
+            }
+        }
+    }
+
     private fun showProgressDialog(){
-        mProgressDialog = Dialog(this)
+        mProgressDialog = Dialog(requireContext())
         mProgressDialog?.setContentView(R.layout.progress_bar)
         mProgressDialog?.show()
     }
@@ -286,28 +321,35 @@ class SearchCoinActivity : AppCompatActivity() {
         mProgressDialog?.dismiss()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_information, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        return super.onPrepareOptionsMenu(menu)
-    }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.actionAddCoinInformation -> {
-                // TODO create dialog for information on how to search coins properly
-                return true
-            }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (binding != null){
+            binding = null
         }
-        return super.onOptionsItemSelected(item)
+        if (adapter != null){
+            adapter = null
+        }
+        if (coin != null){
+            coin = null
+        }
+        if (mProgressDialog != null){
+            mProgressDialog = null
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         if (binding != null){
             binding = null
+        }
+        if (adapter != null){
+            adapter = null
+        }
+        if (coin != null){
+            coin = null
+        }
+        if (mProgressDialog != null){
+            mProgressDialog = null
         }
     }
 }

@@ -15,9 +15,9 @@ import com.example.investmenttracker.data.util.formatTokenHeldAmount
 import com.example.investmenttracker.data.util.formatTokenTotalValue
 import com.example.investmenttracker.databinding.WalletTokenSingleItemBinding
 
-class MainActivityAdapter(
+class MainFragmentAdapter(
     private val context: Context,
-    ): RecyclerView.Adapter<MainActivityAdapter.WalletViewHolder>() {
+    ): RecyclerView.Adapter<MainFragmentAdapter.WalletViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
 

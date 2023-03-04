@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.investmenttracker.presentation.MainFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_main" >
+        <action
+            android:id="@+id/action_mainFragment_to_searchCoinFragment"
+            app:destination="@id/searchCoinFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_tokenDetailsFragment"
+            app:destination="@id/tokenDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/searchCoinFragment"
+        android:name="com.example.investmenttracker.presentation.SearchCoinFragment"
+        android:label="fragment_search_coin"
+        tools:layout="@layout/fragment_search_coin" >
+        <action
+            android:id="@+id/action_searchCoinFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/tokenDetailsFragment"
+        android:name="com.example.investmenttracker.presentation.TokenDetailsFragment"
+        android:label="fragment_token_details"
+        tools:layout="@layout/fragment_token_details" >
+        <argument
+            android:name="current_coin"
+            app:argType="com.example.investmenttracker.data.model.CoinModel" />
+        <action
+            android:id="@+id/action_tokenDetailsFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+</navigation>

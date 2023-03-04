@@ -28,7 +28,7 @@
             app:civ_border_width="0.5dp" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
@@ -38,8 +38,8 @@
                 android:id="@+id/tvCoinName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
                 android:textColor="#f2f2f2"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 tools:text="Coin Name" />
 
@@ -60,9 +60,9 @@
                     android:id="@+id/tvCoinPriceChangeDaily"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
                     android:textColor="#008759"
                     android:textSize="14sp"
-                    android:layout_marginStart="10dp"
                     tools:text="+3.97" />
 
             </LinearLayout>
@@ -85,7 +85,7 @@
                 android:textSize="14sp"
                 android:textColor="#d5d6d7"
                 android:gravity="end"
-                tools:text="Coin Name" />
+                tools:text="Coin Held Amount" />
 
             <TextView
                 android:id="@+id/tvTokenTotalValue"

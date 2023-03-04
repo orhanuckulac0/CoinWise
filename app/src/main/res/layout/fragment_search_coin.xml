@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/mainColor"
-    tools:context=".presentation.activities.SearchCoinActivity">
+    tools:context=".presentation.SearchCoinFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -41,6 +41,7 @@
             android:autofillHints="Search a coin"
             android:background="@drawable/rounded_edittext"
             android:inputType="textPersonName"
+            android:hint="Search"
             />
 
         <com.google.android.material.textfield.TextInputLayout

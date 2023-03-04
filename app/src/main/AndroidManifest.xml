@@ -22,7 +22,7 @@
             android:name=".presentation.activities.SearchCoinActivity"
             android:exported="false" />
         <activity
-            android:name=".presentation.activities.MainActivity"
+            android:name=".presentation.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

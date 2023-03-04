@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/mainColor"
     android:orientation="vertical"
-    tools:context=".presentation.activities.TokenDetailsActivity">
+    tools:context=".presentation.TokenDetailsFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -92,7 +92,7 @@
                 android:ems="10"
                 android:background="@drawable/rounded_edittext_token_details"
                 android:inputType="numberDecimal"
-                 />
+                />
 
         </LinearLayout>
 
