@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class TokenDetailsActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityTokenDetailsBinding
+    private var binding: ActivityTokenDetailsBinding? = null
     private lateinit var viewModel: TokenDetailsViewModel
     @Inject
     lateinit var factory: TokenDetailsViewModelFactory
@@ -32,7 +32,7 @@ class TokenDetailsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTokenDetailsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(binding!!.root)
 
         viewModel = ViewModelProvider(this, factory)[TokenDetailsViewModel::class.java]
 
@@ -44,19 +44,19 @@ class TokenDetailsActivity : AppCompatActivity() {
             viewModel.eventFlow.collect {event->
                 when(event) {
                     is UiEvent.ShowErrorSnackbar -> {
-                        Snackbar.make(binding.root, event.message, Snackbar.LENGTH_LONG).show()
+                        Snackbar.make(binding!!.root, event.message, Snackbar.LENGTH_LONG).show()
                     }else -> {}
                 }
             }
         }
 
         // to prevent copy pasting
-        binding.etTokenHeldAmount.setDecimalInput()
-        binding.etTokenInvestmentAmount.setDecimalInput()
+        binding!!.etTokenHeldAmount.setDecimalInput()
+        binding!!.etTokenInvestmentAmount.setDecimalInput()
 
-        binding.tokenDetailUpdateBtn.setOnClickListener {
-            val totalTokenHeld = binding.etTokenHeldAmount.text.toString()
-            val totalInvestment = binding.etTokenInvestmentAmount.text.toString()
+        binding!!.tokenDetailUpdateBtn.setOnClickListener {
+            val totalTokenHeld = binding!!.etTokenHeldAmount.text.toString()
+            val totalInvestment = binding!!.etTokenInvestmentAmount.text.toString()
 
             if (viewModel.checkEmptyInput(totalTokenHeld, totalInvestment)){
                 val totalInvestmentWorth = formatTokenTotalValue(currentCoin.price, totalTokenHeld.toDouble()).replace(",", "").toDouble()
@@ -69,7 +69,7 @@ class TokenDetailsActivity : AppCompatActivity() {
     private fun setupView(){
         val coinIcon = "https://s2.coinmarketcap.com/static/img/coins/64x64/"+"${currentCoin.cmcId}"+".png"
 
-        binding.tvCoinName.text = currentCoin.name
+        binding!!.tvCoinName.text = currentCoin.name
 
         Glide
             .with(this)
@@ -77,18 +77,18 @@ class TokenDetailsActivity : AppCompatActivity() {
             .thumbnail(Glide.with(this).load(R.drawable.spinner))
             .centerCrop()
             .placeholder(R.drawable.coin_place_holder)
-            .into(binding.ivTokenDetailImage)
+            .into(binding!!.ivTokenDetailImage)
     }
 
 
     private fun setupActionBar(){
-        setSupportActionBar(binding.toolbarTokenDetailsActivity)
+        setSupportActionBar(binding!!.toolbarTokenDetailsActivity)
         val actionBar = supportActionBar
         if (actionBar != null){
             actionBar.title = "Token Details"
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.setHomeAsUpIndicator(R.drawable.back_arrow_white)
-            binding.toolbarTokenDetailsActivity.setNavigationOnClickListener {
+            binding!!.toolbarTokenDetailsActivity.setNavigationOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
             }
         }
@@ -111,5 +111,12 @@ class TokenDetailsActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (binding != null){
+            binding = null
+        }
     }
 }

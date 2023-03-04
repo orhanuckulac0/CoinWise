@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
+import com.example.investmenttracker.domain.use_case.coin.GetMultipleCoinsUseCase
 import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.InsertUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
@@ -13,7 +14,8 @@ class CoinViewModelFactory(
     private val getAllCoinsUseCase: GetAllCoinsUseCase,
     private val insertUserDataUseCase: InsertUserDataUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
-    private val updateUserDataUseCase: UpdateUserDataUseCase
+    private val updateUserDataUseCase: UpdateUserDataUseCase,
+    private val getMultipleCoinsUseCase: GetMultipleCoinsUseCase
     ): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return CoinViewModel(
@@ -21,7 +23,8 @@ class CoinViewModelFactory(
             getAllCoinsUseCase,
             insertUserDataUseCase,
             getUserDataUseCase,
-            updateUserDataUseCase
+            updateUserDataUseCase,
+            getMultipleCoinsUseCase
         ) as T
     }
 }

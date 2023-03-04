@@ -26,14 +26,16 @@ class FactoryModule {
         getAllCoinsUseCase: GetAllCoinsUseCase,
         insertUserDataUseCase: InsertUserDataUseCase,
         getUserDataUseCase: GetUserDataUseCase,
-        updateUserDataUseCase: UpdateUserDataUseCase
+        updateUserDataUseCase: UpdateUserDataUseCase,
+        getMultipleCoinsUseCase: GetMultipleCoinsUseCase
     ): CoinViewModelFactory {
         return CoinViewModelFactory(
             app,
             getAllCoinsUseCase,
             insertUserDataUseCase,
             getUserDataUseCase,
-            updateUserDataUseCase
+            updateUserDataUseCase,
+            getMultipleCoinsUseCase
         )
     }
 

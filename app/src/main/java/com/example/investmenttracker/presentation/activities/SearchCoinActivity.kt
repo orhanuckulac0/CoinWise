@@ -29,7 +29,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchCoinActivity : AppCompatActivity() {
-    private lateinit var binding: ActivitySearchCoinBinding
+    private var binding: ActivitySearchCoinBinding? = null
     lateinit var viewModel: SearchCoinViewModel
     @Inject lateinit var factory: SearchCoinViewModelFactory
     private lateinit var adapter: SearchCoinAdapter
@@ -44,7 +44,7 @@ class SearchCoinActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search_coin)
 
         binding = ActivitySearchCoinBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(binding?.root)
         setupActionBar()
 
         viewModel = ViewModelProvider(this, factory)[SearchCoinViewModel::class.java]
@@ -53,21 +53,21 @@ class SearchCoinActivity : AppCompatActivity() {
             viewModel.eventFlow.collect {event->
                 when(event) {
                     is UiEvent.ShowCoinAddedSnackbar -> {
-                        Snackbar.make(binding.root, event.message, Snackbar.LENGTH_SHORT).show()
+                        Snackbar.make(binding!!.root, event.message, Snackbar.LENGTH_SHORT).show()
                     }
                     is UiEvent.ShowErrorSnackbar -> {
-                        Snackbar.make(binding.root, event.message, Snackbar.LENGTH_LONG).show()
+                        Snackbar.make(binding!!.root, event.message, Snackbar.LENGTH_LONG).show()
                     }
                 }
             }
         }
 
-        binding.searchCoinBtnSlug.setOnClickListener {
-            viewModel.coinSearchInputText.value = binding.etSearchCoin.text.toString().lowercase()
+        binding!!.searchCoinBtnSlug.setOnClickListener {
+            viewModel.coinSearchInputText.value = binding!!.etSearchCoin.text.toString().lowercase()
             getCoinBySlug()
         }
-        binding.searchCoinBtnSymbol.setOnClickListener {
-            viewModel.coinSearchInputText.value = binding.etSearchCoin.text.toString().uppercase()
+        binding!!.searchCoinBtnSymbol.setOnClickListener {
+            viewModel.coinSearchInputText.value = binding!!.etSearchCoin.text.toString().uppercase()
             getCoinBySymbol()
         }
 
@@ -203,13 +203,13 @@ class SearchCoinActivity : AppCompatActivity() {
 
 
     private fun setupActionBar(){
-        setSupportActionBar(binding.toolbarSearchCoinActivity)
+        setSupportActionBar(binding?.toolbarSearchCoinActivity)
         val actionBar = supportActionBar
         if (actionBar != null){
             actionBar.title = "Add Coin"
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.setHomeAsUpIndicator(R.drawable.back_arrow_white)
-            binding.toolbarSearchCoinActivity.setNavigationOnClickListener {
+            binding!!.toolbarSearchCoinActivity.setNavigationOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
             }
         }
@@ -221,9 +221,9 @@ class SearchCoinActivity : AppCompatActivity() {
             adapter.differ.submitList(coinList)
 
             val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-            val rvCoinSearchResults = binding.rvCoinSearchResults
+            val rvCoinSearchResults = binding!!.rvCoinSearchResults
 
-            binding.tvNoResults.visibility = View.GONE
+            binding!!.tvNoResults.visibility = View.GONE
             rvCoinSearchResults.visibility = View.VISIBLE
             rvCoinSearchResults.layoutManager = layoutManager
             rvCoinSearchResults.adapter = adapter
@@ -254,9 +254,9 @@ class SearchCoinActivity : AppCompatActivity() {
                     adapter.notifyDataSetChanged()
 
                     // refresh UI
-                    binding.etSearchCoin.setText("")
+                    binding!!.etSearchCoin.setText("")
                     if (coinList.isEmpty()){
-                        binding.rvCoinSearchResults.visibility = View.INVISIBLE
+                        binding!!.rvCoinSearchResults.visibility = View.INVISIBLE
                     }
 
                     // trigger snackbar
@@ -271,8 +271,8 @@ class SearchCoinActivity : AppCompatActivity() {
             }
 
         }else{
-            binding.tvNoResults.visibility = View.VISIBLE
-            binding.rvCoinSearchResults.visibility = View.GONE
+            binding!!.tvNoResults.visibility = View.VISIBLE
+            binding!!.rvCoinSearchResults.visibility = View.GONE
         }
     }
 
@@ -304,4 +304,10 @@ class SearchCoinActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        if (binding != null){
+            binding = null
+        }
+    }
 }

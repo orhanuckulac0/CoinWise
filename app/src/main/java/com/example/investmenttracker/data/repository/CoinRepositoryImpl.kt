@@ -6,7 +6,6 @@ import com.example.investmenttracker.data.repository.datasource.CoinRemoteDataSo
 import com.example.investmenttracker.domain.repository.CoinRepository
 import com.google.gson.JsonObject
 import kotlinx.coroutines.flow.Flow
-import retrofit2.Call
 
 class CoinRepositoryImpl(
     private val coinRemoteDataSource: CoinRemoteDataSource,
@@ -18,6 +17,10 @@ class CoinRepositoryImpl(
 
     override suspend fun getCoinBySymbol(symbol: String): JsonObject {
         return coinRemoteDataSource.getCoinBySymbol(symbol)
+    }
+
+    override suspend fun getMultipleCoinsBySlug(slugList: List<String>): JsonObject {
+        return coinRemoteDataSource.getMultipleCoinsBySlug(slugList)
     }
 
     override suspend fun insertCoinToDB(coinModel: CoinModel) {

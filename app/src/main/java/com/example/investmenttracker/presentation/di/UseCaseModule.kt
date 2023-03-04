@@ -61,6 +61,12 @@ class UseCaseModule {
         return UpdateCoinUseCase(coinRepository)
     }
 
+    @Singleton
+    @Provides
+    fun getMultipleCoinsUseCase(coinRepository: CoinRepository): GetMultipleCoinsUseCase {
+        return GetMultipleCoinsUseCase(coinRepository)
+    }
+
     // User Related UseCases
     @Singleton
     @Provides

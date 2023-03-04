@@ -20,32 +20,27 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
+    private var binding: ActivityMainBinding? = null
     @Inject lateinit var factory: CoinViewModelFactory
     lateinit var viewModel: CoinViewModel
     private lateinit var walletAdapter: MainActivityAdapter
-
-    var totalInvestment: Double = 0.0
-    var userTotalBalanceWorth: Double = 0.0
-    var totalInvestmentWorth: Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(binding?.root)
 
         viewModel = ViewModelProvider(this, factory)[CoinViewModel::class.java]
         walletAdapter = MainActivityAdapter(this)
 
         setupActionBar()
         setupView()
-        updateUserData()
     }
 
 
     private fun setupView(){
-        binding.rvTokens.apply {
+        binding!!.rvTokens.apply {
             adapter = walletAdapter
             layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.VERTICAL, false)
         }
@@ -65,6 +60,10 @@ class MainActivity : AppCompatActivity() {
     private fun updateUserData(){
         viewModel.getTokensFromWallet().observe(this){coinsList->
             if (!coinsList.isNullOrEmpty()) {
+                var totalInvestment: Double = 0.0
+                var userTotalBalanceWorth: Double = 0.0
+                var totalInvestmentWorth: Double = 0.0
+
                 for (coin in coinsList){
                     totalInvestment += coin.totalInvestmentAmount
                     totalInvestmentWorth += coin.price*coin.totalTokenHeldAmount
@@ -76,7 +75,7 @@ class MainActivity : AppCompatActivity() {
                     it.userTotalBalanceWorth = String.format("%.2f",userTotalBalanceWorth).toDouble()
                     it.userTotalCoinInvestedQuantity = coinsList.size
 
-                    binding.tvTotalBalance.text = String.format("%,.2f", userTotalBalanceWorth)
+                    binding!!.tvTotalBalance.text = "$${String.format("%,.2f", userTotalBalanceWorth)}"
 
                     viewModel.userData = it
                     viewModel.updateUserdata()
@@ -101,7 +100,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupActionBar(){
-        setSupportActionBar(binding.toolbarMainActivity)
+        setSupportActionBar(binding!!.toolbarMainActivity)
         val actionBar = supportActionBar
         if (actionBar != null){
             actionBar.title = "InvestmentTracker"
@@ -124,5 +123,17 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateUserData()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (binding != null){
+            binding = null
+        }
     }
 }

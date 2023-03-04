@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -20,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.lang.reflect.InvocationTargetException
 
 class SearchCoinViewModel(
     private val app: Application,
@@ -66,6 +68,10 @@ class SearchCoinViewModel(
             }
         }catch (e:java.lang.Exception){
             coinSearchedBySlug.postValue(Resource.Error("No search results. Check your spelling."))
+        }catch (e: InvocationTargetException) {
+            Log.i("MYTAG", e.cause.toString())
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -81,6 +87,10 @@ class SearchCoinViewModel(
             }
         }catch (e:java.lang.Exception){
             coinSearchedBySymbol.postValue(Resource.Error("No search results. Check your spelling."))
+        }catch (e: InvocationTargetException) {
+            Log.i("MYTAG", e.cause.toString())
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace();
         }
     }
 
