@@ -15,7 +15,6 @@ import com.example.investmenttracker.data.util.formatTokenTotalValue
 import com.example.investmenttracker.data.util.setDecimalInput
 import com.example.investmenttracker.databinding.ActivityTokenDetailsBinding
 import com.example.investmenttracker.presentation.events.UiEvent
-import com.example.investmenttracker.presentation.events.UiEventActions
 import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModel
 import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModelFactory
 import com.google.android.material.snackbar.Snackbar
@@ -25,7 +24,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class TokenDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTokenDetailsBinding
-    lateinit var viewModel: TokenDetailsViewModel
+    private lateinit var viewModel: TokenDetailsViewModel
     @Inject
     lateinit var factory: TokenDetailsViewModelFactory
     private lateinit var currentCoin: CoinModel
@@ -58,23 +57,14 @@ class TokenDetailsActivity : AppCompatActivity() {
         binding.tokenDetailUpdateBtn.setOnClickListener {
             val totalTokenHeld = binding.etTokenHeldAmount.text.toString()
             val totalInvestment = binding.etTokenInvestmentAmount.text.toString()
-            val totalInvestmentWorth = formatTokenTotalValue(currentCoin.price, totalTokenHeld.toDouble()).replace(",", "").toDouble()
 
-            if (totalTokenHeld.isEmpty()){
-                viewModel.triggerUiEvent(UiEventActions.TOTAL_TOKEN_HELD_EMPTY, UiEventActions.TOTAL_TOKEN_HELD_EMPTY)
-            }else if (totalInvestment.isEmpty()){
-                viewModel.triggerUiEvent(UiEventActions.TOTAL_INVESTMENT_EMPTY, UiEventActions.TOTAL_INVESTMENT_EMPTY)
-            }else{
-                updateTokenDetails(totalTokenHeld.toDouble(), totalInvestment.toDouble(), totalInvestmentWorth)
+            if (viewModel.checkEmptyInput(totalTokenHeld, totalInvestment)){
+                val totalInvestmentWorth = formatTokenTotalValue(currentCoin.price, totalTokenHeld.toDouble()).replace(",", "").toDouble()
+                viewModel.updateTokenDetails(currentCoin.cmcId, totalTokenHeld.toDouble(), totalInvestment.toDouble(), totalInvestmentWorth)
+                startActivity(Intent(this, MainActivity::class.java))
             }
         }
     }
-
-    private fun updateTokenDetails(totalTokenHeld: Double, totalInvestment: Double, totalInvestmentWorth: Double){
-        viewModel.updateTokenDetails(currentCoin.cmcId, totalTokenHeld, totalInvestment, totalInvestmentWorth)
-        startActivity(Intent(this, MainActivity::class.java))
-    }
-
 
     private fun setupView(){
         val coinIcon = "https://s2.coinmarketcap.com/static/img/coins/64x64/"+"${currentCoin.cmcId}"+".png"

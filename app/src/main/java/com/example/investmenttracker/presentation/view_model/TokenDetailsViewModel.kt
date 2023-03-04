@@ -52,6 +52,17 @@ class TokenDetailsViewModel(
         }
     }
 
+    fun checkEmptyInput(totalTokenHeld: String, totalInvestment: String): Boolean {
+        if (totalTokenHeld.isEmpty()){
+            triggerUiEvent(UiEventActions.TOTAL_TOKEN_HELD_EMPTY, UiEventActions.TOTAL_TOKEN_HELD_EMPTY)
+            return false
+        }else if (totalInvestment.isEmpty()){
+            triggerUiEvent(UiEventActions.TOTAL_INVESTMENT_EMPTY, UiEventActions.TOTAL_INVESTMENT_EMPTY)
+            return false
+        }
+        return true
+    }
+
     fun deleteTokenFromDB(coin: CoinModel) {
         if (isNetworkAvailable(app)){
             viewModelScope.launch {
@@ -62,7 +73,7 @@ class TokenDetailsViewModel(
         }
     }
 
-    fun triggerUiEvent(message: String, action: String) = viewModelScope.launch(Dispatchers.Main) {
+    private fun triggerUiEvent(message: String, action: String) = viewModelScope.launch(Dispatchers.Main) {
         if (action == UiEventActions.TOTAL_INVESTMENT_EMPTY || action == UiEventActions.TOTAL_TOKEN_HELD_EMPTY) {
             eventChannel.send(UiEvent.ShowErrorSnackbar(message))
         }
