@@ -28,7 +28,7 @@
             app:civ_border_width="0.5dp" />
 
         <LinearLayout
-            android:layout_width="150dp"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
@@ -36,7 +36,7 @@
 
             <TextView
                 android:id="@+id/tvCoinName"
-                android:layout_width="match_parent"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:textColor="#f2f2f2"
                 android:textSize="18sp"
@@ -82,18 +82,18 @@
                 android:id="@+id/tvTokenHeldAmount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textColor="#d5d6d7"
                 android:gravity="end"
+                android:textColor="#d5d6d7"
+                android:textSize="14sp"
                 tools:text="Coin Held Amount" />
 
             <TextView
                 android:id="@+id/tvTokenTotalValue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="end"
                 android:textColor="#6f7070"
                 android:textSize="14sp"
-                android:gravity="end"
                 tools:text="10.000" />
         </LinearLayout>
 

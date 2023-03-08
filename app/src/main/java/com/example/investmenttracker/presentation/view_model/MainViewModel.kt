@@ -4,34 +4,43 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
+import android.util.Log
+import androidx.lifecycle.*
+import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.model.UserData
 import com.example.investmenttracker.data.util.Resource
 import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetMultipleCoinsUseCase
+import com.example.investmenttracker.domain.use_case.coin.UpdateCoinDetailsUseCase
 import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.InsertUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
 import com.example.investmenttracker.presentation.events.UiEventActions
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import java.util.concurrent.locks.ReentrantLock
 
-class CoinViewModel(
+class MainViewModel(
     private val app:Application,
     private val getAllCoinsUseCase: GetAllCoinsUseCase,
     private val insertUserDataUseCase: InsertUserDataUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
     private val updateUserDataUseCase: UpdateUserDataUseCase,
-    private val getMultipleCoinsUseCase: GetMultipleCoinsUseCase
+    private val getMultipleCoinsUseCase: GetMultipleCoinsUseCase,
+    private val updateCoinDetailsUseCase: UpdateCoinDetailsUseCase
 ): AndroidViewModel(app) {
 
     var userData: UserData? = null
 
-    val coinsListResponse: MutableLiveData<Resource<JsonObject>> = MutableLiveData()
+    val multipleCoinsListResponse: MutableLiveData<Resource<JsonObject>> = MutableLiveData()
+    var currentWalletCoins = mutableListOf<CoinModel>()
+    var slugNames = ""
+
+    // Create an instance of ReentrantLock
+    val databaseUpdateLock = ReentrantLock()
+    var isDatabaseUpdateInProgress = false
 
     @Suppress("DEPRECATION")
     fun isNetworkAvailable(context: Context): Boolean {
@@ -50,24 +59,17 @@ class CoinViewModel(
         return result
     }
 
-    fun getTokensFromWallet() = liveData {
-        getAllCoinsUseCase.execute().collect(){
-            emit(it)
-        }
-    }
-
-    fun getUserData(id: Int) = liveData {
-        getUserDataUseCase.execute(id).collect(){
-            emit(it)
-            userData = it
-        }
-    }
-
-    fun updateUserdata(){
+    fun getUserData(id: Int) {
         viewModelScope.launch {
-            if (userData != null){
-                updateUserDataUseCase.execute(userData!!)
+            getUserDataUseCase.execute(id).collect {
+                userData = it
             }
+        }
+    }
+
+    fun updateUserdata(data: UserData){
+        viewModelScope.launch {
+            updateUserDataUseCase.execute(data)
         }
     }
 
@@ -77,17 +79,41 @@ class CoinViewModel(
         }
     }
 
+    fun getTokensFromWallet() {
+        if (!isDatabaseUpdateInProgress){
+            viewModelScope.launch {
+                getAllCoinsUseCase.execute()
+                    .distinctUntilChanged()
+                    .collect { walletCoins ->
+                        Log.i("MYTAG", "db tokens $walletCoins")
+
+                        currentWalletCoins.clear()
+                        currentWalletCoins.addAll(walletCoins)
+
+                        val walletTokenNames = currentWalletCoins.map { coin -> coin.slug.replace("\"", "") }
+                        val joinedNames = walletTokenNames.joinToString(",")
+                        slugNames = joinedNames
+                        Log.i("MYTAG", "joined names for api request $slugNames")
+                    }
+            }
+        }
+    }
+
     fun getMultipleCoinsBySlug(slugList: List<String>) = viewModelScope.launch(Dispatchers.IO) {
-        coinsListResponse.postValue(Resource.Loading())
+        multipleCoinsListResponse.postValue(Resource.Loading())
         try {
             if (isNetworkAvailable(app)){
                 val slugListResponse = getMultipleCoinsUseCase.execute(slugList)
-                coinsListResponse.postValue(Resource.Success(slugListResponse))
+                multipleCoinsListResponse.postValue(Resource.Success(slugListResponse))
             }else {
-                coinsListResponse.postValue(Resource.Error(UiEventActions.NO_INTERNET_CONNECTION))
+                multipleCoinsListResponse.postValue(Resource.Error(UiEventActions.NO_INTERNET_CONNECTION))
             }
         }catch (e:java.lang.Exception){
-            coinsListResponse.postValue(Resource.Error("No search results. Check your spelling."))
+            multipleCoinsListResponse.postValue(Resource.Error("${e.message}"))
         }
+    }
+
+    suspend fun updateMultipleCoinDetails(coins: List<CoinModel>) = viewModelScope.launch(Dispatchers.IO) {
+        updateCoinDetailsUseCase.execute(coins)
     }
 }

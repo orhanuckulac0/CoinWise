@@ -14,8 +14,18 @@ interface CoinDAO {
                 " totalTokenHeldAmount = :totalTokenHeldAmount," +
                 " totalInvestmentAmount = :totalInvestmentAmount," +
                 " totalInvestmentWorth = :totalInvestmentWorth" +
-                " WHERE id = :id")
-    suspend fun updateCoin(id: Int, totalTokenHeldAmount: Double ,totalInvestmentAmount: Double, totalInvestmentWorth: Double)
+                " WHERE id = :id"
+    )
+    suspend fun updateCoinInvestmentDetails(
+        id: Int,
+        totalTokenHeldAmount: Double,
+        totalInvestmentAmount: Double,
+        totalInvestmentWorth: Double
+    )
+
+    @Update
+    suspend fun updateCoinDetails(coins: List<CoinModel>)
+
 
     @Query("SELECT * FROM coins")
     fun getAllCoins(): Flow<List<CoinModel>>

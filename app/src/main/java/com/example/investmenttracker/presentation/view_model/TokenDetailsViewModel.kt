@@ -8,7 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.domain.use_case.coin.DeleteCoinUseCase
-import com.example.investmenttracker.domain.use_case.coin.UpdateCoinUseCase
+import com.example.investmenttracker.domain.use_case.coin.UpdateInvestmentUseCase
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.events.UiEventActions
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 class TokenDetailsViewModel(
     private val app: Application,
-    private val updateCoinUseCase: UpdateCoinUseCase,
+    private val updateInvestmentUseCase: UpdateInvestmentUseCase,
     private val deleteCoinUseCase: DeleteCoinUseCase
     ): AndroidViewModel(app) {
 
@@ -45,7 +45,7 @@ class TokenDetailsViewModel(
     fun updateTokenDetails(id: Int, totalTokenHeldAmount: Double, totalInvestmentAmount: Double, totalInvestmentWorth: Double){
         if (isNetworkAvailable(app)){
             viewModelScope.launch {
-                updateCoinUseCase.execute(id, totalTokenHeldAmount, totalInvestmentAmount, totalInvestmentWorth)
+                updateInvestmentUseCase.execute(id, totalTokenHeldAmount, totalInvestmentAmount, totalInvestmentWorth)
             }
         }else{
             triggerUiEvent(UiEventActions.NO_INTERNET_CONNECTION, UiEventActions.NO_INTERNET_CONNECTION)

@@ -4,17 +4,17 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.investmenttracker.domain.use_case.coin.DeleteCoinUseCase
-import com.example.investmenttracker.domain.use_case.coin.UpdateCoinUseCase
+import com.example.investmenttracker.domain.use_case.coin.UpdateInvestmentUseCase
 
 class TokenDetailsViewModelFactory(
     private val app: Application,
-    private val updateCoinUseCase: UpdateCoinUseCase,
+    private val updateInvestmentUseCase: UpdateInvestmentUseCase,
     private val deleteCoinUseCase: DeleteCoinUseCase
 ): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return TokenDetailsViewModel(
             app,
-            updateCoinUseCase,
+            updateInvestmentUseCase,
             deleteCoinUseCase
         ) as T
     }

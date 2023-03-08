@@ -57,8 +57,14 @@ class UseCaseModule {
 
     @Singleton
     @Provides
-    fun provideUpdateCoin(coinRepository: CoinRepository): UpdateCoinUseCase {
-        return UpdateCoinUseCase(coinRepository)
+    fun provideUpdateInvestment(coinRepository: CoinRepository): UpdateInvestmentUseCase {
+        return UpdateInvestmentUseCase(coinRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideUpdateCoinDetails(coinRepository: CoinRepository): UpdateCoinDetailsUseCase {
+        return UpdateCoinDetailsUseCase(coinRepository)
     }
 
     @Singleton

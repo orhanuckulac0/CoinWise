@@ -147,14 +147,4 @@ class TokenDetailsFragment : Fragment() {
             binding = null
         }
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (currentCoin != null){
-            currentCoin = null
-        }
-        if (binding != null){
-            binding = null
-        }
-    }
 }

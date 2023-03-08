@@ -336,20 +336,4 @@ class SearchCoinFragment : Fragment() {
             mProgressDialog = null
         }
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (binding != null){
-            binding = null
-        }
-        if (adapter != null){
-            adapter = null
-        }
-        if (coin != null){
-            coin = null
-        }
-        if (mProgressDialog != null){
-            mProgressDialog = null
-        }
-    }
 }
