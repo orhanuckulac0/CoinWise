@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
-import com.example.investmenttracker.data.util.formatPrice
+import com.example.investmenttracker.domain.use_case.util.formatPrice
 import com.example.investmenttracker.databinding.SearchCoinSingleItemBinding
 
 class SearchCoinAdapter(

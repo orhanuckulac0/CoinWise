@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
-import com.example.investmenttracker.data.util.Resource
-import com.example.investmenttracker.data.util.formatPrice
+import com.example.investmenttracker.domain.use_case.util.Resource
+import com.example.investmenttracker.domain.use_case.util.formatPrice
 import com.example.investmenttracker.databinding.FragmentSearchCoinBinding
 import com.example.investmenttracker.presentation.adapter.SearchCoinAdapter
 import com.example.investmenttracker.presentation.events.UiEvent

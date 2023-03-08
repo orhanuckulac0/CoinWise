@@ -14,9 +14,9 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
-import com.example.investmenttracker.data.util.Constants
-import com.example.investmenttracker.data.util.formatTokenTotalValue
-import com.example.investmenttracker.data.util.setDecimalInput
+import com.example.investmenttracker.domain.use_case.util.Constants
+import com.example.investmenttracker.domain.use_case.util.formatTokenTotalValue
+import com.example.investmenttracker.domain.use_case.util.setDecimalInput
 import com.example.investmenttracker.databinding.FragmentTokenDetailsBinding
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModel

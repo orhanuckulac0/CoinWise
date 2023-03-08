@@ -16,15 +16,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.model.UserData
-import com.example.investmenttracker.data.util.*
 import com.example.investmenttracker.databinding.FragmentMainBinding
+import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.adapter.MainFragmentAdapter
 import com.example.investmenttracker.presentation.view_model.MainViewModel
 import com.example.investmenttracker.presentation.view_model.MainViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import org.json.JSONException
-import org.json.JSONObject
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -35,8 +33,6 @@ class MainFragment : Fragment() {
     lateinit var factory: MainViewModelFactory
     lateinit var viewModel: MainViewModel
     private var walletAdapter: MainFragmentAdapter? = null
-    private var newTokensDataResponse = mutableListOf<CoinModel>()
-    private var walletTokensToUpdateDB = mutableListOf<CoinModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -85,8 +81,8 @@ class MainFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         }
 
-        Log.i("MYTAG", "Adapter walletTokensToUpdateDB $walletTokensToUpdateDB")
-        walletAdapter?.differ?.submitList(walletTokensToUpdateDB)
+        Log.i("MYTAG", "Adapter walletTokensToUpdateDB $viewModel.walletTokensToUpdateDB")
+        walletAdapter?.differ?.submitList(viewModel.walletTokensToUpdateDB)
 
         walletAdapter?.setOnClickListener(object: MainFragmentAdapter.OnClickListener {
             override fun onClick(position: Int, coinModel: CoinModel) {
@@ -119,47 +115,18 @@ class MainFragment : Fragment() {
 
                         val response = resource.data
                         if (response != null){
-                            try {
-                                val jsonObject = JSONObject(response.toString())
-                                val dataObject = jsonObject.getJSONObject("data")
+                            // format the api response to get coins in it
+                            val responseCoinsList = viewModel.formatAPIResponse(response)
 
-                                // Iterate over the keys in the data object
-                                val keys = dataObject.keys()
-                                while (keys.hasNext()) {
-                                    val key = keys.next() as String
-                                    val rowObject = dataObject.getJSONObject(key)
-                                    val quoteObject = rowObject.getJSONObject("quote")
-                                    val usdObject = quoteObject.getJSONObject("USD")
-
-                                    // Extract the desired data from the row object
-                                    // create a model out if it
-                                    val coin = CoinModel(
-                                        id = rowObject.getInt("id"), // cmcId
-                                        cmcId = rowObject.getInt("id"), // cmcId
-                                        name = rowObject.getString("name"),
-                                        slug = rowObject.getString("slug"),
-                                        symbol = rowObject.getString("symbol"),
-                                        price = usdObject.getString("price").toDouble(),
-                                        marketCap =  usdObject.getString("market_cap").toDouble(),
-                                        percentChange1h = usdObject.getString("percent_change_1h").toDouble(),
-                                        percentChange24h=  usdObject.getString("percent_change_24h").toDouble(),
-                                        percentChange7d=  usdObject.getString("percent_change_7d").toDouble(),
-                                        percentChange30d=  usdObject.getString("percent_change_30d").toDouble(),
-                                        totalTokenHeldAmount = 0.0,
-                                        totalInvestmentAmount = 0.0,
-                                        totalInvestmentWorth = 0.0
-                                    )
-                                    newTokensDataResponse.add(coin)
-                                }
-                            } catch (e: JSONException) {
-                                Log.e("MYTAG", "Error parsing JSON: ${e.message}")
+                            for (coin in responseCoinsList){
+                                viewModel.newTokensDataResponse.add(coin)
                             }
-                            Log.i("MYTAG", "api call success: $newTokensDataResponse")
+                            Log.i("MYTAG", "api call success: $viewModel.newTokensDataResponse")
 
                             // switch back to background thread because I will be operating db functions
                             lifecycleScope.launch(Dispatchers.IO){
                                 delay(500)
-                                getTokensReadyToSaveToDb()
+                                lockThreadAndUpdateCoinDetailsToDB()
                             }
 
                         } else {
@@ -180,33 +147,7 @@ class MainFragment : Fragment() {
 
     }
 
-    // this function will loop through each lists
-    // and update tokens in walletTokensList with the coins the latest api request returns
-    // some values of the tokens will remain the same, such as token held amount investment amount etc.
-    // copy creates a new obj but I wont use it so I just applied it to the current walletTokensToUpdateDB.
-    private fun getTokensReadyToSaveToDb(){
-        Log.i("MYTAG", "viewModel.currentWalletCoins ${viewModel.currentWalletCoins}")
-        Log.i("MYTAG", "newTokensDataResponse $newTokensDataResponse")
-        for (walletCoin in viewModel.currentWalletCoins){
-            for (coin in newTokensDataResponse){
-                if (walletCoin.cmcId == coin.cmcId){
-                    val updatedCoin = walletCoin.apply {
-                        price = formatPrice(coin.price).toDouble()
-                        marketCap = formatPrice(coin.marketCap).toDouble()
-                        percentChange1h = coin.percentChange1h
-                        percentChange24h = coin.percentChange24h
-                        percentChange7d = coin.percentChange7d
-                        percentChange30d = coin.percentChange30d
-                    }
-                    walletTokensToUpdateDB.add(updatedCoin)
-                }
-            }
-        }
-
-        Log.i("MYTAG", "new wallet: $walletTokensToUpdateDB")
-        for (coin in walletTokensToUpdateDB){
-            Log.i("MYTAG", "updated coin prices: ${coin.price}")
-        }
+    private fun lockThreadAndUpdateCoinDetailsToDB(){
         // operate on background thread for db function
         lifecycleScope.launch(Dispatchers.IO) {
             // lock the current thread because
@@ -216,8 +157,8 @@ class MainFragment : Fragment() {
             viewModel.databaseUpdateLock.lock()
             try {
                 viewModel.isDatabaseUpdateInProgress = true
-                viewModel.updateMultipleCoinDetails(walletTokensToUpdateDB)
-                updateUserDataAndCoinDB()
+                viewModel.updateMultipleCoinDetails()
+                updateUserDataAndUserDataDB()
             } finally {
                 viewModel.isDatabaseUpdateInProgress = false
                 viewModel.databaseUpdateLock.unlock()
@@ -226,16 +167,16 @@ class MainFragment : Fragment() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun updateUserDataAndCoinDB() {
+    private fun updateUserDataAndUserDataDB() {
         var totalInvestment = 0.0
         val userTotalBalanceWorth: Double
         var totalInvestmentWorth = 0.0
 
         val currentUser = viewModel.userData
 
-        if (walletTokensToUpdateDB.isNotEmpty() && currentUser != null) {
+        if (viewModel.walletTokensToUpdateDB.isNotEmpty() && currentUser != null) {
 
-            for (coin in walletTokensToUpdateDB){
+            for (coin in viewModel.walletTokensToUpdateDB){
                 totalInvestment += coin.totalInvestmentAmount
                 totalInvestmentWorth += coin.price*coin.totalTokenHeldAmount
             }
@@ -245,7 +186,7 @@ class MainFragment : Fragment() {
             currentUser.userTotalLoss = 0.0
             currentUser.userTotalInvestment = totalInvestment
             currentUser.userTotalBalanceWorth = String.format("%.2f", userTotalBalanceWorth).toDouble()
-            currentUser.userTotalCoinInvestedQuantity = walletTokensToUpdateDB.size
+            currentUser.userTotalCoinInvestedQuantity = viewModel.walletTokensToUpdateDB.size
             Log.i("MYTAG", "USER DATA FRAGMENT: ${currentUser.id}")
             Log.i("MYTAG", "total investment : $totalInvestment")
             Log.i("MYTAG", "totalInvestmentWorth: $totalInvestmentWorth")
@@ -293,7 +234,5 @@ class MainFragment : Fragment() {
         }
 
         viewModel.multipleCoinsListResponse.removeObservers(viewLifecycleOwner)
-        newTokensDataResponse.clear()
-        walletTokensToUpdateDB.clear()
     }
 }

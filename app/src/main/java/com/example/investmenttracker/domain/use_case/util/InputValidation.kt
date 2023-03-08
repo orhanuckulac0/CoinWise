@@ -1,4 +1,4 @@
-package com.example.investmenttracker.data.util
+package com.example.investmenttracker.domain.use_case.util
 
 import android.text.Editable
 import android.text.TextWatcher

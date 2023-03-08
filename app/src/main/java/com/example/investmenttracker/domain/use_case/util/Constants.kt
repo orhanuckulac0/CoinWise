@@ -1,4 +1,4 @@
-package com.example.investmenttracker.data.util
+package com.example.investmenttracker.domain.use_case.util
 
 object Constants {
 

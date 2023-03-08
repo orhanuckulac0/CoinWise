@@ -9,7 +9,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.investmenttracker.data.model.CoinModel
-import com.example.investmenttracker.data.util.Resource
+import com.example.investmenttracker.domain.use_case.util.Resource
 import com.example.investmenttracker.domain.use_case.*
 import com.example.investmenttracker.domain.use_case.coin.GetCoinBySlugUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetCoinBySymbolUseCase
