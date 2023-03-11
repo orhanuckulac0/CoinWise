@@ -1,6 +1,9 @@
 package com.example.investmenttracker.presentation
 
 import android.annotation.SuppressLint
+import android.app.Dialog
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -33,6 +36,9 @@ class MainFragment : Fragment() {
     lateinit var factory: MainViewModelFactory
     lateinit var viewModel: MainViewModel
     private var walletAdapter: MainFragmentAdapter? = null
+    private var mProgressDialog: Dialog? = null
+    private lateinit var sharedPref: SharedPreferences
+    private var lastApiRequestTime: Long = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,19 +76,85 @@ class MainFragment : Fragment() {
         // get current user and set it in viewModel to later use in Fragment
         viewModel.getUserData(1)
 
-        lifecycleScope.launch(Dispatchers.IO){
-            requestNewDataForWalletCoins()
+        sharedPref = requireContext().getSharedPreferences(Constants.REFRESH_STATE, Context.MODE_PRIVATE)
+        lastApiRequestTime = sharedPref.getLong(Constants.LAST_API_REQUEST_TIME, 0)
+
+        triggerAppLaunch()
+    }
+
+    private fun triggerAppLaunch() {
+        if (shouldMakeApiRequest(lastApiRequestTime)) {
+            lifecycleScope.launch(Dispatchers.IO){
+
+                // reset current values
+                viewModel.currentWalletCoins.clear()
+                viewModel.slugNames = ""
+                viewModel.newTokensDataResponse.clear()
+                withContext(Dispatchers.Main){
+                    viewModel.multipleCoinsListResponse.value = null
+                }
+                // make request
+                requestNewDataForWalletCoins()
+
+                // Update lastApiRequestTime
+                lastApiRequestTime = System.currentTimeMillis()
+
+                // Save lastApiRequestTime in shared preferences
+                withContext(Dispatchers.IO) {
+                    val editor = sharedPref.edit()
+                    editor.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
+                    editor.apply()
+                }
+            }
+        }else{
+            populateFromCache()
         }
     }
 
-    private fun setupView() {
+    private fun populateFromCache(){
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel.getTokensFromWallet()
+            delay(250)
+
+            withContext(Dispatchers.Main){
+                setupView(viewModel.currentWalletCoins)
+            }
+        }
+    }
+
+    private fun setupView(coinsList: MutableList<CoinModel>) {
+        var populated = false
+
         binding!!.rvTokens.apply {
             adapter = walletAdapter
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         }
+        if (coinsList.isEmpty() && !populated){
+            populated = true
+            populateFromCache()
+        }
 
-        Log.i("MYTAG", "Adapter walletTokensToUpdateDB $viewModel.walletTokensToUpdateDB")
-        walletAdapter?.differ?.submitList(viewModel.walletTokensToUpdateDB)
+        walletAdapter?.differ?.submitList(coinsList)
+
+
+        // update UI only, in 60 seconds db user data will update itself
+        var totalInvestmentWorth = 0.0
+        for (coin in coinsList){
+            totalInvestmentWorth += coin.price*coin.totalTokenHeldAmount
+        }
+
+        if (viewModel.userData?.userTotalBalanceWorth == null) {
+            binding!!.tvTotalBalance.text = ""
+            binding!!.tvBalanceDailyChangePercentage.text = ""
+        } else if (viewModel.userData?.userTotalProfit == null) {
+            binding!!.tvTotalBalance.text = formatTotalBalanceValue(totalInvestmentWorth)
+            binding!!.tvBalanceDailyChangePercentage.text = ""
+        } else {
+            binding!!.tvTotalBalance.text = formatTotalBalanceValue(totalInvestmentWorth)
+            binding!!.tvBalanceDailyChangePercentage.text = "+2,34%" // dummy
+        }
+
+        cancelProgressDialog()
 
         walletAdapter?.setOnClickListener(object: MainFragmentAdapter.OnClickListener {
             override fun onClick(position: Int, coinModel: CoinModel) {
@@ -105,29 +177,22 @@ class MainFragment : Fragment() {
         withContext(Dispatchers.Main){
             delay(500)
             Log.i("MYTAG", "joined names list ${listOf(viewModel.slugNames)}")
+
             // make the request
             viewModel.getMultipleCoinsBySlug(listOf(viewModel.slugNames))
 
             // observe the result
             viewModel.multipleCoinsListResponse.observe(viewLifecycleOwner){ resource ->
+
                 when (resource) {
                     is Resource.Success -> {
-
                         val response = resource.data
                         if (response != null){
                             // format the api response to get coins in it
-                            val responseCoinsList = viewModel.formatAPIResponse(response)
+                            viewModel.formatAPIResponse(response)
+                            Log.i("MYTAG", "api call success: ${viewModel.newTokensDataResponse}")
 
-                            for (coin in responseCoinsList){
-                                viewModel.newTokensDataResponse.add(coin)
-                            }
-                            Log.i("MYTAG", "api call success: $viewModel.newTokensDataResponse")
-
-                            // switch back to background thread because I will be operating db functions
-                            lifecycleScope.launch(Dispatchers.IO){
-                                delay(500)
-                                lockThreadAndUpdateCoinDetailsToDB()
-                            }
+                            updateDB()
 
                         } else {
                             Log.e("MYTAG", "Response object is null")
@@ -136,38 +201,27 @@ class MainFragment : Fragment() {
 
                     is Resource.Error -> {
                         Log.e("MYTAG", "Error fetching data: ${resource.message}")
+                        cancelProgressDialog()
                     }
                     is Resource.Loading -> {
-                        // do nothing
+                        showProgressDialog()
                     }
                 }
             }
-
         }
-
     }
 
-    private fun lockThreadAndUpdateCoinDetailsToDB(){
+    private fun updateDB(){
         // operate on background thread for db function
-        lifecycleScope.launch(Dispatchers.IO) {
-            // lock the current thread because
-            // walletTokensToUpdateDB may be reached from another functions,
-            // while updating db and this causes
-            // viewModel.getTokensFromWallet() to trigger itself again
-            viewModel.databaseUpdateLock.lock()
-            try {
-                viewModel.isDatabaseUpdateInProgress = true
-                viewModel.updateMultipleCoinDetails()
-                updateUserDataAndUserDataDB()
-            } finally {
-                viewModel.isDatabaseUpdateInProgress = false
-                viewModel.databaseUpdateLock.unlock()
-            }
+        lifecycleScope.launch(Dispatchers.IO){
+            viewModel.updateMultipleCoinDetails()
+            delay(1000)
+            updateUserDataDB()
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun updateUserDataAndUserDataDB() {
+    private fun updateUserDataDB() {
         var totalInvestment = 0.0
         val userTotalBalanceWorth: Double
         var totalInvestmentWorth = 0.0
@@ -211,9 +265,18 @@ class MainFragment : Fragment() {
         }
         // switch to Main to update UI
         lifecycleScope.launch(Dispatchers.Main){
-            binding!!.tvTotalBalance.text = "$${String.format("%,.2f", formatTotalBalanceValue(totalInvestmentWorth).toDouble())}"
-            setupView()
+            setupView(viewModel.walletTokensToUpdateDB)
         }
+    }
+
+    private fun showProgressDialog(){
+        mProgressDialog = Dialog(requireContext())
+        mProgressDialog?.setContentView(R.layout.progress_bar)
+        mProgressDialog?.show()
+    }
+
+    private fun cancelProgressDialog(){
+        mProgressDialog?.dismiss()
     }
 
     private fun setupActionBar() {
@@ -233,6 +296,10 @@ class MainFragment : Fragment() {
             walletAdapter = null
         }
 
+        if (mProgressDialog != null){
+            mProgressDialog?.dismiss()
+            mProgressDialog = null
+        }
         viewModel.multipleCoinsListResponse.removeObservers(viewLifecycleOwner)
     }
 }

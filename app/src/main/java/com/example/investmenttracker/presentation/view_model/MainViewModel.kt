@@ -22,7 +22,6 @@ import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import java.util.concurrent.locks.ReentrantLock
 
 class MainViewModel(
     private val app:Application,
@@ -42,10 +41,6 @@ class MainViewModel(
     var newTokensDataResponse = mutableListOf<CoinModel>()
     var walletTokensToUpdateDB = mutableListOf<CoinModel>()
     var slugNames = ""
-
-    // Create an instance of ReentrantLock
-    val databaseUpdateLock = ReentrantLock()
-    var isDatabaseUpdateInProgress = false
 
     @Suppress("DEPRECATION")
     fun isNetworkAvailable(context: Context): Boolean {
@@ -85,24 +80,28 @@ class MainViewModel(
     }
 
     fun getTokensFromWallet() {
-        if (!isDatabaseUpdateInProgress){
-            viewModelScope.launch {
-                getAllCoinsUseCase.execute()
-                    .distinctUntilChanged()
-                    .collect { walletCoins ->
-                        Log.i("MYTAG", "db tokens $walletCoins")
+        val startTime = System.nanoTime()
 
-                        currentWalletCoins.clear()
-                        currentWalletCoins.addAll(walletCoins)
+        viewModelScope.launch {
+            getAllCoinsUseCase.execute()
+                .distinctUntilChanged()
+                .collect { walletCoins ->
+                    Log.i("MYTAG", "db tokens $walletCoins")
 
-                        // to send API get request with ["slug1,slug2,slug3"] query
-                        val walletTokenNames = currentWalletCoins.map { coin -> coin.slug.replace("\"", "") }
-                        val joinedNames = walletTokenNames.joinToString(",")
-                        slugNames = joinedNames
-                        Log.i("MYTAG", "joined names for api request $slugNames")
-                    }
-            }
+                    currentWalletCoins.clear()
+                    currentWalletCoins.addAll(walletCoins)
+
+                    // to send API get request with ["slug1,slug2,slug3"] query
+                    val walletTokenNames = currentWalletCoins.map { coin -> coin.slug.replace("\"", "") }
+                    val joinedNames = walletTokenNames.joinToString(",")
+                    slugNames = joinedNames
+                    Log.i("MYTAG", "joined names for api request $slugNames")
+                }
         }
+        val endTime = System.nanoTime()
+        val elapsedTime = (endTime - startTime) / 1000000.0 // convert nanoseconds to milliseconds
+        Log.i("MyFunction", "Elapsed time: $elapsedTime ms")
+
     }
 
     fun getMultipleCoinsBySlug(slugList: List<String>) = viewModelScope.launch(Dispatchers.IO) {
@@ -120,8 +119,6 @@ class MainViewModel(
     }
 
     suspend fun updateMultipleCoinDetails() = viewModelScope.launch(Dispatchers.IO) {
-        Log.i("MYTAG", "viewModel.currentWalletCoins $currentWalletCoins")
-        Log.i("MYTAG", "viewModel.newTokensDataResponse $newTokensDataResponse")
         // this will loop through each lists
         // and update tokens in currentWalletCoins with the coins the latest api request returns
         // some values of the tokens will remain the same, such as token held amount investment amount etc.
@@ -143,14 +140,13 @@ class MainViewModel(
         }
 
         Log.i("MYTAG", "new wallet: $newTokensDataResponse")
-        for (coin in walletTokensToUpdateDB){
-            Log.i("MYTAG", "updated coin prices: ${coin.price}")
-        }
-
         updateCoinDetailsUseCase.execute(walletTokensToUpdateDB)
     }
 
-    fun formatAPIResponse(data: JsonObject): MutableList<CoinModel>{
-        return formatAPIResponseUseCase.execute(data)
+    fun formatAPIResponse(data: JsonObject) {
+        val result = formatAPIResponseUseCase.execute(data)
+        for (coin in result){
+            newTokensDataResponse.add(coin)
+        }
     }
 }
