@@ -19,4 +19,8 @@
     <style parent="ThemeOverlay.AppCompat.Dark.ActionBar" name="AppTheme.AppBarOverlay"/>
     <style parent="ThemeOverlay.AppCompat.Light" name="AppTheme.PopupOverlay"/>
 
+    <style name="MyProgressDialogStyle" parent="android:Theme.Material.Dialog">
+        <item name="android:windowBackground">@drawable/dialog_rounded</item>
+    </style>
+
 </resources>

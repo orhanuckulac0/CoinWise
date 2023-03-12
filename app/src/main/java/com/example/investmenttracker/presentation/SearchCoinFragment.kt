@@ -2,6 +2,7 @@ package com.example.investmenttracker.presentation
 
 import android.app.Dialog
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +21,8 @@ import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.domain.use_case.util.Resource
 import com.example.investmenttracker.domain.use_case.util.formatPrice
 import com.example.investmenttracker.databinding.FragmentSearchCoinBinding
+import com.example.investmenttracker.domain.use_case.util.cancelProgressDialog
+import com.example.investmenttracker.domain.use_case.util.showProgressDialog
 import com.example.investmenttracker.presentation.adapter.SearchCoinAdapter
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.events.UiEventActions
@@ -27,6 +30,7 @@ import com.example.investmenttracker.presentation.view_model.SearchCoinViewModel
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModelFactory
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import org.json.JSONException
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -58,6 +62,7 @@ class SearchCoinFragment : Fragment() {
         binding = FragmentSearchCoinBinding.bind(view)
 
         setupActionBar()
+        mProgressDialog = showProgressDialog(requireContext())
 
         viewModel = ViewModelProvider(this, factory)[SearchCoinViewModel::class.java]
         adapter = SearchCoinAdapter(requireContext())
@@ -93,12 +98,22 @@ class SearchCoinFragment : Fragment() {
         }
 
         binding!!.searchCoinBtnSlug.setOnClickListener {
-            viewModel.coinSearchInputText.value = binding!!.etSearchCoin.text.toString().lowercase()
-            getCoinBySlug()
+            if(binding!!.etSearchCoin.text.toString() != ""){
+                viewModel.coinSearchInputText.value = binding!!.etSearchCoin.text.toString().lowercase()
+                binding!!.etSearchCoin.setText("")
+                getCoinBySlug()
+            }else{
+                viewModel.triggerUiEvent(UiEventActions.EMPTY_INPUT, UiEventActions.EMPTY_INPUT)
+            }
         }
         binding!!.searchCoinBtnSymbol.setOnClickListener {
-            viewModel.coinSearchInputText.value = binding!!.etSearchCoin.text.toString().uppercase()
-            getCoinBySymbol()
+            if (binding!!.etSearchCoin.text.toString() != ""){
+                viewModel.coinSearchInputText.value = binding!!.etSearchCoin.text.toString().uppercase()
+                binding!!.etSearchCoin.setText("")
+                getCoinBySymbol()
+            }else{
+                viewModel.triggerUiEvent(UiEventActions.EMPTY_INPUT, UiEventActions.EMPTY_INPUT)
+            }
         }
 
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
@@ -115,50 +130,31 @@ class SearchCoinFragment : Fragment() {
         viewModel.getSearchedCoinBySlug(searchInput)
 
         viewModel.coinSearchedBySlug.observe(viewLifecycleOwner){ result ->
-            cancelProgressDialog()
+            cancelProgressDialog(mProgressDialog!!)
             val responseList = arrayListOf<CoinModel>()
 
             when(result) {
                 is Resource.Success -> {
-                    // to remove "" coming with api result, otherwise name is "Bitcoin" instead of just Bitcoin
-                    val regex = Regex("[^A-Za-z0-9 ]")
-
                     val jsonObject = JSONObject(result.data.toString())
-                    val dataObject = jsonObject.getJSONObject("data")
-                    val firstKey = dataObject.keys().next()  // use keys().next() because each firstKey is unique
-                    val resultCoinObject = dataObject.getJSONObject(firstKey)
+                    try {
+                        val dataObject = jsonObject.getJSONObject("data")
 
-                    // Extract the "USD" object from the "quote" object
-                    val quoteObject = resultCoinObject.getJSONObject("quote")
-                    val usdObject = quoteObject.getJSONObject("USD")
+                        viewModel.parseSlugResponse(dataObject)
 
-                    coin = CoinModel(
-                        id = resultCoinObject.getInt("id"),
-                        cmcId = resultCoinObject.getInt("id"),
-                        name = regex.replace(resultCoinObject.get("name").toString(), ""),
-                        slug = resultCoinObject.get("slug").toString(),
-                        symbol = resultCoinObject.get("symbol").toString(),
-                        price = usdObject.get("price").toString().toDouble(),
-                        marketCap = usdObject.get("market_cap").toString().toDouble(),
-                        percentChange1h = usdObject.get("percent_change_1h").toString().toDouble(),
-                        percentChange24h = usdObject.get("percent_change_24h").toString().toDouble(),
-                        percentChange7d = usdObject.get("percent_change_7d").toString().toDouble(),
-                        percentChange30d = usdObject.get("percent_change_30d").toString().toDouble(),
-                        totalTokenHeldAmount = 0.toDouble(),
-                        totalInvestmentAmount = 0.toDouble(),
-                        totalInvestmentWorth = 0.toDouble()
-                    )
+                        responseList.add(viewModel.slugCoinParsed)
 
-                    responseList.add(coin!!)
+                        setupView(responseList)
+                        result.data?.asMap()?.clear()
+                    }catch (e: JSONException){
+                        Log.e("MYTAG", "${e.cause}")
+                        Log.e("MYTAG", "${e.message}")
+                    }
 
-                    setupView(responseList)
-                    result.data?.asMap()?.clear()
-
-                    cancelProgressDialog()
+                    cancelProgressDialog(mProgressDialog!!)
                 }
 
                 is Resource.Error -> {
-                    cancelProgressDialog()
+                    cancelProgressDialog(mProgressDialog!!)
                     if (result.data.toString() == "No Internet Connection Error"){
                         viewModel.triggerUiEvent(UiEventActions.NO_INTERNET_CONNECTION, UiEventActions.NO_INTERNET_CONNECTION)
                     }else {
@@ -168,59 +164,38 @@ class SearchCoinFragment : Fragment() {
                 }
 
                 is Resource.Loading -> {
-                    showProgressDialog()
+                    mProgressDialog!!.show()
                 }
             }
         }
-        cancelProgressDialog()
+        cancelProgressDialog(mProgressDialog!!)
     }
 
     // search coins by symbol, BTC - ETH
     // returns a jsonArray because symbols are not unique
     private fun getCoinBySymbol() {
+        Log.i("MYTAG", "search input onsymbol : ${viewModel.coinSearchInputText.value.toString()}")
+
         val searchInput = viewModel.coinSearchInputText.value.toString()
         viewModel.getSearchCoinBySymbol(searchInput)
 
         viewModel.coinSearchedBySymbol.observe(requireActivity()){ result ->
-            cancelProgressDialog()
+            cancelProgressDialog(mProgressDialog!!)
             val responseList = arrayListOf<CoinModel>()
 
             when(result) {
                 is Resource.Success -> {
-                    // to remove "" coming with api result, otherwise name is "Bitcoin" instead of just Bitcoin
-                    val regex = Regex("[^A-Za-z0-9 ]")
-
                     val response = result.data?.getAsJsonObject("data")?.get(searchInput)?.asJsonArray
                     println(response)
 
-                    if (response != null){
-                        for (c in response.asJsonArray){
-                            coin = CoinModel(
-                                id = c.asJsonObject.get("id").toString().toInt(),
-                                cmcId = c.asJsonObject.get("id").toString().toInt(),
-                                name = regex.replace(c.asJsonObject.get("name").toString(), ""),
-                                slug = c.asJsonObject.get("slug").toString(),
-                                symbol = c.asJsonObject.get("symbol").toString(),
-                                price = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("price").toString().toDouble(),
-                                marketCap = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("market_cap").toString().toDouble(),
-                                percentChange1h = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_1h").toString().toDouble(),
-                                percentChange24h = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_24h").toString().toDouble(),
-                                percentChange7d = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_7d").toString().toDouble(),
-                                percentChange30d = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_30d").toString().toDouble(),
-                                totalTokenHeldAmount = 0.toDouble(),
-                                totalInvestmentAmount = 0.toDouble(),
-                                totalInvestmentWorth =0.toDouble()
-                            )
-                            responseList.add(coin!!)
-                        }
-                    }
+                    viewModel.parseSymbolResponse(response)
 
-                    setupView(responseList)
-                    cancelProgressDialog()
+                    setupView(viewModel.symbolCoinsListParsed)
+                    cancelProgressDialog(mProgressDialog!!)
                 }
 
                 is Resource.Error -> {
-                    cancelProgressDialog()
+                    cancelProgressDialog(mProgressDialog!!)
                     if (result.data.toString() == "No Internet Connection Error"){
                         viewModel.triggerUiEvent(UiEventActions.NO_INTERNET_CONNECTION, UiEventActions.NO_INTERNET_CONNECTION)
                     }else {
@@ -230,14 +205,15 @@ class SearchCoinFragment : Fragment() {
                 }
 
                 is Resource.Loading -> {
-                    showProgressDialog()
+                    mProgressDialog!!.show()
                 }
             }
         }
-        cancelProgressDialog()
+        cancelProgressDialog(mProgressDialog!!)
     }
 
-    private fun setupView(coinList: ArrayList<CoinModel>) {
+    private fun setupView(coinList: MutableList<CoinModel>) {
+
         if (coinList.isNotEmpty()){
             adapter = SearchCoinAdapter(requireContext())
             adapter?.differ?.submitList(coinList)
@@ -311,16 +287,6 @@ class SearchCoinFragment : Fragment() {
         }
     }
 
-    private fun showProgressDialog(){
-        mProgressDialog = Dialog(requireContext())
-        mProgressDialog?.setContentView(R.layout.progress_bar)
-        mProgressDialog?.show()
-    }
-
-    private fun cancelProgressDialog(){
-        mProgressDialog?.dismiss()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         if (binding != null){
@@ -335,5 +301,7 @@ class SearchCoinFragment : Fragment() {
         if (mProgressDialog != null){
             mProgressDialog = null
         }
+        viewModel.coinSearchedBySymbol.removeObservers(viewLifecycleOwner)
+        viewModel.coinSearchedBySlug.removeObservers(viewLifecycleOwner)
     }
 }

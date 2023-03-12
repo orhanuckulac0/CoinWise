@@ -6,7 +6,6 @@ import com.example.investmenttracker.domain.use_case.coin.*
 import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.InsertUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
-import com.example.investmenttracker.domain.use_case.coin.FormatAPIResponseUseCase
 import com.example.investmenttracker.presentation.view_model.MainViewModelFactory
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModelFactory
 import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModelFactory
@@ -30,7 +29,6 @@ class FactoryModule {
         updateUserDataUseCase: UpdateUserDataUseCase,
         getMultipleCoinsUseCase: GetMultipleCoinsUseCase,
         updateCoinDetailsUseCase: UpdateCoinDetailsUseCase,
-        formatAPIResponseUseCase: FormatAPIResponseUseCase
     ): MainViewModelFactory {
         return MainViewModelFactory(
             app,
@@ -40,7 +38,6 @@ class FactoryModule {
             updateUserDataUseCase,
             getMultipleCoinsUseCase,
             updateCoinDetailsUseCase,
-            formatAPIResponseUseCase
         )
     }
 
@@ -50,7 +47,7 @@ class FactoryModule {
         app: Application,
         getCoinBySlugUseCase: GetCoinBySlugUseCase,
         getCoinBySymbolUseCase: GetCoinBySymbolUseCase,
-        saveCoinUseCase: SaveCoinUseCase
+        saveCoinUseCase: SaveCoinUseCase,
     ): SearchCoinViewModelFactory {
         return SearchCoinViewModelFactory(
             app,

@@ -3,7 +3,6 @@ package com.example.investmenttracker.presentation.view_model
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.investmenttracker.domain.use_case.coin.FormatAPIResponseUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetMultipleCoinsUseCase
 import com.example.investmenttracker.domain.use_case.coin.UpdateCoinDetailsUseCase
@@ -19,7 +18,6 @@ class MainViewModelFactory(
     private val updateUserDataUseCase: UpdateUserDataUseCase,
     private val getMultipleCoinsUseCase: GetMultipleCoinsUseCase,
     private val updateCoinDetailsUseCase: UpdateCoinDetailsUseCase,
-    private val formatAPIResponseUseCase: FormatAPIResponseUseCase
     ): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return MainViewModel(
@@ -30,7 +28,6 @@ class MainViewModelFactory(
             updateUserDataUseCase,
             getMultipleCoinsUseCase,
             updateCoinDetailsUseCase,
-            formatAPIResponseUseCase
         ) as T
     }
 }

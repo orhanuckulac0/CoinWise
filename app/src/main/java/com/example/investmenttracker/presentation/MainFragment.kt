@@ -39,6 +39,7 @@ class MainFragment : Fragment() {
     private var mProgressDialog: Dialog? = null
     private lateinit var sharedPref: SharedPreferences
     private var lastApiRequestTime: Long = 0
+    private var populated = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,6 +73,7 @@ class MainFragment : Fragment() {
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         setupActionBar()
+        mProgressDialog = showProgressDialog(requireContext())
 
         // get current user and set it in viewModel to later use in Fragment
         viewModel.getUserData(1)
@@ -107,6 +109,7 @@ class MainFragment : Fragment() {
                 }
             }
         }else{
+            mProgressDialog!!.show()
             populateFromCache()
         }
     }
@@ -123,7 +126,6 @@ class MainFragment : Fragment() {
     }
 
     private fun setupView(coinsList: MutableList<CoinModel>) {
-        var populated = false
 
         binding!!.rvTokens.apply {
             adapter = walletAdapter
@@ -154,7 +156,7 @@ class MainFragment : Fragment() {
             binding!!.tvBalanceDailyChangePercentage.text = "+2,34%" // dummy
         }
 
-        cancelProgressDialog()
+        cancelProgressDialog(mProgressDialog!!)
 
         walletAdapter?.setOnClickListener(object: MainFragmentAdapter.OnClickListener {
             override fun onClick(position: Int, coinModel: CoinModel) {
@@ -189,7 +191,7 @@ class MainFragment : Fragment() {
                         val response = resource.data
                         if (response != null){
                             // format the api response to get coins in it
-                            viewModel.formatAPIResponse(response)
+                            viewModel.parseAPIResponse(response)
                             Log.i("MYTAG", "api call success: ${viewModel.newTokensDataResponse}")
 
                             updateDB()
@@ -201,10 +203,10 @@ class MainFragment : Fragment() {
 
                     is Resource.Error -> {
                         Log.e("MYTAG", "Error fetching data: ${resource.message}")
-                        cancelProgressDialog()
+                        cancelProgressDialog(mProgressDialog!!)
                     }
                     is Resource.Loading -> {
-                        showProgressDialog()
+                        mProgressDialog!!.show()
                     }
                 }
             }
@@ -267,16 +269,6 @@ class MainFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.Main){
             setupView(viewModel.walletTokensToUpdateDB)
         }
-    }
-
-    private fun showProgressDialog(){
-        mProgressDialog = Dialog(requireContext())
-        mProgressDialog?.setContentView(R.layout.progress_bar)
-        mProgressDialog?.show()
-    }
-
-    private fun cancelProgressDialog(){
-        mProgressDialog?.dismiss()
     }
 
     private fun setupActionBar() {

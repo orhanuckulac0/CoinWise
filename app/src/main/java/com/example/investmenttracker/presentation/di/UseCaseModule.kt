@@ -8,7 +8,6 @@ import com.example.investmenttracker.domain.use_case.user.DeleteUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.InsertUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
-import com.example.investmenttracker.domain.use_case.coin.FormatAPIResponseUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -74,11 +73,6 @@ class UseCaseModule {
         return GetMultipleCoinsUseCase(coinRepository)
     }
 
-    @Singleton
-    @Provides
-    fun provideFormatAPIResponseUseCase(): FormatAPIResponseUseCase {
-        return FormatAPIResponseUseCase()
-    }
 
     // User Related UseCases
     @Singleton

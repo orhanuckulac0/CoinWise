@@ -9,7 +9,6 @@ import androidx.lifecycle.*
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.model.UserData
 import com.example.investmenttracker.domain.use_case.util.Resource
-import com.example.investmenttracker.domain.use_case.coin.FormatAPIResponseUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetMultipleCoinsUseCase
 import com.example.investmenttracker.domain.use_case.coin.UpdateCoinDetailsUseCase
@@ -17,6 +16,7 @@ import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.InsertUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
 import com.example.investmenttracker.domain.use_case.util.formatPrice
+import com.example.investmenttracker.domain.use_case.util.parseMultipleCoinsResponseUtil
 import com.example.investmenttracker.presentation.events.UiEventActions
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +31,6 @@ class MainViewModel(
     private val updateUserDataUseCase: UpdateUserDataUseCase,
     private val getMultipleCoinsUseCase: GetMultipleCoinsUseCase,
     private val updateCoinDetailsUseCase: UpdateCoinDetailsUseCase,
-    private val formatAPIResponseUseCase: FormatAPIResponseUseCase
 ): AndroidViewModel(app) {
 
     var userData: UserData? = null
@@ -143,10 +142,7 @@ class MainViewModel(
         updateCoinDetailsUseCase.execute(walletTokensToUpdateDB)
     }
 
-    fun formatAPIResponse(data: JsonObject) {
-        val result = formatAPIResponseUseCase.execute(data)
-        for (coin in result){
-            newTokensDataResponse.add(coin)
-        }
+    fun parseAPIResponse(data: JsonObject) {
+        newTokensDataResponse = parseMultipleCoinsResponseUtil(data)
     }
 }

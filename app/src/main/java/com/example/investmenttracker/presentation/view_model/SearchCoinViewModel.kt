@@ -14,13 +14,17 @@ import com.example.investmenttracker.domain.use_case.*
 import com.example.investmenttracker.domain.use_case.coin.GetCoinBySlugUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetCoinBySymbolUseCase
 import com.example.investmenttracker.domain.use_case.coin.SaveCoinUseCase
+import com.example.investmenttracker.domain.use_case.util.parseSlugResponseUtil
+import com.example.investmenttracker.domain.use_case.util.parseSymbolResponseUtil
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.events.UiEventActions
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.lang.reflect.InvocationTargetException
 
 class SearchCoinViewModel(
@@ -38,6 +42,8 @@ class SearchCoinViewModel(
 
     val coinSearchedBySlug: MutableLiveData<Resource<JsonObject>> = MutableLiveData()
     val coinSearchedBySymbol: MutableLiveData<Resource<JsonObject>> = MutableLiveData()
+    var symbolCoinsListParsed = mutableListOf<CoinModel>()
+    lateinit var slugCoinParsed: CoinModel
 
     @Suppress("DEPRECATION")
     fun isNetworkAvailable(context: Context): Boolean {
@@ -98,10 +104,20 @@ class SearchCoinViewModel(
         saveCoinUseCase.execute(coinModel)
     }
 
+    fun parseSymbolResponse(data: JsonArray?) {
+        symbolCoinsListParsed = parseSymbolResponseUtil(data)
+    }
+
+    fun parseSlugResponse(data: JSONObject){
+        slugCoinParsed = parseSlugResponseUtil(data)!!
+    }
+
     fun triggerUiEvent(message: String, action: String) = viewModelScope.launch(Dispatchers.Main) {
         if (action == UiEventActions.COIN_ADDED) {
             eventChannel.send(UiEvent.ShowCoinAddedSnackbar(message))
         } else if (action == UiEventActions.NO_INTERNET_CONNECTION) {
+            eventChannel.send(UiEvent.ShowErrorSnackbar(message))
+        } else if (action == UiEventActions.EMPTY_INPUT){
             eventChannel.send(UiEvent.ShowErrorSnackbar(message))
         }
     }

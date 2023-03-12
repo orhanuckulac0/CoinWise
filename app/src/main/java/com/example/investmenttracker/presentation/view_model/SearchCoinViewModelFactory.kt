@@ -11,14 +11,14 @@ class SearchCoinViewModelFactory(
     private val app: Application,
     private val getCoinBySlugUseCase: GetCoinBySlugUseCase,
     private val getCoinBySymbolUseCase: GetCoinBySymbolUseCase,
-    private val saveCoinUseCase: SaveCoinUseCase
+    private val saveCoinUseCase: SaveCoinUseCase,
 ): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return SearchCoinViewModel(
             app,
             getCoinBySlugUseCase,
             getCoinBySymbolUseCase,
-            saveCoinUseCase
+            saveCoinUseCase,
         ) as T
     }
 }
