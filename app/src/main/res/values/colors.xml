@@ -13,4 +13,8 @@
     <color name="searchCoinButtonColor">#0286ff</color>
     <color name="redColorPercentage">#bd2729</color>
     <color name="greenColorPercentage">#03764f</color>
+
+    <color name="bottomNavSelected">#EAEAEA</color>
+    <color name="bottomNavUnselected">#808080</color>
+
 </resources>

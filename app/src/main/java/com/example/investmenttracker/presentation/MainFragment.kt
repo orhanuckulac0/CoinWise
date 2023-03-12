@@ -24,6 +24,7 @@ import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.adapter.MainFragmentAdapter
 import com.example.investmenttracker.presentation.view_model.MainViewModel
 import com.example.investmenttracker.presentation.view_model.MainViewModelFactory
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -316,5 +317,11 @@ class MainFragment : Fragment() {
             mProgressDialog = null
         }
         viewModel.multipleCoinsListResponse.removeObservers(viewLifecycleOwner)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val bottomNavigationView = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNavigationView.menu.findItem(R.id.home).isChecked = true
     }
 }
