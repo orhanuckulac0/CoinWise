@@ -40,6 +40,7 @@ class MainFragment : Fragment() {
     private lateinit var sharedPref: SharedPreferences
     private var lastApiRequestTime: Long = 0
     private var populated = false
+    private var sorted = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -82,6 +83,27 @@ class MainFragment : Fragment() {
         lastApiRequestTime = sharedPref.getLong(Constants.LAST_API_REQUEST_TIME, 0)
 
         triggerAppLaunch()
+
+        binding!!.tvSortTokensByValue.setOnClickListener {
+            if (!sorted){
+                val sortedList = sortCoinsByAscending(walletAdapter!!.differ.currentList)
+                walletAdapter!!.differ.submitList(sortedList)
+                sorted = !sorted
+            }else{
+                val sortedList = sortCoinsByDescending(walletAdapter!!.differ.currentList)
+                walletAdapter!!.differ.submitList(sortedList)
+                sorted = !sorted
+            }
+            binding!!.rvTokens.viewTreeObserver.addOnGlobalLayoutListener(object :
+                ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    // Remove the listener to avoid infinite loops
+                    binding!!.rvTokens.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    // Scroll to the top of the list
+                    binding!!.rvTokens.scrollToPosition(0)
+                }
+            })
+        }
     }
 
     private fun triggerAppLaunch() {
@@ -125,6 +147,7 @@ class MainFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setupView(coinsList: MutableList<CoinModel>) {
 
         binding!!.rvTokens.apply {
@@ -149,10 +172,10 @@ class MainFragment : Fragment() {
             binding!!.tvTotalBalance.text = ""
             binding!!.tvBalanceDailyChangePercentage.text = ""
         } else if (viewModel.userData?.userTotalProfit == null) {
-            binding!!.tvTotalBalance.text = formatTotalBalanceValue(totalInvestmentWorth)
+            binding!!.tvTotalBalance.text = "$${formatTotalBalanceValue(totalInvestmentWorth)}"
             binding!!.tvBalanceDailyChangePercentage.text = ""
         } else {
-            binding!!.tvTotalBalance.text = formatTotalBalanceValue(totalInvestmentWorth)
+            binding!!.tvTotalBalance.text = "$${formatTotalBalanceValue(totalInvestmentWorth)}"
             binding!!.tvBalanceDailyChangePercentage.text = "+2,34%" // dummy
         }
 

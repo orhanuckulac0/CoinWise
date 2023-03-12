@@ -33,7 +33,7 @@
         android:layout_marginTop="40dp"
         android:textColor="#737374"
         android:textSize="14sp"
-        android:text=""
+        android:text="Total Balance"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -103,6 +103,7 @@
                 android:layout_height="wrap_content"
                 android:drawableRight="@drawable/sort_vector"
                 android:gravity="end"
+                android:background="?attr/selectableItemBackground"
                 android:text="Sort "
                 android:textColor="#5d5e5e"
                 android:textSize="14sp" />
