@@ -5,4 +5,5 @@ object Constants {
     const val PASSED_COIN = "passedCoin"
     const val REFRESH_STATE = "refreshState"
     const val LAST_API_REQUEST_TIME = "lastApiRequestTime"
+    const val PASSED_COIN_IDS = "passedCoinIDs"
 }

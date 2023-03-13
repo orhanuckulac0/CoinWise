@@ -18,11 +18,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
-import com.example.investmenttracker.domain.use_case.util.Resource
-import com.example.investmenttracker.domain.use_case.util.formatPrice
 import com.example.investmenttracker.databinding.FragmentSearchCoinBinding
-import com.example.investmenttracker.domain.use_case.util.cancelProgressDialog
-import com.example.investmenttracker.domain.use_case.util.showProgressDialog
+import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.adapter.SearchCoinAdapter
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.events.UiEventActions
@@ -47,6 +44,7 @@ class SearchCoinFragment : Fragment() {
 
     private var mProgressDialog: Dialog? = null
     private var coin: CoinModel? = null
+    private var coinIDs: ArrayList<String>? = null
 
 
     override fun onCreateView(
@@ -96,6 +94,8 @@ class SearchCoinFragment : Fragment() {
                 }
             }
         }
+
+        coinIDs = requireArguments().getStringArrayList(Constants.PASSED_COIN_IDS)
 
         binding!!.searchCoinBtnSlug.setOnClickListener {
             if(binding!!.etSearchCoin.text.toString() != ""){
@@ -229,36 +229,50 @@ class SearchCoinFragment : Fragment() {
 
             adapter?.setOnClickListener(object: SearchCoinAdapter.OnClickListener {
                 override fun onClick(position: Int, coinModel: CoinModel) {
-                    // save coin to db
-                    viewModel.saveCoinToDB(
-                        CoinModel(
-                            id = coinModel.cmcId,
-                            cmcId = coinModel.cmcId,
-                            name = coinModel.name,
-                            slug = coinModel.slug,
-                            symbol = coinModel.symbol,
-                            price = formatPrice(coinModel.price).toDouble(),
-                            marketCap = formatPrice(coinModel.marketCap).toDouble(),
-                            percentChange1h = coinModel.percentChange1h,
-                            percentChange24h = coinModel.percentChange24h,
-                            percentChange7d = coinModel.percentChange7d,
-                            percentChange30d = coinModel.percentChange30d,
-                            0.0,
-                            0.0,
-                            0.0
-                        )
-                    )
-                    coinList.removeAt(position)
-                    adapter?.notifyDataSetChanged()
 
+                    var isAlreadyInWallet = false
+                    coinIDs?.forEach { cmcId->
+                        if (cmcId == coinModel.cmcId.toString()) {
+                            isAlreadyInWallet = true
+                            return@forEach
+                        }
+                    }
+                    if (!isAlreadyInWallet){
+                        // save coin to db
+                        viewModel.saveCoinToDB(
+                            CoinModel(
+                                id = coinModel.cmcId,
+                                cmcId = coinModel.cmcId,
+                                name = coinModel.name,
+                                slug = coinModel.slug,
+                                symbol = coinModel.symbol,
+                                price = formatPrice(coinModel.price).toDouble(),
+                                marketCap = formatPrice(coinModel.marketCap).toDouble(),
+                                percentChange1h = coinModel.percentChange1h,
+                                percentChange24h = coinModel.percentChange24h,
+                                percentChange7d = coinModel.percentChange7d,
+                                percentChange30d = coinModel.percentChange30d,
+                                0.0,
+                                0.0,
+                                0.0
+                            )
+                        )
+                        coinList.removeAt(position)
+                        adapter?.notifyItemRemoved(position)
+
+
+                        // trigger snackbar
+                        viewModel.triggerUiEvent("${coinModel.name} added successfully!", UiEventActions.COIN_ADDED)
+                    }else{
+
+                        // trigger snackbar
+                        viewModel.triggerUiEvent("${coinModel.name} is already in wallet.", UiEventActions.ALREADY_IN_WALLET)
+                    }
                     // refresh UI
                     binding!!.etSearchCoin.setText("")
                     if (coinList.isEmpty()){
                         binding!!.rvCoinSearchResults.visibility = View.INVISIBLE
                     }
-
-                    // trigger snackbar
-                    viewModel.triggerUiEvent("${coinModel.name} added successfully!", UiEventActions.COIN_ADDED)
                 }
             })
             if (!dividerCreated && coinList.size > 1){

@@ -67,7 +67,16 @@ class MainFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 when(menuItem.itemId) {
                     R.id.actionAddCoin -> {
-                        findNavController().navigate(R.id.action_mainFragment_to_searchCoinFragment)
+                        // pass coin cmc Ids
+                        val coinIDs = arrayListOf<String>()
+                        for (coin in walletAdapter!!.differ.currentList){
+                            coinIDs.add(coin.cmcId.toString())
+                        }
+                        val bundle = Bundle().apply {
+                            putStringArrayList(Constants.PASSED_COIN_IDS, coinIDs)
+                        }
+
+                        findNavController().navigate(R.id.action_mainFragment_to_searchCoinFragment, bundle)
                     }
                 }
                 return true

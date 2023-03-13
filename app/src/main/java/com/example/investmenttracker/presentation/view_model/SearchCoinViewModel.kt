@@ -119,6 +119,8 @@ class SearchCoinViewModel(
             eventChannel.send(UiEvent.ShowErrorSnackbar(message))
         } else if (action == UiEventActions.EMPTY_INPUT){
             eventChannel.send(UiEvent.ShowErrorSnackbar(message))
+        } else if (action == UiEventActions.ALREADY_IN_WALLET){
+            eventChannel.send(UiEvent.ShowErrorSnackbar(message))
         }
     }
 }
