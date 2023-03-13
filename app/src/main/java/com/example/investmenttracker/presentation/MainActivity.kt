@@ -35,22 +35,15 @@ class MainActivity : AppCompatActivity() {
                     lastMenuItem = item
                     true
                 }
-                R.id.history -> {
-                    // TODO create a fragment for history
+                R.id.analytics -> {
+                    // TODO create a fragment for analytics
                     item.isEnabled = false
                     lastMenuItem?.isEnabled = true
                     lastMenuItem = item
                     true
                 }
-                R.id.explore -> {
+                R.id.search -> {
                     navController.navigate(R.id.searchCoinFragment)
-                    item.isEnabled = false
-                    lastMenuItem?.isEnabled = true
-                    lastMenuItem = item
-                    true
-                }
-                R.id.settings -> {
-                    // TODO create a fragment for settings
                     item.isEnabled = false
                     lastMenuItem?.isEnabled = true
                     lastMenuItem = item

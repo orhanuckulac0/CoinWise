@@ -7,18 +7,13 @@
         app:showAsAction="always"
         android:title="Home"  />
     <item
-        android:id="@+id/history"
-        android:icon="@drawable/ic_history_24"
+        android:id="@+id/analytics"
+        android:icon="@drawable/ic_analytics_chart_24"
         app:showAsAction="always"
-        android:title="History" />
+        android:title="Analytics" />
     <item
-        android:id="@+id/explore"
-        android:icon="@drawable/ic_explore_24"
+        android:id="@+id/search"
+        android:icon="@drawable/ic_search_coin_24"
         app:showAsAction="always"
-        android:title="Explore" />
-    <item
-        android:id="@+id/settings"
-        android:icon="@drawable/ic_settings_24"
-        app:showAsAction="always"
-        android:title="Settings" />
+        android:title="Search" />
 </menu>

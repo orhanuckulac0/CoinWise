@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.domain.use_case.util.Resource
 import com.example.investmenttracker.domain.use_case.*
+import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetCoinBySlugUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetCoinBySymbolUseCase
 import com.example.investmenttracker.domain.use_case.coin.SaveCoinUseCase
@@ -22,6 +23,8 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -32,6 +35,7 @@ class SearchCoinViewModel(
     private val getCoinBySlugUseCase: GetCoinBySlugUseCase,
     private val getCoinBySymbolUseCase: GetCoinBySymbolUseCase,
     private val saveCoinUseCase: SaveCoinUseCase,
+    private val getAllCoinsUseCase: GetAllCoinsUseCase
 ): AndroidViewModel(app) {
 
     private var _coinSearchInputText = MutableLiveData("")
@@ -44,6 +48,18 @@ class SearchCoinViewModel(
     val coinSearchedBySymbol: MutableLiveData<Resource<JsonObject>> = MutableLiveData()
     var symbolCoinsListParsed = mutableListOf<CoinModel>()
     lateinit var slugCoinParsed: CoinModel
+
+    var allCoinIDs = arrayListOf<String>()
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            getAllCoinsUseCase.execute().collect{coins->
+                coins.forEach { coin->
+                    allCoinIDs.add(coin.cmcId.toString())
+                }
+            }
+        }
+    }
 
     @Suppress("DEPRECATION")
     fun isNetworkAvailable(context: Context): Boolean {

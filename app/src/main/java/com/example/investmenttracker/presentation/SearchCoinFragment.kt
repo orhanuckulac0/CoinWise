@@ -231,7 +231,7 @@ class SearchCoinFragment : Fragment() {
                 override fun onClick(position: Int, coinModel: CoinModel) {
 
                     var isAlreadyInWallet = false
-                    coinIDs?.forEach { cmcId->
+                    viewModel.allCoinIDs.forEach { cmcId->
                         if (cmcId == coinModel.cmcId.toString()) {
                             isAlreadyInWallet = true
                             return@forEach

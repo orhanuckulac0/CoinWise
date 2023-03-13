@@ -48,12 +48,14 @@ class FactoryModule {
         getCoinBySlugUseCase: GetCoinBySlugUseCase,
         getCoinBySymbolUseCase: GetCoinBySymbolUseCase,
         saveCoinUseCase: SaveCoinUseCase,
+        getAllCoinsUseCase: GetAllCoinsUseCase
     ): SearchCoinViewModelFactory {
         return SearchCoinViewModelFactory(
             app,
             getCoinBySlugUseCase,
             getCoinBySymbolUseCase,
             saveCoinUseCase,
+            getAllCoinsUseCase
         )
     }
 

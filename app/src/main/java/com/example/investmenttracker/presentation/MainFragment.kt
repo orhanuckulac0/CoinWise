@@ -61,22 +61,12 @@ class MainFragment : Fragment() {
 
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                // Add menu items here
-                menuInflater.inflate(R.menu.menu_add_coin, menu)
+                menuInflater.inflate(R.menu.menu_settings, menu)
             }
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 when(menuItem.itemId) {
-                    R.id.actionAddCoin -> {
-                        // pass coin cmc Ids
-                        val coinIDs = arrayListOf<String>()
-                        for (coin in walletAdapter!!.differ.currentList){
-                            coinIDs.add(coin.cmcId.toString())
-                        }
-                        val bundle = Bundle().apply {
-                            putStringArrayList(Constants.PASSED_COIN_IDS, coinIDs)
-                        }
-
-                        findNavController().navigate(R.id.action_mainFragment_to_searchCoinFragment, bundle)
+                    R.id.actionSettings -> {
+                        // TODO create a settings fragment
                     }
                 }
                 return true
