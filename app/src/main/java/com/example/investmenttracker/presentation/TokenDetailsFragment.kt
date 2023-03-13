@@ -1,5 +1,6 @@
 package com.example.investmenttracker.presentation
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import androidx.activity.OnBackPressedCallback
@@ -14,10 +15,8 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
-import com.example.investmenttracker.domain.use_case.util.Constants
-import com.example.investmenttracker.domain.use_case.util.formatTokenTotalValue
-import com.example.investmenttracker.domain.use_case.util.setDecimalInput
 import com.example.investmenttracker.databinding.FragmentTokenDetailsBinding
+import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModel
 import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModelFactory
@@ -111,10 +110,33 @@ class TokenDetailsFragment : Fragment() {
 
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setupView(){
         val coinIcon = "https://s2.coinmarketcap.com/static/img/coins/64x64/"+"${currentCoin?.cmcId}"+".png"
 
-        binding!!.tvCoinName.text = currentCoin?.name
+        val regex = Regex("[^A-Za-z0-9 ]")
+
+        binding!!.tvCoinName.text = currentCoin?.name + " / " + regex.replace(currentCoin!!.symbol, "")
+        binding!!.tvTotalHeldAmount.text = formatTokenHeldAmount(currentCoin!!.totalTokenHeldAmount) + " " + regex.replace(currentCoin!!.symbol, "")
+        binding!!.tvTotalInvestment.text = "$"+currentCoin?.totalInvestmentAmount.toString()
+        binding!!.tvCurrentInvestmentValue.text =  "$"+currentCoin?.totalInvestmentWorth.toString()
+        binding!!.tvProfitLossAmount.text = formatTotalProfitAmountUI(currentCoin!!)
+
+        if (currentCoin?.totalInvestmentAmount == 0.0){
+            binding!!.tvProfitLossAmount.setTextColor(requireContext().getColor(R.color.white))
+            binding!!.tvProfitLossPercentage.setTextColor(requireContext().getColor(R.color.white))
+            binding!!.tvProfitLossPercentage.text = "0.0%"
+        }else{
+            val profitLoss = (currentCoin!!.totalInvestmentWorth-currentCoin!!.totalInvestmentAmount).toString()
+            if (profitLoss.contains("-")){
+                binding!!.tvProfitLossAmount.setTextColor(requireContext().getColor(R.color.redColorPercentage))
+                // TODO calculate profit / loss percentage and display on UI
+            }else{
+                binding!!.tvProfitLossAmount.setTextColor(requireContext().getColor(R.color.greenColorPercentage))
+                // TODO calculate profit / loss percentage and display on UI
+            }
+        }
+
 
         Glide
             .with(this)

@@ -42,6 +42,13 @@ class MainActivity : AppCompatActivity() {
                     lastMenuItem = item
                     true
                 }
+                R.id.explore -> {
+                    navController.navigate(R.id.searchCoinFragment)
+                    item.isEnabled = false
+                    lastMenuItem?.isEnabled = true
+                    lastMenuItem = item
+                    true
+                }
                 R.id.settings -> {
                     // TODO create a fragment for settings
                     item.isEnabled = false

@@ -17,4 +17,6 @@
     <color name="bottomNavSelected">#EAEAEA</color>
     <color name="bottomNavUnselected">#808080</color>
 
+    <color name ="tokenDetailPageTitleColor">#808080</color>
+
 </resources>

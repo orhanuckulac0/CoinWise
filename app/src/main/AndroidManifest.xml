@@ -16,13 +16,8 @@
         android:theme="@style/Theme.InvestmentTracker"
         tools:targetApi="31">
         <activity
-            android:name=".presentation.activities.TokenDetailsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".presentation.activities.SearchCoinActivity"
-            android:exported="false" />
-        <activity
             android:name=".presentation.MainActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden|adjustPan"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

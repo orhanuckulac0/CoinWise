@@ -36,12 +36,13 @@
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:ems="10"
-            android:textColorHint="@color/black"
-            app:hintTextColor="@color/black"
+            android:hint="Search"
+            android:textColorHint="#777776"
+            app:hintTextColor="#777776"
             android:autofillHints="Search a coin"
             android:background="@drawable/rounded_edittext"
             android:inputType="textPersonName"
-            android:hint="Search"
+            android:drawableLeft="@drawable/ic_search_24"
             />
 
         <com.google.android.material.textfield.TextInputLayout

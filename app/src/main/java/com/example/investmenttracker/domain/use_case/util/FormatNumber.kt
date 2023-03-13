@@ -1,6 +1,8 @@
 package com.example.investmenttracker.domain.use_case.util
 
+import com.example.investmenttracker.data.model.CoinModel
 import java.text.DecimalFormat
+import kotlin.math.abs
 
 
 fun formatPrice(number: Double): String {
@@ -23,7 +25,7 @@ fun convertScientificNotationToString(number: Double): String {
             0
         }
         if (decimalPlaces > 4) {
-            String.format("%.5f", number)
+            String.format("%.4f", number)
         } else {
             String.format("%.${decimalPlaces}f", number)
         }
@@ -47,4 +49,18 @@ fun formatTokenTotalValue(coinPrice: Double, totalInvestment: Double): String {
 
 fun formatTotalBalanceValue(totalInvestment: Double): String {
     return String.format("%.2f", totalInvestment)
+}
+
+fun formatTotalProfitAmountUI(currentCoin: CoinModel): String{
+    val profitLoss = (currentCoin.totalInvestmentWorth-currentCoin.totalInvestmentAmount).toString()
+
+    return if (currentCoin.totalInvestmentAmount == 0.0){
+        "$"+currentCoin.totalInvestmentAmount
+    }else{
+        if (profitLoss.contains("-")){
+            String.format("-$%.2f", abs(profitLoss.toDouble()))
+        }else {
+            String.format("+$%.2f", abs(profitLoss.toDouble()))
+        }
+    }
 }

@@ -12,6 +12,11 @@
         app:showAsAction="always"
         android:title="History" />
     <item
+        android:id="@+id/explore"
+        android:icon="@drawable/ic_explore_24"
+        app:showAsAction="always"
+        android:title="Explore" />
+    <item
         android:id="@+id/settings"
         android:icon="@drawable/ic_settings_24"
         app:showAsAction="always"
