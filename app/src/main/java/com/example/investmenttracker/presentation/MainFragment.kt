@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuHost
@@ -24,7 +25,6 @@ import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.adapter.MainFragmentAdapter
 import com.example.investmenttracker.presentation.view_model.MainViewModel
 import com.example.investmenttracker.presentation.view_model.MainViewModelFactory
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -104,6 +104,12 @@ class MainFragment : Fragment() {
                 }
             })
         }
+
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                requireActivity().finish()
+            }
+        })
     }
 
     private fun triggerAppLaunch() {
@@ -170,14 +176,25 @@ class MainFragment : Fragment() {
 
         if (viewModel.userData?.userTotalBalanceWorth == null) {
             binding!!.tvTotalBalance.text = ""
-            binding!!.tvBalanceDailyChangePercentage.text = ""
+            binding!!.tvInvestmentPercentageChange.text = ""
         } else if (viewModel.userData?.userTotalProfit == null) {
-            binding!!.tvTotalBalance.text = "$${formatTotalBalanceValue(totalInvestmentWorth)}"
-            binding!!.tvBalanceDailyChangePercentage.text = ""
+            binding!!.tvTotalBalance.text = "$" + String.format("%,.2f", totalInvestmentWorth)
+            binding!!.tvInvestmentPercentageChange.text = ""
         } else {
-            binding!!.tvTotalBalance.text = "$${formatTotalBalanceValue(totalInvestmentWorth)}"
-            binding!!.tvBalanceDailyChangePercentage.text = "+2,34%" // dummy
+            binding!!.tvTotalBalance.text = "$" + String.format("%,.2f", totalInvestmentWorth)
+
+            val percentage = calculateProfitLossPercentage(totalInvestmentWorth, viewModel.userData!!.userTotalInvestment)
+            if (percentage == 0.0.toString()){
+                binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.white))
+            }else if (percentage.contains("-")){
+                binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.redColorPercentage))
+            }else {
+                binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.greenColorPercentage))
+            }
+
+            binding!!.tvInvestmentPercentageChange.text = percentage
         }
+
 
         cancelProgressDialog(mProgressDialog!!)
 
@@ -318,9 +335,4 @@ class MainFragment : Fragment() {
         viewModel.multipleCoinsListResponse.removeObservers(viewLifecycleOwner)
     }
 
-    override fun onResume() {
-        super.onResume()
-        val bottomNavigationView = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        bottomNavigationView.menu.findItem(R.id.home).isChecked = true
-    }
 }

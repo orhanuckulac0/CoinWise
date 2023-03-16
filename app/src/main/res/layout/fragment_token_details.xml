@@ -192,7 +192,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Profit / Loss on Investment:"
+                android:text="Profit / Loss Percentage:"
                 android:textStyle="bold"
                 android:textColor="@color/tokenDetailPageTitleColor"
                 />

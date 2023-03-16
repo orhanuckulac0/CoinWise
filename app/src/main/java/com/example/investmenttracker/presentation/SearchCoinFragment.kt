@@ -7,9 +7,9 @@ import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -25,6 +25,7 @@ import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.events.UiEventActions
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModel
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModelFactory
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import org.json.JSONException
@@ -115,10 +116,12 @@ class SearchCoinFragment : Fragment() {
                 viewModel.triggerUiEvent(UiEventActions.EMPTY_INPUT, UiEventActions.EMPTY_INPUT)
             }
         }
+        val navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
 
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigate(R.id.action_searchCoinFragment_to_mainFragment)
+                navigation.selectedItemId = R.id.home
             }
         })
     }

@@ -128,13 +128,15 @@ class TokenDetailsFragment : Fragment() {
             binding!!.tvProfitLossPercentage.text = "0.0%"
         }else{
             val profitLoss = (currentCoin!!.totalInvestmentWorth-currentCoin!!.totalInvestmentAmount).toString()
+            val percentage = calculateProfitLossPercentage(currentCoin!!.totalInvestmentWorth, currentCoin!!.totalInvestmentAmount)
             if (profitLoss.contains("-")){
                 binding!!.tvProfitLossAmount.setTextColor(requireContext().getColor(R.color.redColorPercentage))
-                // TODO calculate profit / loss percentage and display on UI
+                binding!!.tvProfitLossPercentage.setTextColor(requireContext().getColor(R.color.redColorPercentage))
             }else{
                 binding!!.tvProfitLossAmount.setTextColor(requireContext().getColor(R.color.greenColorPercentage))
-                // TODO calculate profit / loss percentage and display on UI
+                binding!!.tvProfitLossPercentage.setTextColor(requireContext().getColor(R.color.greenColorPercentage))
             }
+            binding!!.tvProfitLossPercentage.text = percentage
         }
 
 

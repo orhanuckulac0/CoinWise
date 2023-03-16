@@ -64,3 +64,8 @@ fun formatTotalProfitAmountUI(currentCoin: CoinModel): String{
         }
     }
 }
+
+fun calculateProfitLossPercentage(currentWorth: Double, initialInvestment: Double): String {
+    val percentage = ((currentWorth - initialInvestment) / initialInvestment) * 100
+    return String.format("%.2f", percentage)+"%"
+}

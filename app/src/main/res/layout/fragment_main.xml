@@ -53,7 +53,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tvTotalBalanceText" />
 
     <TextView
-        android:id="@+id/tvBalanceDailyChangePercentage"
+        android:id="@+id/tvInvestmentPercentageChange"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
