@@ -5,99 +5,90 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:layout_gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
     >
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/ivSearchedCoinResultImage"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/coin_place_holder"
+        app:civ_border_color="@color/wallet_civ_border_color"
+        app:civ_border_width="0.5dp" />
+
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        >
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/ivSearchedCoinResultImage"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src="@drawable/coin_place_holder"
-            app:civ_border_color="#363A43"
-            app:civ_border_width="0.5dp" />
+        <TextView
+            android:id="@+id/tvCoinName"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/coin_name_wallet_color"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="Coin Name" />
 
         <LinearLayout
-            android:layout_width="200dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tvCoinName"
-                android:layout_width="160dp"
-                android:layout_height="wrap_content"
-                android:textColor="#f2f2f2"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                tools:text="Coin Name" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/tvCoinPrice"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="#6f7070"
-                    android:textSize="14sp"
-                    tools:text="10.000" />
-
-                <TextView
-                    android:id="@+id/tvCoinPriceChangeDaily"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:textColor="#008759"
-                    android:textSize="14sp"
-                    tools:text="+3.97" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvTokenHeldAmount"
+                android:id="@+id/tvCoinPrice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="end"
-                android:textColor="#d5d6d7"
-                android:textSize="14sp"
-                tools:text="Coin Held Amount" />
-
-            <TextView
-                android:id="@+id/tvTokenTotalValue"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="end"
-                android:textColor="#6f7070"
+                android:textColor="@color/wallet_color_price_value_color"
                 android:textSize="14sp"
                 tools:text="10.000" />
+
+            <TextView
+                android:id="@+id/tvCoinPriceChangeDaily"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:textSize="14sp"
+                tools:text="+3.97" />
+
         </LinearLayout>
 
 
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvTokenHeldAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:textColor="@color/coin_held_amount_color"
+            android:textSize="14sp"
+            tools:text="Coin Held Amount" />
+
+        <TextView
+            android:id="@+id/tvTokenTotalValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:textColor="@color/wallet_color_price_value_color"
+            android:textSize="14sp"
+            tools:text="10.000" />
+    </LinearLayout>
+
 
 </LinearLayout>

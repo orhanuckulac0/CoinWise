@@ -1,4 +1,23 @@
 <resources>
     <string name="app_name">InvestmentTracker</string>
-    <string name="search_a_coin">Search a coin</string>
+    <string name="tokens">Tokens</string>
+    <string name="sort">Sort</string>
+    <string name="no_results_found">   No Results Found   </string>
+    <string name="coin_symbol">COIN SYMBOL</string>
+    <string name="coin_name">COIN NAME</string>
+    <string name="search">Search</string>
+    <string name="total_investment">Total Investment:</string>
+    <string name="dollar_sign">$</string>
+    <string name="save">SAVE</string>
+    <string name="total_token_held">Total Token Held:</string>
+    <string name="update_investment">Update Investment</string>
+    <string name="profit_loss_percentage">Profit / Loss Percentage:</string>
+    <string name="profit_loss_amount">Profit / Loss Amount:</string>
+    <string name="current_investment_value">Current Investment Value:</string>
+    <string name="total_investment_detail">Total Investment:</string>
+    <string name="total_token_held_detail">Total Token Held:</string>
+    <string name="investment_details">Investment Details</string>
+    <string name="image_description">Image</string>
+    <string name="total_balance">Total Balance</string>
+    <string name="data_loading">Data Loading…</string>
 </resources>

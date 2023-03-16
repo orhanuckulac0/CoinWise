@@ -31,9 +31,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:textColor="#737374"
+        android:textColor="@color/tv_total_balance_text_color"
         android:textSize="14sp"
-        android:text="Total Balance"
+        android:text="@string/total_balance"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text=""
-        android:textColor="#f1f1f1"
+        android:textColor="@color/tv_total_balance_color"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -58,7 +58,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text=""
-        android:textColor="#018a59"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -68,7 +67,7 @@
         android:id="@+id/viewDivider"
         android:layout_width="0dp"
         android:layout_height="2dp"
-        android:background="#5c5e5f"
+        android:background="@color/view_divider_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -79,39 +78,32 @@
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        android:gravity="end"
         android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/viewDivider">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end">
+            android:text="@string/tokens"
+            android:textColor="@color/tokens_text_color"
+            android:textSize="20sp"
+            android:layout_weight="1"/>
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Tokens"
-                android:textColor="#f6f6f6"
-                android:textSize="20sp"
-                android:layout_weight="1"/>
-
-            <TextView
-                android:id="@+id/tvSortTokensByValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:layout_gravity="center_vertical"
-                android:gravity="center_vertical"
-                android:text="Sort "
-                android:textColor="#5d5e5e"
-                android:textSize="14sp"
-                app:drawableEndCompat="@drawable/ic_swap_vert_24" />
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/tvSortTokensByValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:text="@string/sort"
+            android:textColor="@color/sort_color"
+            android:textSize="14sp"
+            app:drawableEndCompat="@drawable/ic_swap_vert_24" />
 
     </LinearLayout>
 

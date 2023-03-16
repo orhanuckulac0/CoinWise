@@ -70,7 +70,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Investment Details"
+            android:text="@string/investment_details"
             android:textColor="@color/white"
             android:textSize="22sp"
             android:layout_gravity="center_horizontal"
@@ -88,7 +88,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total Token Held:"
+                android:text="@string/total_token_held_detail"
                 android:textStyle="bold"
                 android:textColor="@color/tokenDetailPageTitleColor"
                 />
@@ -97,7 +97,6 @@
                 android:id="@+id/tvTotalHeldAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="100 BTC"
                 android:textColor="@color/white"
                 android:layout_marginStart="15dp"
                 />
@@ -114,7 +113,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total Investment:"
+                android:text="@string/total_investment_detail"
                 android:textStyle="bold"
                 android:textColor="@color/tokenDetailPageTitleColor"
                 />
@@ -123,7 +122,6 @@
                 android:id="@+id/tvTotalInvestment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="$20.000"
                 android:textColor="@color/white"
                 android:layout_marginStart="15dp"
                 />
@@ -140,7 +138,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Current Investment Value: "
+                android:text="@string/current_investment_value"
                 android:textStyle="bold"
                 android:textColor="@color/tokenDetailPageTitleColor"
                 />
@@ -149,7 +147,6 @@
                 android:id="@+id/tvCurrentInvestmentValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="$22.156"
                 android:textColor="@color/white"
                 android:layout_marginStart="15dp"
                 />
@@ -166,7 +163,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Profit / Loss Amount:"
+                android:text="@string/profit_loss_amount"
                 android:textStyle="bold"
                 android:textColor="@color/tokenDetailPageTitleColor"
                 />
@@ -175,7 +172,7 @@
                 android:id="@+id/tvProfitLossAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=" $2215.6"
+                android:text=""
                 android:textColor="@color/greenColorPercentage"
                 android:layout_marginStart="15dp"
                 />
@@ -192,7 +189,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Profit / Loss Percentage:"
+                android:text="@string/profit_loss_percentage"
                 android:textStyle="bold"
                 android:textColor="@color/tokenDetailPageTitleColor"
                 />
@@ -201,7 +198,7 @@
                 android:id="@+id/tvProfitLossPercentage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="+10.78%"
+                android:text=""
                 android:textColor="@color/greenColorPercentage"
                 android:layout_marginStart="15dp"
                 />
@@ -231,7 +228,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Update Investment"
+            android:text="@string/update_investment"
             android:textSize="22sp"
             android:layout_marginBottom="25dp"
             android:layout_gravity="center_horizontal"
@@ -247,7 +244,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total Token Held:"
+                android:text="@string/total_token_held"
                 android:textSize="16sp"
                 android:textColor="@color/white" />
 
@@ -258,6 +255,7 @@
                 android:layout_weight="1"
                 android:layout_marginStart="20dp"
                 android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:maxLength="20"
                 android:ems="10"
                 android:autofillHints="number"
@@ -277,7 +275,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total Investment:"
+                android:text="@string/total_investment"
                 android:textSize="16sp"
                 android:textColor="@color/white" />
 
@@ -288,9 +286,10 @@
                 android:layout_weight="1"
                 android:layout_marginStart="20dp"
                 android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:maxLength="20"
                 android:ems="10"
-                android:hint="$"
+                android:hint="@string/dollar_sign"
                 android:autofillHints="number"
                 android:background="@drawable/rounded_edittext_token_details"
                 android:inputType="numberDecimal"
@@ -309,7 +308,7 @@
                 android:id="@+id/tokenDetailUpdateBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SAVE"
+                android:text="@string/save"
                 android:background="@drawable/rounded_button"
                 android:gravity="center"
                 android:paddingStart="20dp"

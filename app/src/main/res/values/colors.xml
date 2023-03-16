@@ -18,5 +18,18 @@
     <color name="bottomNavUnselected">#808080</color>
 
     <color name ="tokenDetailPageTitleColor">#808080</color>
+    <color name="coin_price_value_color">#7A8089</color>
+    <color name="civ_border_color_img">#363A43</color>
+    <color name="coin_name_wallet_color">#f2f2f2</color>
+    <color name="coin_held_amount_color">#d5d6d7</color>
+    <color name="wallet_color_price_value_color">#6f7070</color>
+    <color name="wallet_civ_border_color">#363A43</color>
+    <color name="sort_color">#5d5e5e</color>
+    <color name="tokens_text_color">#f6f6f6</color>
+    <color name="view_divider_color">#5c5e5f</color>
+    <color name="tv_total_balance_color">#f1f1f1</color>
+    <color name="tv_total_balance_text_color">#737374</color>
+    <color name="search_text_color_hint">#777776</color>
+    <color name="tv_no_results_color">#D0D0D0</color>
 
 </resources>
