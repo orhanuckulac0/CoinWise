@@ -15,7 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    var lastMenuItem: MenuItem? = null
+    private var lastMenuItem: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.analytics -> {
-                    // TODO create a fragment for analytics
+                    navController.navigate(R.id.analyticsFragment)
                     item.isEnabled = false
                     lastMenuItem?.isEnabled = true
                     lastMenuItem = item

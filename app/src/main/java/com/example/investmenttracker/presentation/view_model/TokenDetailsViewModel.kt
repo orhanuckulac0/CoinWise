@@ -1,9 +1,6 @@
 package com.example.investmenttracker.presentation.view_model
 
 import android.app.Application
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.investmenttracker.data.model.CoinModel
@@ -25,30 +22,10 @@ class TokenDetailsViewModel(
     private val eventChannel = Channel<UiEvent>()
     val eventFlow = eventChannel.receiveAsFlow()
 
-    @Suppress("DEPRECATION")
-    fun isNetworkAvailable(context: Context): Boolean {
-        var result = false
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
-        connectivityManager?.run {
-            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)?.run {
-                result = when {
-                    hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                    hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                    hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-                    else -> false
-                }
-            }
-        }
-        return result
-    }
 
     fun updateTokenDetails(id: Int, totalTokenHeldAmount: Double, totalInvestmentAmount: Double, totalInvestmentWorth: Double){
-        if (isNetworkAvailable(app)){
-            viewModelScope.launch {
-                updateInvestmentUseCase.execute(id, totalTokenHeldAmount, totalInvestmentAmount, totalInvestmentWorth)
-            }
-        }else{
-            triggerUiEvent(UiEventActions.NO_INTERNET_CONNECTION, UiEventActions.NO_INTERNET_CONNECTION)
+        viewModelScope.launch {
+            updateInvestmentUseCase.execute(id, totalTokenHeldAmount, totalInvestmentAmount, totalInvestmentWorth)
         }
     }
 
@@ -64,12 +41,8 @@ class TokenDetailsViewModel(
     }
 
     fun deleteTokenFromDB(coin: CoinModel) {
-        if (isNetworkAvailable(app)){
-            viewModelScope.launch {
-                deleteCoinUseCase.execute(coin)
-            }
-        }else{
-            triggerUiEvent(UiEventActions.NO_INTERNET_CONNECTION, UiEventActions.NO_INTERNET_CONNECTION)
+        viewModelScope.launch {
+            deleteCoinUseCase.execute(coin)
         }
     }
 

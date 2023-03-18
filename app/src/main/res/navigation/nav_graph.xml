@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_mainFragment_to_tokenDetailsFragment"
             app:destination="@id/tokenDetailsFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_analyticsFragment"
+            app:destination="@id/analyticsFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchCoinFragment"
@@ -39,6 +42,15 @@
             app:argType="com.example.investmenttracker.data.model.CoinModel" />
         <action
             android:id="@+id/action_tokenDetailsFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/analyticsFragment"
+        android:name="com.example.investmenttracker.presentation.AnalyticsFragment"
+        android:label="fragment_analytics"
+        tools:layout="@layout/fragment_analytics" >
+        <action
+            android:id="@+id/action_analyticsFragment_to_mainFragment"
             app:destination="@id/mainFragment" />
     </fragment>
 </navigation>

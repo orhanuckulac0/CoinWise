@@ -10,6 +10,8 @@ import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
@@ -25,6 +27,7 @@ import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.adapter.MainFragmentAdapter
 import com.example.investmenttracker.presentation.view_model.MainViewModel
 import com.example.investmenttracker.presentation.view_model.MainViewModelFactory
+import com.google.android.material.appbar.AppBarLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -37,6 +40,8 @@ class MainFragment : Fragment() {
     lateinit var factory: MainViewModelFactory
     lateinit var viewModel: MainViewModel
     private var walletAdapter: MainFragmentAdapter? = null
+    private var constraintLayout: ConstraintLayout? = null
+
     private var mProgressDialog: Dialog? = null
     private lateinit var sharedPref: SharedPreferences
     private var lastApiRequestTime: Long = 0
@@ -48,6 +53,7 @@ class MainFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        constraintLayout = view?.findViewById(R.id.mainFragmentCL)
         return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
@@ -312,9 +318,9 @@ class MainFragment : Fragment() {
     }
 
     private fun setupActionBar() {
-        (requireActivity() as AppCompatActivity).setSupportActionBar(binding!!.toolbarMainActivity)
+        (requireActivity() as AppCompatActivity).setSupportActionBar(binding!!.toolbarMainFragment)
         val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
-        if (actionBar != null){
+        if (actionBar != null) {
             actionBar.title = "InvestmentTracker"
         }
     }
@@ -331,6 +337,10 @@ class MainFragment : Fragment() {
         if (mProgressDialog != null){
             mProgressDialog?.dismiss()
             mProgressDialog = null
+        }
+
+        if (constraintLayout != null){
+            constraintLayout = null
         }
         viewModel.multipleCoinsListResponse.removeObservers(viewLifecycleOwner)
     }

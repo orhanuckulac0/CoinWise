@@ -32,4 +32,8 @@
     <color name="search_text_color_hint">#777776</color>
     <color name="tv_no_results_color">#D0D0D0</color>
 
+    <color name="yellow">#FFEB3B</color>
+    <color name="red">#F44336</color>
+
+
 </resources>

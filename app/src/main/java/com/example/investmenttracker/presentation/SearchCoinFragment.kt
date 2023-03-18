@@ -40,6 +40,7 @@ class SearchCoinFragment : Fragment() {
     lateinit var factory: SearchCoinViewModelFactory
     private lateinit var viewModel: SearchCoinViewModel
     private var adapter: SearchCoinAdapter? = null
+    private var navigation: BottomNavigationView? = null
 
     private var dividerCreated: Boolean = false
 
@@ -116,12 +117,13 @@ class SearchCoinFragment : Fragment() {
                 viewModel.triggerUiEvent(UiEventActions.EMPTY_INPUT, UiEventActions.EMPTY_INPUT)
             }
         }
-        val navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
+
+        navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
 
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigate(R.id.action_searchCoinFragment_to_mainFragment)
-                navigation.selectedItemId = R.id.home
+                navigation?.selectedItemId = R.id.home
             }
         })
     }
@@ -218,7 +220,6 @@ class SearchCoinFragment : Fragment() {
     private fun setupView(coinList: MutableList<CoinModel>) {
 
         if (coinList.isNotEmpty()){
-            adapter = SearchCoinAdapter(requireContext())
             adapter?.differ?.submitList(coinList)
 
             val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
@@ -226,8 +227,8 @@ class SearchCoinFragment : Fragment() {
 
             binding!!.tvNoResults.visibility = View.GONE
             rvCoinSearchResults.visibility = View.VISIBLE
-            rvCoinSearchResults.layoutManager = layoutManager
             rvCoinSearchResults.adapter = adapter
+            rvCoinSearchResults.layoutManager = layoutManager
             rvCoinSearchResults.setHasFixedSize(true)
 
             adapter?.setOnClickListener(object: SearchCoinAdapter.OnClickListener {
@@ -292,14 +293,15 @@ class SearchCoinFragment : Fragment() {
     }
 
     private fun setupActionBar() {
-        (requireActivity() as AppCompatActivity).setSupportActionBar(binding!!.toolbarSearchCoinActivity)
+        (requireActivity() as AppCompatActivity).setSupportActionBar(binding!!.toolbarSearchCoinFragment)
         val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
         if (actionBar != null){
             actionBar.title = "Add Coin"
             actionBar.setDisplayHomeAsUpEnabled(true)
             actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_white)
-            binding!!.toolbarSearchCoinActivity.setNavigationOnClickListener {
+            binding!!.toolbarSearchCoinFragment.setNavigationOnClickListener {
                 findNavController().navigate(R.id.action_searchCoinFragment_to_mainFragment)
+                navigation?.selectedItemId = R.id.home
             }
         }
     }

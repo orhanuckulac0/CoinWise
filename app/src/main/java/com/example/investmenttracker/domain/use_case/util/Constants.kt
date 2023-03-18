@@ -6,4 +6,5 @@ object Constants {
     const val REFRESH_STATE = "refreshState"
     const val LAST_API_REQUEST_TIME = "lastApiRequestTime"
     const val PASSED_COIN_IDS = "passedCoinIDs"
+    const val COIN_IMAGE_LINK = "https://s2.coinmarketcap.com/static/img/coins/64x64/"
 }

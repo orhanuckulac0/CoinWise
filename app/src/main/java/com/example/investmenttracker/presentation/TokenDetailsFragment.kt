@@ -112,7 +112,7 @@ class TokenDetailsFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun setupView(){
-        val coinIcon = "https://s2.coinmarketcap.com/static/img/coins/64x64/"+"${currentCoin?.cmcId}"+".png"
+        val coinIcon = Constants.COIN_IMAGE_LINK+"${currentCoin?.cmcId}"+".png"
 
         val regex = Regex("[^A-Za-z0-9 ]")
 
@@ -150,13 +150,13 @@ class TokenDetailsFragment : Fragment() {
     }
 
     private fun setupActionBar(){
-        (requireActivity() as AppCompatActivity).setSupportActionBar(binding!!.toolbarTokenDetailsActivity)
+        (requireActivity() as AppCompatActivity).setSupportActionBar(binding!!.toolbarTokenDetailsFragment)
         val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
         if (actionBar != null){
             actionBar.title = "Token Details"
             actionBar.setDisplayHomeAsUpEnabled(true)
             actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_white)
-            binding!!.toolbarTokenDetailsActivity.setNavigationOnClickListener {
+            binding!!.toolbarTokenDetailsFragment.setNavigationOnClickListener {
                 findNavController().navigate(R.id.action_tokenDetailsFragment_to_mainFragment)
             }
         }
