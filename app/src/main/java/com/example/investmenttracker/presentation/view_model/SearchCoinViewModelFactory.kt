@@ -7,13 +7,17 @@ import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetCoinBySlugUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetCoinBySymbolUseCase
 import com.example.investmenttracker.domain.use_case.coin.SaveCoinUseCase
+import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
+import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
 
 class SearchCoinViewModelFactory(
     private val app: Application,
     private val getCoinBySlugUseCase: GetCoinBySlugUseCase,
     private val getCoinBySymbolUseCase: GetCoinBySymbolUseCase,
     private val saveCoinUseCase: SaveCoinUseCase,
-    private val getAllCoinsUseCase: GetAllCoinsUseCase
+    private val getAllCoinsUseCase: GetAllCoinsUseCase,
+    private val getUserDataUseCase: GetUserDataUseCase,
+    private val updateUserDataUseCase: UpdateUserDataUseCase
 ): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return SearchCoinViewModel(
@@ -21,7 +25,9 @@ class SearchCoinViewModelFactory(
             getCoinBySlugUseCase,
             getCoinBySymbolUseCase,
             saveCoinUseCase,
-            getAllCoinsUseCase
+            getAllCoinsUseCase,
+            getUserDataUseCase,
+            updateUserDataUseCase
         ) as T
     }
 }

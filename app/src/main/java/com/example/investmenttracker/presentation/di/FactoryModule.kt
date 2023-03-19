@@ -49,14 +49,18 @@ class FactoryModule {
         getCoinBySlugUseCase: GetCoinBySlugUseCase,
         getCoinBySymbolUseCase: GetCoinBySymbolUseCase,
         saveCoinUseCase: SaveCoinUseCase,
-        getAllCoinsUseCase: GetAllCoinsUseCase
+        getAllCoinsUseCase: GetAllCoinsUseCase,
+        getUserDataUseCase: GetUserDataUseCase,
+        updateUserDataUseCase: UpdateUserDataUseCase
     ): SearchCoinViewModelFactory {
         return SearchCoinViewModelFactory(
             app,
             getCoinBySlugUseCase,
             getCoinBySymbolUseCase,
             saveCoinUseCase,
-            getAllCoinsUseCase
+            getAllCoinsUseCase,
+            getUserDataUseCase,
+            updateUserDataUseCase
         )
     }
 
@@ -65,12 +69,16 @@ class FactoryModule {
     fun provideTokenDetailsViewModelFactory(
         app: Application,
         updateInvestmentUseCase: UpdateInvestmentUseCase,
-        deleteCoinUseCase: DeleteCoinUseCase
+        deleteCoinUseCase: DeleteCoinUseCase,
+        getUserDataUseCase: GetUserDataUseCase,
+        updateUserDataUseCase: UpdateUserDataUseCase
     ): TokenDetailsViewModelFactory {
         return TokenDetailsViewModelFactory(
             app,
             updateInvestmentUseCase,
-            deleteCoinUseCase
+            deleteCoinUseCase,
+            getUserDataUseCase,
+            updateUserDataUseCase
         )
     }
 

@@ -4,8 +4,11 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.investmenttracker.data.model.CoinModel
+import com.example.investmenttracker.data.model.UserData
 import com.example.investmenttracker.domain.use_case.coin.DeleteCoinUseCase
 import com.example.investmenttracker.domain.use_case.coin.UpdateInvestmentUseCase
+import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
+import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.events.UiEventActions
 import kotlinx.coroutines.Dispatchers
@@ -16,15 +19,25 @@ import kotlinx.coroutines.launch
 class TokenDetailsViewModel(
     private val app: Application,
     private val updateInvestmentUseCase: UpdateInvestmentUseCase,
-    private val deleteCoinUseCase: DeleteCoinUseCase
+    private val deleteCoinUseCase: DeleteCoinUseCase,
+    private val getUserDataUseCase: GetUserDataUseCase,
+    private val updateUserDataUseCase: UpdateUserDataUseCase
     ): AndroidViewModel(app) {
 
     private val eventChannel = Channel<UiEvent>()
     val eventFlow = eventChannel.receiveAsFlow()
+    var userData: UserData? = null
 
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            getUserDataUseCase.execute(1).collect{
+                userData = it
+            }
+        }
+    }
 
     fun updateTokenDetails(id: Int, totalTokenHeldAmount: Double, totalInvestmentAmount: Double, totalInvestmentWorth: Double){
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             updateInvestmentUseCase.execute(id, totalTokenHeldAmount, totalInvestmentAmount, totalInvestmentWorth)
         }
     }
@@ -41,8 +54,14 @@ class TokenDetailsViewModel(
     }
 
     fun deleteTokenFromDB(coin: CoinModel) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             deleteCoinUseCase.execute(coin)
+        }
+    }
+
+    fun updateUserDB(userData: UserData){
+        viewModelScope.launch(Dispatchers.IO) {
+            updateUserDataUseCase.execute(userData)
         }
     }
 

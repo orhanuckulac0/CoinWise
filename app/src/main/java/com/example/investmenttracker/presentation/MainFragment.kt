@@ -10,7 +10,6 @@ import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -27,7 +26,7 @@ import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.adapter.MainFragmentAdapter
 import com.example.investmenttracker.presentation.view_model.MainViewModel
 import com.example.investmenttracker.presentation.view_model.MainViewModelFactory
-import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -41,6 +40,7 @@ class MainFragment : Fragment() {
     lateinit var viewModel: MainViewModel
     private var walletAdapter: MainFragmentAdapter? = null
     private var constraintLayout: ConstraintLayout? = null
+    private var navigation: BottomNavigationView? = null
 
     private var mProgressDialog: Dialog? = null
     private lateinit var sharedPref: SharedPreferences
@@ -81,6 +81,7 @@ class MainFragment : Fragment() {
 
         setupActionBar()
         mProgressDialog = showProgressDialog(requireContext())
+        navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
 
         // get current user and set it in viewModel to later use in Fragment
         viewModel.getUserData(1)
@@ -208,11 +209,13 @@ class MainFragment : Fragment() {
             override fun onClick(position: Int, coinModel: CoinModel) {
                 val bundle = Bundle().apply {
                     putSerializable(Constants.PASSED_COIN, coinModel)
+                    putSerializable(Constants.PASSED_USER, viewModel.userData)
                 }
                 findNavController().navigate(
                     R.id.action_mainFragment_to_tokenDetailsFragment,
                     bundle
                 )
+                navigation?.selectedItemId = R.id.invisibleItem
             }
         })
     }
@@ -327,21 +330,12 @@ class MainFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (binding != null){
-            binding = null
-        }
-        if (walletAdapter != null){
-            walletAdapter = null
-        }
-
-        if (mProgressDialog != null){
-            mProgressDialog?.dismiss()
-            mProgressDialog = null
-        }
-
-        if (constraintLayout != null){
-            constraintLayout = null
-        }
+        binding = null
+        walletAdapter = null
+        mProgressDialog?.dismiss()
+        mProgressDialog = null
+        constraintLayout = null
+        navigation = null
         viewModel.multipleCoinsListResponse.removeObservers(viewLifecycleOwner)
     }
 

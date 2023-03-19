@@ -16,4 +16,9 @@
         android:icon="@drawable/ic_search_coin_24"
         app:showAsAction="always"
         android:title="Search" />
+    <item
+        android:id="@+id/invisibleItem"
+        android:visible="false"
+        android:title="" />
+
 </menu>

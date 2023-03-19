@@ -2,7 +2,6 @@ package com.example.investmenttracker.presentation
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,11 +12,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.investmenttracker.R
 import com.example.investmenttracker.databinding.FragmentAnalyticsBinding
+import com.example.investmenttracker.domain.use_case.util.ChartUtil
 import com.example.investmenttracker.domain.use_case.util.createPieChart
 import com.example.investmenttracker.domain.use_case.util.showProgressDialog
 import com.example.investmenttracker.presentation.view_model.AnalyticsViewModel
 import com.example.investmenttracker.presentation.view_model.AnalyticsViewModelFactory
 import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.formatter.PercentFormatter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -29,10 +30,12 @@ class AnalyticsFragment : Fragment() {
     private var binding: FragmentAnalyticsBinding? = null
     @Inject
     lateinit var factory: AnalyticsViewModelFactory
-    lateinit var viewModel: AnalyticsViewModel
+    private lateinit var viewModel: AnalyticsViewModel
+
     private var mProgressDialog: Dialog? = null
     private var navigation: BottomNavigationView? = null
     private var pieChart: PieChart? = null
+    private var percentFormatter: PercentFormatter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,8 +50,11 @@ class AnalyticsFragment : Fragment() {
 
         binding = FragmentAnalyticsBinding.bind(view)
         viewModel = ViewModelProvider(this, factory)[AnalyticsViewModel::class.java]
+
         mProgressDialog = showProgressDialog(requireContext())
         pieChart = binding!!.pieChart
+        percentFormatter = ChartUtil.getPercentFormatter(pieChart!!)
+
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
 
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
@@ -64,7 +70,8 @@ class AnalyticsFragment : Fragment() {
 
     private fun setupView(){
         // setup pie chart
-        createPieChart(pieChart!!, requireContext())
+        val walletCoins = viewModel.walletCoins
+        createPieChart(pieChart!!, percentFormatter ,requireContext(), walletCoins)
     }
 
 
@@ -84,14 +91,9 @@ class AnalyticsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (binding != null){
-            binding = null
-        }
-        if (mProgressDialog != null){
-            mProgressDialog = null
-        }
-        if (pieChart != null){
-            pieChart = null
-        }
+        binding = null
+        mProgressDialog = null
+        pieChart = null
+        percentFormatter = null
     }
 }

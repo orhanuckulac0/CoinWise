@@ -15,11 +15,13 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
+import com.example.investmenttracker.data.model.UserData
 import com.example.investmenttracker.databinding.FragmentTokenDetailsBinding
 import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModel
 import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModelFactory
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -32,6 +34,8 @@ class TokenDetailsFragment : Fragment() {
     lateinit var factory: TokenDetailsViewModelFactory
     lateinit var viewModel: TokenDetailsViewModel
     private var currentCoin: CoinModel? = null
+    private var userData: UserData? = null
+    private var navigation: BottomNavigationView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,10 +53,13 @@ class TokenDetailsFragment : Fragment() {
         setupActionBar()
 
         arguments?.let {
-            currentCoin = it.getSerializable(Constants.PASSED_COIN) as CoinModel
+            currentCoin = it.customGetSerializable(Constants.PASSED_COIN)
+            userData = it.customGetSerializable(Constants.PASSED_USER)
         }
-
         setupView()
+
+        navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
+        navigation?.selectedItemId = 0 // set the selected item to be null
 
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
@@ -64,7 +71,13 @@ class TokenDetailsFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 when(menuItem.itemId) {
                     R.id.actionDeleteCoin -> {
+                        viewModel.updateUserDB(userData!!.copy(
+                            userTotalInvestment = userData!!.userTotalInvestment - currentCoin!!.totalInvestmentAmount,
+                            userTotalBalanceWorth = userData!!.userTotalBalanceWorth - currentCoin!!.totalInvestmentWorth,
+                            userTotalCoinInvestedQuantity = userData!!.userTotalCoinInvestedQuantity - 1
+                        ))
                         viewModel.deleteTokenFromDB(currentCoin!!)
+
                         findNavController().navigate(
                             R.id.action_tokenDetailsFragment_to_mainFragment
                         )
@@ -96,15 +109,26 @@ class TokenDetailsFragment : Fragment() {
             if (viewModel.checkEmptyInput(totalTokenHeld, totalInvestment)){
                 val totalInvestmentWorth = formatTokenTotalValue(currentCoin!!.price, totalTokenHeld.toDouble()).replace(",", "").toDouble()
                 viewModel.updateTokenDetails(currentCoin!!.cmcId, totalTokenHeld.toDouble(), totalInvestment.toDouble(), totalInvestmentWorth)
+
+                // update userData
+                val overallTotalInvestment: Double = (userData!!.userTotalInvestment - currentCoin!!.totalInvestmentAmount) + totalInvestment.toDouble()
+                val overallTotalInvestmentWorth: Double = (userData!!.userTotalBalanceWorth - currentCoin!!.totalInvestmentWorth) + totalInvestmentWorth
+                viewModel.updateUserDB(userData!!.copy(
+                    userTotalInvestment = overallTotalInvestment,
+                    userTotalBalanceWorth = overallTotalInvestmentWorth
+                ))
+
                 findNavController().navigate(
                     R.id.action_tokenDetailsFragment_to_mainFragment
                 )
+                navigation?.selectedItemId = R.id.home
             }
         }
 
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigate(R.id.action_tokenDetailsFragment_to_mainFragment)
+                navigation?.selectedItemId = R.id.home
             }
         })
 
@@ -158,17 +182,16 @@ class TokenDetailsFragment : Fragment() {
             actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_white)
             binding!!.toolbarTokenDetailsFragment.setNavigationOnClickListener {
                 findNavController().navigate(R.id.action_tokenDetailsFragment_to_mainFragment)
+                navigation?.selectedItemId = R.id.home
             }
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (currentCoin != null){
-            currentCoin = null
-        }
-        if (binding != null){
-            binding = null
-        }
+        currentCoin = null
+        binding = null
+        userData = null
+        navigation = null
     }
 }

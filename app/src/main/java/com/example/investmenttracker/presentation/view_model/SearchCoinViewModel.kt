@@ -9,12 +9,15 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.investmenttracker.data.model.CoinModel
+import com.example.investmenttracker.data.model.UserData
 import com.example.investmenttracker.domain.use_case.util.Resource
 import com.example.investmenttracker.domain.use_case.*
 import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetCoinBySlugUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetCoinBySymbolUseCase
 import com.example.investmenttracker.domain.use_case.coin.SaveCoinUseCase
+import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
+import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
 import com.example.investmenttracker.domain.use_case.util.parseSlugResponseUtil
 import com.example.investmenttracker.domain.use_case.util.parseSymbolResponseUtil
 import com.example.investmenttracker.presentation.events.UiEvent
@@ -23,6 +26,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -33,7 +37,9 @@ class SearchCoinViewModel(
     private val getCoinBySlugUseCase: GetCoinBySlugUseCase,
     private val getCoinBySymbolUseCase: GetCoinBySymbolUseCase,
     private val saveCoinUseCase: SaveCoinUseCase,
-    private val getAllCoinsUseCase: GetAllCoinsUseCase
+    private val getAllCoinsUseCase: GetAllCoinsUseCase,
+    private val getUserDataUseCase: GetUserDataUseCase,
+    private val updateUserDataUseCase: UpdateUserDataUseCase
 ): AndroidViewModel(app) {
 
     private var _coinSearchInputText = MutableLiveData("")
@@ -48,6 +54,7 @@ class SearchCoinViewModel(
     lateinit var slugCoinParsed: CoinModel
 
     var allCoinIDs = arrayListOf<String>()
+    var userData = MutableLiveData<UserData>()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -55,6 +62,11 @@ class SearchCoinViewModel(
                 coins.forEach { coin->
                     allCoinIDs.add(coin.cmcId.toString())
                 }
+            }
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            getUserDataUseCase.execute(1).collect(){
+                userData.postValue(it)
             }
         }
     }
@@ -111,6 +123,12 @@ class SearchCoinViewModel(
             Log.i("MYTAG", e.cause.toString())
         } catch (e: java.lang.Exception) {
             e.printStackTrace();
+        }
+    }
+
+    fun updateUserDataDB(userData: UserData){
+        viewModelScope.launch(Dispatchers.IO) {
+            updateUserDataUseCase.execute(userData)
         }
     }
 

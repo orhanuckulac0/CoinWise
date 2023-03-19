@@ -49,6 +49,12 @@ class MainActivity : AppCompatActivity() {
                     lastMenuItem = item
                     true
                 }
+                R.id.invisibleItem -> {
+                    item.isEnabled = false
+                    lastMenuItem?.isEnabled = true
+                    lastMenuItem = item
+                    true
+                }
                 else -> false
             }
         }

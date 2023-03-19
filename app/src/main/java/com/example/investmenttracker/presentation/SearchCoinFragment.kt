@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
+import com.example.investmenttracker.data.model.UserData
 import com.example.investmenttracker.databinding.FragmentSearchCoinBinding
 import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.adapter.SearchCoinAdapter
@@ -40,6 +41,8 @@ class SearchCoinFragment : Fragment() {
     lateinit var factory: SearchCoinViewModelFactory
     private lateinit var viewModel: SearchCoinViewModel
     private var adapter: SearchCoinAdapter? = null
+    private var userData: UserData? = null
+
     private var navigation: BottomNavigationView? = null
 
     private var dividerCreated: Boolean = false
@@ -66,6 +69,11 @@ class SearchCoinFragment : Fragment() {
 
         viewModel = ViewModelProvider(this, factory)[SearchCoinViewModel::class.java]
         adapter = SearchCoinAdapter(requireContext())
+
+        viewModel.userData.observe(viewLifecycleOwner){
+            userData = it
+        }
+
         val menuHost: MenuHost = requireActivity()
 
         menuHost.addMenuProvider(object : MenuProvider {
@@ -261,6 +269,10 @@ class SearchCoinFragment : Fragment() {
                                 0.0
                             )
                         )
+                        viewModel.updateUserDataDB(
+                            userData!!.copy(
+                            userTotalCoinInvestedQuantity = userData!!.userTotalCoinInvestedQuantity + 1
+                        ))
                         coinList.removeAt(position)
                         adapter?.notifyItemRemoved(position)
 
@@ -308,18 +320,11 @@ class SearchCoinFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (binding != null){
-            binding = null
-        }
-        if (adapter != null){
-            adapter = null
-        }
-        if (coin != null){
-            coin = null
-        }
-        if (mProgressDialog != null){
-            mProgressDialog = null
-        }
+        binding = null
+        adapter = null
+        coin = null
+        mProgressDialog = null
+        userData = null
         viewModel.coinSearchedBySymbol.removeObservers(viewLifecycleOwner)
         viewModel.coinSearchedBySlug.removeObservers(viewLifecycleOwner)
     }
