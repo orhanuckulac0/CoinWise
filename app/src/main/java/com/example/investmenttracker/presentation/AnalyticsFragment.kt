@@ -71,7 +71,9 @@ class AnalyticsFragment : Fragment() {
     private fun setupView(){
         // setup pie chart
         val walletCoins = viewModel.walletCoins
-        createPieChart(pieChart!!, percentFormatter ,requireContext(), walletCoins)
+        if (walletCoins.isNotEmpty()){
+            createPieChart(pieChart!!, percentFormatter ,requireContext(), walletCoins)
+        }
     }
 
 

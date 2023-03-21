@@ -9,10 +9,7 @@ data class UserData(
     val id: Int,
     var userTotalInvestment: Double,
     var userTotalBalanceWorth: Double,
-    var userTotalProfit: Double,
-    var userTotalLoss: Double,
-    var userBalanceDailyChange: Double,
-    var userBalanceWeeklyChange: Double,
-    var userBalanceMonthlyChange: Double,
+    var userTotalProfitAndLoss: Double,
+    var userTotalProfitAndLossPercentage: Double,
     var userTotalCoinInvestedQuantity: Int
 ): java.io.Serializable

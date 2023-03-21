@@ -71,11 +71,25 @@ class TokenDetailsFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 when(menuItem.itemId) {
                     R.id.actionDeleteCoin -> {
-                        viewModel.updateUserDB(userData!!.copy(
-                            userTotalInvestment = userData!!.userTotalInvestment - currentCoin!!.totalInvestmentAmount,
-                            userTotalBalanceWorth = userData!!.userTotalBalanceWorth - currentCoin!!.totalInvestmentWorth,
-                            userTotalCoinInvestedQuantity = userData!!.userTotalCoinInvestedQuantity - 1
-                        ))
+                        val user = viewModel.userData!!
+                        // if that coin is the last in db, set all values to default **necessary
+                        if (user.userTotalCoinInvestedQuantity == 1){
+                            viewModel.updateUserDB(user.copy(
+                                userTotalInvestment = 0.0,
+                                userTotalBalanceWorth = 0.0,
+                                userTotalProfitAndLoss = 0.0,
+                                userTotalProfitAndLossPercentage = 0.0,
+                                userTotalCoinInvestedQuantity = 0
+                            ))
+                        }else{
+                            viewModel.updateUserDB(user.copy(
+                                userTotalInvestment = formatToTwoDecimal(user.userTotalInvestment - currentCoin!!.totalInvestmentAmount),
+                                userTotalBalanceWorth = formatToTwoDecimal(user.userTotalBalanceWorth - currentCoin!!.totalInvestmentWorth),
+                                userTotalProfitAndLoss = formatToTwoDecimal(user.userTotalBalanceWorth - user.userTotalInvestment),
+                                userTotalProfitAndLossPercentage = calculateProfitLossPercentage(user.userTotalBalanceWorth, user.userTotalInvestment).replace("%", "").toDouble(),
+                                userTotalCoinInvestedQuantity = user.userTotalCoinInvestedQuantity - 1
+                            ))
+                        }
                         viewModel.deleteTokenFromDB(currentCoin!!)
 
                         findNavController().navigate(

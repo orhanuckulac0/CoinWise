@@ -92,14 +92,14 @@ class MainFragment : Fragment() {
         triggerAppLaunch()
 
         binding!!.tvSortTokensByValue.setOnClickListener {
-            if (!sorted){
+            sorted = if (!sorted){
                 val sortedList = sortCoinsByAscending(walletAdapter!!.differ.currentList)
                 walletAdapter!!.differ.submitList(sortedList)
-                sorted = !sorted
+                !sorted
             }else{
                 val sortedList = sortCoinsByDescending(walletAdapter!!.differ.currentList)
                 walletAdapter!!.differ.submitList(sortedList)
-                sorted = !sorted
+                !sorted
             }
             binding!!.rvTokens.viewTreeObserver.addOnGlobalLayoutListener(object :
                 ViewTreeObserver.OnGlobalLayoutListener {
@@ -173,33 +173,53 @@ class MainFragment : Fragment() {
         }
 
         walletAdapter?.differ?.submitList(coinsList)
-
-
-        // update UI only, in 60 seconds db user data will update itself
-        var totalInvestmentWorth = 0.0
-        for (coin in coinsList){
-            totalInvestmentWorth += coin.price*coin.totalTokenHeldAmount
+        if (coinsList.isEmpty()){
+            binding!!.rvTokens.visibility = View.GONE
+            binding!!.tvEmptyWalletText.visibility = View.VISIBLE
+        }else{
+            binding!!.rvTokens.visibility = View.VISIBLE
+            binding!!.tvEmptyWalletText.visibility = View.GONE
         }
 
-        if (viewModel.userData?.userTotalBalanceWorth == null) {
-            binding!!.tvTotalBalance.text = ""
-            binding!!.tvInvestmentPercentageChange.text = ""
-        } else if (viewModel.userData?.userTotalProfit == null) {
-            binding!!.tvTotalBalance.text = "$" + String.format("%,.2f", totalInvestmentWorth)
-            binding!!.tvInvestmentPercentageChange.text = ""
-        } else {
-            binding!!.tvTotalBalance.text = "$" + String.format("%,.2f", totalInvestmentWorth)
+        // update UI only, in 60 seconds db user data will update itself
+        if (viewModel.userData != null){
+            var userTotalBalanceWorth = 0.0
+            val userTotalPercentageChange: Double
+            var userTotalInvestment = 0.0
 
-            val percentage = calculateProfitLossPercentage(totalInvestmentWorth, viewModel.userData!!.userTotalInvestment)
-            if (percentage == 0.0.toString()){
-                binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.white))
-            }else if (percentage.contains("-")){
-                binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.redColorPercentage))
-            }else {
-                binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.greenColorPercentage))
+            for (coin in coinsList){
+                userTotalBalanceWorth += coin.price * coin.totalTokenHeldAmount
+            }
+            // balance text
+            if (userTotalBalanceWorth == 0.0) {
+                binding!!.tvTotalBalance.text = "$0.00"
+                binding!!.tvTotalBalance.setTextColor(requireContext().getColor(R.color.white))
+            }else{
+                binding!!.tvTotalBalance.text = formatTotalBalanceValue(userTotalBalanceWorth)
             }
 
-            binding!!.tvInvestmentPercentageChange.text = percentage
+            // percentage text
+            for (coin in coinsList){
+                 userTotalInvestment += coin.totalInvestmentAmount
+            }
+            userTotalPercentageChange = calculateProfitLossPercentage(userTotalBalanceWorth, userTotalInvestment).replace("%", "").toDouble()
+            if (userTotalPercentageChange == 0.0 || userTotalPercentageChange.isNaN()){
+                binding!!.tvInvestmentPercentageChange.text = "0.0%"
+                binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.sort_color))
+            }else{
+                binding!!.tvInvestmentPercentageChange.text = "$userTotalPercentageChange%"
+                if (userTotalPercentageChange.toString().contains("-")){
+                    binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.redColorPercentage))
+                }else {
+                    binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.greenColorPercentage))
+                }
+                binding!!.tvTotalBalance.text = formatTotalBalanceValue(userTotalBalanceWorth)
+            }
+        }else{
+            binding!!.tvTotalBalance.text = "$0.00"
+            binding!!.tvTotalBalance.setTextColor(requireContext().getColor(R.color.white))
+            binding!!.tvInvestmentPercentageChange.text = "0.0%"
+            binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.sort_color))
         }
 
 
@@ -253,6 +273,8 @@ class MainFragment : Fragment() {
                     is Resource.Error -> {
                         Log.e("MYTAG", "Error fetching data: ${resource.message}")
                         cancelProgressDialog(mProgressDialog!!)
+                        // pass empty list to adapter
+                        setupView(mutableListOf())
                     }
                     is Resource.Loading -> {
                         mProgressDialog!!.show()
@@ -273,29 +295,24 @@ class MainFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun updateUserDataDB() {
-        var totalInvestment = 0.0
-        val userTotalBalanceWorth: Double
-        var totalInvestmentWorth = 0.0
-
         val currentUser = viewModel.userData
 
         if (viewModel.walletTokensToUpdateDB.isNotEmpty() && currentUser != null) {
 
-            for (coin in viewModel.walletTokensToUpdateDB){
-                totalInvestment += coin.totalInvestmentAmount
-                totalInvestmentWorth += coin.price*coin.totalTokenHeldAmount
-            }
+            currentUser.userTotalProfitAndLoss = formatToTwoDecimal(currentUser.userTotalBalanceWorth-currentUser.userTotalInvestment)
 
-            userTotalBalanceWorth = formatTotalBalanceValue(totalInvestmentWorth).toDouble()
+            currentUser.userTotalProfitAndLossPercentage = calculateProfitLossPercentage(
+                currentUser.userTotalBalanceWorth,
+                currentUser.userTotalInvestment
+            ).replace("%", "").toDouble()
 
-            currentUser.userTotalLoss = 0.0
-            currentUser.userTotalInvestment = totalInvestment
-            currentUser.userTotalBalanceWorth = String.format("%.2f", userTotalBalanceWorth).toDouble()
+            currentUser.userTotalInvestment = currentUser.userTotalInvestment
+            currentUser.userTotalBalanceWorth = formatToTwoDecimal(currentUser.userTotalBalanceWorth)
             currentUser.userTotalCoinInvestedQuantity = viewModel.walletTokensToUpdateDB.size
             Log.i("MYTAG", "USER DATA FRAGMENT: ${currentUser.id}")
-            Log.i("MYTAG", "total investment : $totalInvestment")
-            Log.i("MYTAG", "totalInvestmentWorth: $totalInvestmentWorth")
-            Log.i("MYTAG", "userTotalBalanceWorth: $userTotalBalanceWorth")
+            Log.i("MYTAG", "total investment : ${currentUser.userTotalInvestment}")
+            Log.i("MYTAG", "totalInvestmentWorth: ${currentUser.userTotalInvestment}")
+            Log.i("MYTAG", "userTotalBalanceWorth: ${currentUser.userTotalBalanceWorth}")
 
             viewModel.updateUserdata(currentUser)
         } else {
@@ -303,9 +320,6 @@ class MainFragment : Fragment() {
             viewModel.insertUserData(
                 UserData(
                     1,
-                    0.0,
-                    0.0,
-                    0.0,
                     0.0,
                     0.0,
                     0.0,

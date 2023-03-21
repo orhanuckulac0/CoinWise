@@ -269,10 +269,22 @@ class SearchCoinFragment : Fragment() {
                                 0.0
                             )
                         )
-                        viewModel.updateUserDataDB(
-                            userData!!.copy(
-                            userTotalCoinInvestedQuantity = userData!!.userTotalCoinInvestedQuantity + 1
-                        ))
+                        if (userData != null){
+                            viewModel.updateUserDataDB(
+                                userData!!.copy(
+                                    userTotalCoinInvestedQuantity = userData!!.userTotalCoinInvestedQuantity + 1
+                                ))
+                        }else{
+                            viewModel.updateUserDataDB(
+                                UserData(
+                                    1,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    1
+                                ))
+                        }
                         coinList.removeAt(position)
                         adapter?.notifyItemRemoved(position)
 
@@ -327,5 +339,6 @@ class SearchCoinFragment : Fragment() {
         userData = null
         viewModel.coinSearchedBySymbol.removeObservers(viewLifecycleOwner)
         viewModel.coinSearchedBySlug.removeObservers(viewLifecycleOwner)
+        viewModel.userData.removeObservers(viewLifecycleOwner)
     }
 }

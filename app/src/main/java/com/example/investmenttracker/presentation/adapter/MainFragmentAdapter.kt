@@ -70,7 +70,7 @@ class MainFragmentAdapter(
 
             if (coinModel.percentChange24h.toString().contains("-")){
                 binding.tvCoinPriceChangeDaily.setTextColor(context.getColor(R.color.redColorPercentage))
-                binding.tvCoinPriceChangeDaily.text = "-"+String.format("%.2f", coinModel.percentChange24h)+"%"
+                binding.tvCoinPriceChangeDaily.text = String.format("%.2f", coinModel.percentChange24h)+"%"
             }else {
                 binding.tvCoinPriceChangeDaily.setTextColor(context.getColor(R.color.greenColorPercentage))
                 binding.tvCoinPriceChangeDaily.text = "+"+String.format("%.2f", coinModel.percentChange24h)+"%"

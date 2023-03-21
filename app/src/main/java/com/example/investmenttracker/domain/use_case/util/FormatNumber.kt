@@ -69,3 +69,7 @@ fun calculateProfitLossPercentage(currentWorth: Double, initialInvestment: Doubl
     val percentage = ((currentWorth - initialInvestment) / initialInvestment) * 100
     return String.format("%.2f", percentage)+"%"
 }
+
+fun formatToTwoDecimal(number: Double): Double{
+    return String.format("%.2f", number).toDouble()
+}
