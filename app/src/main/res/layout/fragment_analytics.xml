@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".presentation.AnalyticsFragment"
+    android:paddingBottom="15dp"
     android:background="@color/mainColor">
 
     <LinearLayout
@@ -26,8 +27,126 @@
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
         </com.google.android.material.appbar.AppBarLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:textSize="22sp"
+            android:text="Investment Details"
+            android:textColor="@color/white"
+            android:layout_marginTop="20dp"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:padding="5dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Initial Investment:"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/tokenDetailPageTitleColor"
+                />
+
+            <TextView
+                android:id="@+id/tvTotalUserInvestment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:layout_marginStart="10dp"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Investment Current Value:"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/tokenDetailPageTitleColor"
+                />
+
+            <TextView
+                android:id="@+id/tvTotalUserInvestmentWorth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:layout_marginStart="10dp"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Investment Profit/Loss:"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/tokenDetailPageTitleColor"
+                />
+
+            <TextView
+                android:id="@+id/tvInvestmentProfitLoss"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:layout_marginStart="10dp"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Investment Return Percentage:"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/tokenDetailPageTitleColor"
+                />
+
+            <TextView
+                android:id="@+id/tvInvestmentReturnPercentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:layout_marginStart="10dp"
+                />
+
+        </LinearLayout>
 
         <TextView
+            android:id="@+id/tvPieChartTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/investment_diversity"
@@ -35,16 +154,135 @@
             android:textSize="22sp"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:paddingTop="10dp"/>
+            android:layout_marginTop="15dp"
+            android:paddingTop="10dp"
+            android:visibility="gone"
+            />
 
         <com.github.mikephil.charting.charts.PieChart
             android:id="@+id/pieChart"
             android:layout_width="300dp"
             android:layout_height="300dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="25dp" />
+            android:layout_marginTop="15dp"
+            android:visibility="gone"
+            />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:textSize="22sp"
+            android:text="Insight"
+            android:textColor="@color/white"
+            android:layout_marginTop="25dp"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:padding="5dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Most Profit:"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/tokenDetailPageTitleColor"
+                />
+
+            <TextView
+                android:id="@+id/tvMostProfitToken"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:layout_marginStart="5dp"
+                />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Most Profit Percentage:"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/tokenDetailPageTitleColor"
+                />
+
+            <TextView
+                android:id="@+id/tvMostProfitByPercentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:layout_marginStart="5dp"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Most Loss:"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/tokenDetailPageTitleColor"
+                />
+
+            <TextView
+                android:id="@+id/tvMostLossToken"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:layout_marginStart="5dp"
+                />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Most Loss Percentage:"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/tokenDetailPageTitleColor"
+                />
+
+            <TextView
+                android:id="@+id/tvMostLossTokenByPercentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:layout_marginStart="5dp"
+                />
+
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -19,5 +19,5 @@ data class CoinModel(
     var percentChange30d: Double,
     val totalTokenHeldAmount: Double,
     val totalInvestmentAmount: Double,
-    val totalInvestmentWorth: Double
+    var totalInvestmentWorth: Double
 ): java.io.Serializable

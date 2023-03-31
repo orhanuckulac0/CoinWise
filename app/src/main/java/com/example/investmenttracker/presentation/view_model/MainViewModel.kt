@@ -8,15 +8,13 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.model.UserData
-import com.example.investmenttracker.domain.use_case.util.Resource
 import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetMultipleCoinsUseCase
 import com.example.investmenttracker.domain.use_case.coin.UpdateCoinDetailsUseCase
 import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.InsertUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
-import com.example.investmenttracker.domain.use_case.util.formatPrice
-import com.example.investmenttracker.domain.use_case.util.parseMultipleCoinsResponseUtil
+import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.events.UiEventActions
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
@@ -38,8 +36,18 @@ class MainViewModel(
     val multipleCoinsListResponse: MutableLiveData<Resource<JsonObject>> = MutableLiveData()
     var currentWalletCoins = mutableListOf<CoinModel>()
     var newTokensDataResponse = mutableListOf<CoinModel>()
+    var temporaryTokenListToUseOnFragment = mutableListOf<CoinModel>()
     var walletTokensToUpdateDB = mutableListOf<CoinModel>()
     var slugNames = ""
+
+    init {
+        // get current user and set it in viewModel to later use in Fragment
+        viewModelScope.launch(Dispatchers.IO) {
+            getUserDataUseCase.execute(1).collect {
+                userData = it
+            }
+        }
+    }
 
     @Suppress("DEPRECATION")
     fun isNetworkAvailable(context: Context): Boolean {
@@ -58,30 +66,20 @@ class MainViewModel(
         return result
     }
 
-    fun getUserData(id: Int) {
-        viewModelScope.launch {
-            getUserDataUseCase.execute(id).collect {
-                userData = it
-            }
-        }
-    }
-
     fun updateUserdata(data: UserData){
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             updateUserDataUseCase.execute(data)
         }
     }
 
     fun insertUserData(data: UserData) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             insertUserDataUseCase.execute(data)
         }
     }
 
     fun getTokensFromWallet() {
-        val startTime = System.nanoTime()
-
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             getAllCoinsUseCase.execute()
                 .distinctUntilChanged()
                 .collect { walletCoins ->
@@ -94,13 +92,9 @@ class MainViewModel(
                     val walletTokenNames = currentWalletCoins.map { coin -> coin.slug.replace("\"", "") }
                     val joinedNames = walletTokenNames.joinToString(",")
                     slugNames = joinedNames
-                    Log.i("MYTAG", "joined names for api request $slugNames")
+                    Log.i("MYTAG", "joined names for api request: -> $slugNames")
                 }
         }
-        val endTime = System.nanoTime()
-        val elapsedTime = (endTime - startTime) / 1000000.0 // convert nanoseconds to milliseconds
-        Log.i("MyFunction", "Elapsed time: $elapsedTime ms")
-
     }
 
     fun getMultipleCoinsBySlug(slugList: List<String>) = viewModelScope.launch(Dispatchers.IO) {
@@ -132,6 +126,7 @@ class MainViewModel(
                         percentChange24h = coin.percentChange24h
                         percentChange7d = coin.percentChange7d
                         percentChange30d = coin.percentChange30d
+                        totalInvestmentWorth = formatToTwoDecimal(coin.price * walletCoin.totalTokenHeldAmount)
                     }
                     walletTokensToUpdateDB.add(updatedCoin)
                 }
@@ -139,6 +134,7 @@ class MainViewModel(
         }
 
         Log.i("MYTAG", "new wallet: $newTokensDataResponse")
+        temporaryTokenListToUseOnFragment.addAll(walletTokensToUpdateDB)
         updateCoinDetailsUseCase.execute(walletTokensToUpdateDB)
     }
 

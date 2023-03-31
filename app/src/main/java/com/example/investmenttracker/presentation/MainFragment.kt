@@ -83,12 +83,10 @@ class MainFragment : Fragment() {
         mProgressDialog = showProgressDialog(requireContext())
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
 
-        // get current user and set it in viewModel to later use in Fragment
-        viewModel.getUserData(1)
-
         sharedPref = requireContext().getSharedPreferences(Constants.REFRESH_STATE, Context.MODE_PRIVATE)
         lastApiRequestTime = sharedPref.getLong(Constants.LAST_API_REQUEST_TIME, 0)
 
+        viewModel.getTokensFromWallet()
         triggerAppLaunch()
 
         binding!!.tvSortTokensByValue.setOnClickListener {
@@ -144,16 +142,12 @@ class MainFragment : Fragment() {
                 }
             }
         }else{
-            mProgressDialog!!.show()
             populateFromCache()
         }
     }
 
     private fun populateFromCache(){
         lifecycleScope.launch(Dispatchers.IO) {
-            viewModel.getTokensFromWallet()
-            delay(250)
-
             withContext(Dispatchers.Main){
                 setupView(viewModel.currentWalletCoins)
             }
@@ -189,19 +183,17 @@ class MainFragment : Fragment() {
 
             for (coin in coinsList){
                 userTotalBalanceWorth += coin.price * coin.totalTokenHeldAmount
+                userTotalInvestment += coin.totalInvestmentAmount
             }
             // balance text
             if (userTotalBalanceWorth == 0.0) {
                 binding!!.tvTotalBalance.text = "$0.00"
                 binding!!.tvTotalBalance.setTextColor(requireContext().getColor(R.color.white))
             }else{
-                binding!!.tvTotalBalance.text = formatTotalBalanceValue(userTotalBalanceWorth)
+                binding!!.tvTotalBalance.text = "$"+formatTotalBalanceValue(userTotalBalanceWorth)
             }
 
             // percentage text
-            for (coin in coinsList){
-                 userTotalInvestment += coin.totalInvestmentAmount
-            }
             userTotalPercentageChange = calculateProfitLossPercentage(userTotalBalanceWorth, userTotalInvestment).replace("%", "").toDouble()
             if (userTotalPercentageChange == 0.0 || userTotalPercentageChange.isNaN()){
                 binding!!.tvInvestmentPercentageChange.text = "0.0%"
@@ -213,7 +205,6 @@ class MainFragment : Fragment() {
                 }else {
                     binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.greenColorPercentage))
                 }
-                binding!!.tvTotalBalance.text = formatTotalBalanceValue(userTotalBalanceWorth)
             }
         }else{
             binding!!.tvTotalBalance.text = "$0.00"
@@ -242,7 +233,6 @@ class MainFragment : Fragment() {
 
 
     private suspend fun requestNewDataForWalletCoins(){
-        viewModel.getTokensFromWallet()
 
         // switch to Main Thread because I will be observing a live data
         withContext(Dispatchers.Main){
@@ -251,35 +241,50 @@ class MainFragment : Fragment() {
 
             // make the request
             viewModel.getMultipleCoinsBySlug(listOf(viewModel.slugNames))
+            if (viewModel.slugNames.isNotEmpty()){
+                // observe the result
+                viewModel.multipleCoinsListResponse.observe(viewLifecycleOwner){ resource ->
 
-            // observe the result
-            viewModel.multipleCoinsListResponse.observe(viewLifecycleOwner){ resource ->
+                    when (resource) {
+                        is Resource.Success -> {
+                            val response = resource.data
+                            if (response != null){
+                                // format the api response to get coins in it
+                                viewModel.parseAPIResponse(response)
+                                Log.i("MYTAG", "api call success: ${viewModel.newTokensDataResponse}")
 
-                when (resource) {
-                    is Resource.Success -> {
-                        val response = resource.data
-                        if (response != null){
-                            // format the api response to get coins in it
-                            viewModel.parseAPIResponse(response)
-                            Log.i("MYTAG", "api call success: ${viewModel.newTokensDataResponse}")
+                                updateDB()
 
-                            updateDB()
+                            } else {
+                                Log.e("MYTAG", "Response object is null")
+                            }
+                        }
 
-                        } else {
-                            Log.e("MYTAG", "Response object is null")
+                        is Resource.Error -> {
+                            Log.e("MYTAG", "Error fetching data: ${resource.message}")
+                            cancelProgressDialog(mProgressDialog!!)
+                            // pass empty list to adapter
+                            setupView(mutableListOf())
+                        }
+                        is Resource.Loading -> {
+                            mProgressDialog!!.show()
                         }
                     }
-
-                    is Resource.Error -> {
-                        Log.e("MYTAG", "Error fetching data: ${resource.message}")
-                        cancelProgressDialog(mProgressDialog!!)
-                        // pass empty list to adapter
-                        setupView(mutableListOf())
-                    }
-                    is Resource.Loading -> {
-                        mProgressDialog!!.show()
-                    }
                 }
+            }else{
+                Log.e("MYTAG", "Empty wallet, no request has been made.")
+                // Update lastApiRequestTime
+                lastApiRequestTime = 60
+
+                // Save lastApiRequestTime in shared preferences
+                withContext(Dispatchers.IO) {
+                    val editor = sharedPref.edit()
+                    editor.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
+                    editor.apply()
+                }
+
+                // pass empty list to adapter
+                setupView(mutableListOf())
             }
         }
     }
@@ -297,24 +302,9 @@ class MainFragment : Fragment() {
     private fun updateUserDataDB() {
         val currentUser = viewModel.userData
 
-        if (viewModel.walletTokensToUpdateDB.isNotEmpty() && currentUser != null) {
-
-            currentUser.userTotalProfitAndLoss = formatToTwoDecimal(currentUser.userTotalBalanceWorth-currentUser.userTotalInvestment)
-
-            currentUser.userTotalProfitAndLossPercentage = calculateProfitLossPercentage(
-                currentUser.userTotalBalanceWorth,
-                currentUser.userTotalInvestment
-            ).replace("%", "").toDouble()
-
-            currentUser.userTotalInvestment = currentUser.userTotalInvestment
-            currentUser.userTotalBalanceWorth = formatToTwoDecimal(currentUser.userTotalBalanceWorth)
-            currentUser.userTotalCoinInvestedQuantity = viewModel.walletTokensToUpdateDB.size
-            Log.i("MYTAG", "USER DATA FRAGMENT: ${currentUser.id}")
-            Log.i("MYTAG", "total investment : ${currentUser.userTotalInvestment}")
-            Log.i("MYTAG", "totalInvestmentWorth: ${currentUser.userTotalInvestment}")
-            Log.i("MYTAG", "userTotalBalanceWorth: ${currentUser.userTotalBalanceWorth}")
-
-            viewModel.updateUserdata(currentUser)
+        if (viewModel.temporaryTokenListToUseOnFragment.isNotEmpty() && currentUser != null) {
+            val updatedUser = setUserValues(currentUser, viewModel.temporaryTokenListToUseOnFragment)
+            viewModel.updateUserdata(updatedUser)
         } else {
             // dummy data for new users opening the app for the first time
             viewModel.insertUserData(
@@ -330,7 +320,7 @@ class MainFragment : Fragment() {
         }
         // switch to Main to update UI
         lifecycleScope.launch(Dispatchers.Main){
-            setupView(viewModel.walletTokensToUpdateDB)
+            setupView(viewModel.temporaryTokenListToUseOnFragment)
         }
     }
 

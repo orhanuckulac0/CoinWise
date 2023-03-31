@@ -152,10 +152,8 @@ class TokenDetailsFragment : Fragment() {
     private fun setupView(){
         val coinIcon = Constants.COIN_IMAGE_LINK+"${currentCoin?.cmcId}"+".png"
 
-        val regex = Regex("[^A-Za-z0-9 ]")
-
-        binding!!.tvCoinName.text = currentCoin?.name + " / " + regex.replace(currentCoin!!.symbol, "")
-        binding!!.tvTotalHeldAmount.text = formatTokenHeldAmount(currentCoin!!.totalTokenHeldAmount) + " " + regex.replace(currentCoin!!.symbol, "")
+        binding!!.tvCoinName.text = currentCoin?.name + " / " + formatCoinNameText(currentCoin!!.symbol)
+        binding!!.tvTotalHeldAmount.text = formatTokenHeldAmount(currentCoin!!.totalTokenHeldAmount) + " " + formatCoinNameText(currentCoin!!.symbol)
         binding!!.tvTotalInvestment.text = "$"+currentCoin?.totalInvestmentAmount.toString()
         binding!!.tvCurrentInvestmentValue.text =  "$"+currentCoin?.totalInvestmentWorth.toString()
         binding!!.tvProfitLossAmount.text = formatTotalProfitAmountUI(currentCoin!!)

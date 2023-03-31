@@ -9,3 +9,46 @@ fun sortCoinsByAscending(coinsList: List<CoinModel>): List<CoinModel>{
 fun sortCoinsByDescending(coinsList: List<CoinModel>): List<CoinModel> {
     return coinsList.sortedByDescending { it.totalInvestmentWorth }
 }
+
+fun mostProfitByCoin(coinsList: List<CoinModel>): CoinModel {
+    return coinsList.maxBy {
+        it.totalInvestmentWorth-it.totalInvestmentAmount
+    }
+}
+
+fun mostLossByCoin(coinsList: List<CoinModel>): CoinModel {
+    return coinsList.minBy {
+        it.totalInvestmentWorth-it.totalInvestmentAmount
+    }
+}
+
+fun mostProfitPercentageByCoin(coinsList: List<CoinModel>): List<String> {
+    var maxProfitCoin: CoinModel? = null
+    var maxProfitPercentage = Double.MIN_VALUE
+
+    for (coin in coinsList){
+        val profitPercentage = (coin.totalInvestmentWorth - coin.totalInvestmentAmount) / coin.totalInvestmentAmount * 100
+        if (profitPercentage > maxProfitPercentage){
+            maxProfitPercentage = profitPercentage
+            maxProfitCoin = coin
+        }
+    }
+    val percentageCoin = (formatCoinNameText(maxProfitCoin!!.symbol) + " " + formatToTwoDecimal(maxProfitPercentage).toString()+"%").split(" ")
+    return percentageCoin
+}
+
+fun mostLossPercentageByCoin(coinsList: List<CoinModel>): List<String> {
+    var minProfitCoin: CoinModel? = null
+    var minProfitPercentage = Double.MIN_VALUE
+
+    for (coin in coinsList){
+        val profitPercentage = (coin.totalInvestmentWorth - coin.totalInvestmentAmount) / coin.totalInvestmentAmount * 100
+        if (profitPercentage < minProfitPercentage){
+            minProfitPercentage = profitPercentage
+            minProfitCoin = coin
+        }
+    }
+    val percentageCoin = (formatCoinNameText(minProfitCoin!!.symbol) + " " + formatToTwoDecimal(minProfitPercentage).toString()+"%").split(" ")
+    return percentageCoin
+
+}

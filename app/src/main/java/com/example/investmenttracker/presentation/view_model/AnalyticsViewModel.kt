@@ -1,8 +1,7 @@
 package com.example.investmenttracker.presentation.view_model
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.model.UserData
 import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
@@ -16,20 +15,26 @@ class AnalyticsViewModel(
     private val getAllCoinsUseCase: GetAllCoinsUseCase
     ): AndroidViewModel(app) {
 
+    private val _walletCoins = MutableLiveData<List<CoinModel>>()
+    val walletCoins: LiveData<List<CoinModel>>
+        get() = _walletCoins
 
-    var userData: UserData? = null
-    var walletCoins = listOf<CoinModel>()
+    private val _userDataLiveData = MutableLiveData<UserData>()
+    val userDataLiveData: LiveData<UserData>
+        get() = _userDataLiveData
+
+    val combinedLiveData = MediatorLiveData<Pair<UserData?, List<CoinModel>>>()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            getUserDataUseCase.execute(1).collect {
-                userData = it
+            getUserDataUseCase.execute(1).collect { userData ->
+                _userDataLiveData.postValue(userData)
             }
         }
 
         viewModelScope.launch(Dispatchers.IO) {
             getAllCoinsUseCase.execute().collect(){
-                walletCoins = it
+                _walletCoins.postValue(it)
             }
         }
     }

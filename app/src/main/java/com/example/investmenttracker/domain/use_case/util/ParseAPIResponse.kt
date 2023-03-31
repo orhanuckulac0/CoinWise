@@ -51,15 +51,13 @@ fun parseMultipleCoinsResponseUtil(data: JsonObject): MutableList<CoinModel> {
 
 fun parseSymbolResponseUtil(response: JsonArray?): MutableList<CoinModel>{
     val newTokensTempHolder = mutableListOf<CoinModel>()
-    // to remove "" coming with api result, otherwise name is "Bitcoin" instead of just Bitcoin
-    val regex = Regex("[^A-Za-z0-9 ]")
 
     try {
         for (c in response!!.asJsonArray){
             val coin = CoinModel(
                 id = c.asJsonObject.get("id").toString().toInt(),
                 cmcId = c.asJsonObject.get("id").toString().toInt(),
-                name = regex.replace(c.asJsonObject.get("name").toString(), ""),
+                name = formatCoinNameText(c.asJsonObject.get("name").toString()),
                 slug = c.asJsonObject.get("slug").toString(),
                 symbol = c.asJsonObject.get("symbol").toString(),
                 price = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("price").toString().toDouble(),
@@ -81,9 +79,6 @@ fun parseSymbolResponseUtil(response: JsonArray?): MutableList<CoinModel>{
 }
 
 fun parseSlugResponseUtil(result: JSONObject): CoinModel? {
-    // to remove "" coming with api result, otherwise name is "Bitcoin" instead of just Bitcoin
-    val regex = Regex("[^A-Za-z0-9 ]")
-
     try {
         val firstKey = result.keys().next()  // use keys().next() because each firstKey is unique
         val resultCoinObject = result.getJSONObject(firstKey)
@@ -96,7 +91,7 @@ fun parseSlugResponseUtil(result: JSONObject): CoinModel? {
         return CoinModel(
             id = resultCoinObject.getInt("id"),
             cmcId = resultCoinObject.getInt("id"),
-            name = regex.replace(resultCoinObject.get("name").toString(), ""),
+            name = formatCoinNameText(resultCoinObject.get("name").toString()),
             slug = resultCoinObject.get("slug").toString(),
             symbol = resultCoinObject.get("symbol").toString(),
             price = usdObject.get("price").toString().toDouble(),
@@ -113,4 +108,10 @@ fun parseSlugResponseUtil(result: JSONObject): CoinModel? {
         Log.e("MYTAG", "Error parsing JSON: ${e.message}")
     }
     return null
+}
+
+// to remove "" from coin symbols coming with api response
+fun formatCoinNameText(symbol: String): String {
+    val regex = Regex("[^A-Za-z0-9 ]")
+    return regex.replace(symbol, "")
 }

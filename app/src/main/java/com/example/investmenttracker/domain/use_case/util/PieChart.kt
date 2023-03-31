@@ -28,7 +28,7 @@ fun createPieChart(
     // setting description as disabled and offset for pie chart
     pieChart.setUsePercentValues(true)
     pieChart.description.isEnabled = false
-    pieChart.setDrawEntryLabels(true) // hide label string on chart
+    pieChart.setDrawEntryLabels(false) // hide label string on chart
     pieChart.setExtraOffsets(5f, 10f, 5f, 5f)
 
     // set drag
@@ -46,8 +46,8 @@ fun createPieChart(
     pieChart.setTransparentCircleAlpha(110)
 
     // set hole radius and add transparent line
-    pieChart.holeRadius = 28f
-    pieChart.transparentCircleRadius = 31f
+    pieChart.holeRadius = 0f
+    pieChart.transparentCircleRadius = 0f
 
     // set rotation of the pie
     pieChart.rotationAngle = 0f
@@ -74,12 +74,17 @@ fun createPieChart(
 
     // calculate total investment amount
     val totalInvestment = walletCoins.sumOf { it.totalInvestmentAmount }
-    // format percent and symbol values
-    val regex = Regex("[^A-Za-z0-9 ]")
-    for (coin in walletCoins) {
+    val sortedWallet = walletCoins.sortedByDescending { it.totalInvestmentAmount }
+
+    for (coin in sortedWallet) {
         val percent = (coin.totalInvestmentAmount / totalInvestment) * 100
         // add each coin user holds as PieEntry
-        entries.add(PieEntry(String.format("%.2f", percent).toFloat(), regex.replace(coin.symbol, "")))
+        entries.add(
+            PieEntry(
+            String.format("%.2f", percent).toFloat(),
+            formatCoinNameText(coin.symbol) + " " + String.format("%.2f", percent)+"%"
+            )
+        )
     }
 
     // set pie data set, set label as empty string
@@ -93,7 +98,7 @@ fun createPieChart(
     dataSet.setDrawIcons(false)
 
     // set slice for pie, make it thinner
-    dataSet.sliceSpace = 0.8f
+    dataSet.sliceSpace = 1f
     dataSet.iconsOffset = MPPointF(0f, 40f)
     dataSet.selectionShift = 5f
 
