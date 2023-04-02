@@ -152,7 +152,7 @@ class AnalyticsFragment : Fragment() {
             val mostProfitByCoin = mostProfitByCoin(walletCoins!!)
             val mostProfitAmount = "$"+ formatToTwoDecimal(mostProfitByCoin.totalInvestmentWorth - mostProfitByCoin.totalInvestmentAmount)
             val tvMostProfitTokenText = spannableTextGreen(
-                formatCoinNameText(mostProfitByCoin.symbol) + " $mostProfitAmount profit on investment",
+                formatCoinNameText(mostProfitByCoin.symbol) + " $mostProfitAmount profit on investment.",
                 mostProfitAmount,
                 requireContext()
             )
@@ -172,7 +172,7 @@ class AnalyticsFragment : Fragment() {
             mostLossAmount = "$$mostLossAmount"
 
             val tvMostLossTokenText = spannableTextRed(
-                formatCoinNameText(mostLossByCoin.symbol) + " $mostLossAmount loss on investment",
+                formatCoinNameText(mostLossByCoin.symbol) + " $mostLossAmount loss on investment.",
                 mostLossAmount,
                 requireContext()
             )

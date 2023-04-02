@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,6 +30,7 @@ import com.example.investmenttracker.presentation.view_model.SearchCoinViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
 import javax.inject.Inject
@@ -92,14 +94,16 @@ class SearchCoinFragment : Fragment() {
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
-        lifecycleScope.launchWhenStarted {
-            viewModel.eventFlow.collect {event->
-                when(event) {
-                    is UiEvent.ShowCoinAddedSnackbar -> {
-                        Snackbar.make(binding!!.root, event.message, Snackbar.LENGTH_SHORT).show()
-                    }
-                    is UiEvent.ShowErrorSnackbar -> {
-                        Snackbar.make(binding!!.root, event.message, Snackbar.LENGTH_LONG).show()
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.eventFlow.collect {event->
+                    when(event) {
+                        is UiEvent.ShowCoinAddedSnackbar -> {
+                            Snackbar.make(binding!!.root, event.message, Snackbar.LENGTH_SHORT).show()
+                        }
+                        is UiEvent.ShowErrorSnackbar -> {
+                            Snackbar.make(binding!!.root, event.message, Snackbar.LENGTH_LONG).show()
+                        }
                     }
                 }
             }

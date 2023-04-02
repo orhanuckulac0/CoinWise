@@ -123,7 +123,7 @@
         android:id="@+id/tvEmptyWalletText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Empty wallet, please add coin. \n Click 'Search' button below."
+        android:text="@string/empty_wallet_please_add_coin_n_click_search_button_below"
         android:textColor="#f6f6f6"
         android:textSize="15sp"
         android:gravity="center_horizontal"

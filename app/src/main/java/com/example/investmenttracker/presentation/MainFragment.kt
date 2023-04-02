@@ -72,7 +72,14 @@ class MainFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 when(menuItem.itemId) {
                     R.id.actionSettings -> {
-                        // TODO create a settings fragment
+                        val bundle = Bundle().apply {
+                            putSerializable(Constants.PASSED_USER, viewModel.userData)
+                        }
+                        findNavController().navigate(
+                            R.id.action_mainFragment_to_settingsFragment,
+                            bundle
+                        )
+                        navigation?.selectedItemId = R.id.invisibleItem
                     }
                 }
                 return true
@@ -328,7 +335,7 @@ class MainFragment : Fragment() {
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding!!.toolbarMainFragment)
         val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
         if (actionBar != null) {
-            actionBar.title = "InvestmentTracker"
+            actionBar.title = "CoinWise"
         }
     }
 

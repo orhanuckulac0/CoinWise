@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_mainFragment_to_analyticsFragment"
             app:destination="@id/analyticsFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchCoinFragment"
@@ -51,6 +54,18 @@
         tools:layout="@layout/fragment_analytics" >
         <action
             android:id="@+id/action_analyticsFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.investmenttracker.presentation.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" >
+        <argument
+            android:name="current_user"
+            app:argType="com.example.investmenttracker.data.model.UserData" />
+        <action
+            android:id="@+id/action_settingsFragment_to_mainFragment"
             app:destination="@id/mainFragment" />
     </fragment>
 </navigation>

@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".presentation.AnalyticsFragment"
-    android:paddingBottom="15dp"
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp"
     android:background="@color/mainColor">
 
     <LinearLayout
@@ -33,7 +34,7 @@
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
             android:textSize="22sp"
-            android:text="Investment Details"
+            android:text="@string/investment_details_text"
             android:textColor="@color/white"
             android:layout_marginTop="20dp"
             />
@@ -49,7 +50,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Initial Investment:"
+                android:text="@string/initial_investment"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/tokenDetailPageTitleColor"
@@ -60,7 +61,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="5dp"
                 />
 
         </LinearLayout>
@@ -75,7 +76,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Investment Current Value:"
+                android:text="@string/investment_current_value"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/tokenDetailPageTitleColor"
@@ -86,7 +87,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="5dp"
                 />
 
         </LinearLayout>
@@ -101,7 +102,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Investment Profit/Loss:"
+                android:text="@string/investment_profit_loss"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/tokenDetailPageTitleColor"
@@ -113,7 +114,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:textStyle="bold"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="5dp"
                 />
 
         </LinearLayout>
@@ -128,7 +129,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Investment Return Percentage:"
+                android:text="@string/investment_return_percentage"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/tokenDetailPageTitleColor"
@@ -140,41 +141,18 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:textStyle="bold"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="5dp"
                 />
 
         </LinearLayout>
 
         <TextView
-            android:id="@+id/tvPieChartTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/investment_diversity"
-            android:textColor="@color/white"
-            android:textSize="22sp"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="15dp"
-            android:paddingTop="10dp"
-            android:visibility="gone"
-            />
-
-        <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/pieChart"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="15dp"
-            android:visibility="gone"
-            />
-
-        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
             android:textSize="22sp"
-            android:text="Insight"
+            android:text="@string/investment_insights"
             android:textColor="@color/white"
             android:layout_marginTop="25dp"
             />
@@ -190,7 +168,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Most Profit:"
+                android:text="@string/most_profit"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/tokenDetailPageTitleColor"
@@ -217,7 +195,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Most Profit Percentage:"
+                android:text="@string/most_profit_percentage"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/tokenDetailPageTitleColor"
@@ -243,7 +221,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Most Loss:"
+                android:text="@string/most_loss"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/tokenDetailPageTitleColor"
@@ -268,7 +246,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Most Loss Percentage:"
+                android:text="@string/most_loss_percentage"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/tokenDetailPageTitleColor"
@@ -283,6 +261,30 @@
                 />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvPieChartTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/investment_diversity"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="15dp"
+            android:paddingTop="10dp"
+            android:visibility="gone"
+            />
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/pieChart"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp"
+            android:paddingBottom="15dp"
+            android:visibility="gone"
+            />
 
     </LinearLayout>
 
