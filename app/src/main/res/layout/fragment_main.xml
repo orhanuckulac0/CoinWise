@@ -23,7 +23,7 @@
             android:id="@+id/toolbarMainFragment"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            style="@style/TOOLBAR_THEME"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -32,7 +32,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:textColor="@color/tv_total_balance_text_color"
         android:textSize="14sp"
         android:text="@string/total_balance"
         app:layout_constraintEnd_toEndOf="parent"

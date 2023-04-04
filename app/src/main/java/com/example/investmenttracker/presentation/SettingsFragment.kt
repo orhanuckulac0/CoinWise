@@ -1,5 +1,7 @@
 package com.example.investmenttracker.presentation
 
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,6 +15,7 @@ import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.UserData
 import com.example.investmenttracker.databinding.FragmentSettingsBinding
 import com.example.investmenttracker.domain.use_case.util.Constants
+import com.example.investmenttracker.domain.use_case.util.changeAppTheme
 import com.example.investmenttracker.domain.use_case.util.customGetSerializable
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -22,6 +25,7 @@ class SettingsFragment : Fragment() {
     private var navigation: BottomNavigationView? = null
     private var userData: UserData? = null
     private var constraintLayout: ConstraintLayout? = null
+    private lateinit var sharedPref: SharedPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,6 +55,18 @@ class SettingsFragment : Fragment() {
             userData = it.customGetSerializable(Constants.PASSED_USER)
         }
         println(userData!!.userTotalBalanceWorth)
+
+        // set sharedPref for theme
+        sharedPref = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
+        binding!!.customSwitch.isChecked = sharedPref.getBoolean(Constants.SWITCH_STATE_KEY, true)
+
+        binding!!.customSwitch.setOnCheckedChangeListener{ _, isChecked->
+            val editor = sharedPref.edit()
+            editor.putBoolean(Constants.SWITCH_STATE_KEY, isChecked)
+            editor.apply()
+
+            changeAppTheme(sharedPref.getBoolean(Constants.SWITCH_STATE_KEY, true))
+        }
 
         setupActionBar()
     }

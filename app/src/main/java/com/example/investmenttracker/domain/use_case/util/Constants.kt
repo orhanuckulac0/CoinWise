@@ -1,7 +1,8 @@
 package com.example.investmenttracker.domain.use_case.util
 
 object Constants {
-
+    const val SWITCH_STATE_KEY = "switchStateKey"
+    const val THEME_PREF = "themePref"
     const val PASSED_USER = "passedUser"
     const val PASSED_COIN = "passedCoin"
     const val REFRESH_STATE = "refreshState"

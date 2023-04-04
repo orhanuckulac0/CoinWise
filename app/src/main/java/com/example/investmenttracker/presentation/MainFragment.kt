@@ -3,6 +3,7 @@ package com.example.investmenttracker.presentation
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
@@ -43,7 +44,8 @@ class MainFragment : Fragment() {
     private var navigation: BottomNavigationView? = null
 
     private var mProgressDialog: Dialog? = null
-    private lateinit var sharedPref: SharedPreferences
+    private lateinit var sharedPrefRefresh: SharedPreferences
+    private lateinit var sharedPrefTheme: SharedPreferences
     private var lastApiRequestTime: Long = 0
     private var populated = false
     private var sorted = false
@@ -63,12 +65,23 @@ class MainFragment : Fragment() {
 
         viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
         walletAdapter = MainFragmentAdapter(requireContext())
+        sharedPrefTheme = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
         val menuHost: MenuHost = requireActivity()
 
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_settings, menu)
+
+                // change icon depending on the theme
+                val menuItem = menu.findItem(R.id.actionSettings)
+                val theme = sharedPrefTheme.getBoolean(Constants.SWITCH_STATE_KEY, true)
+                if (theme) {
+                    menuItem.setIcon(R.drawable.ic_settings_gray_24)
+                } else {
+                    menuItem.setIcon(R.drawable.ic_settings_black_24)
+                }
             }
+
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 when(menuItem.itemId) {
                     R.id.actionSettings -> {
@@ -90,8 +103,8 @@ class MainFragment : Fragment() {
         mProgressDialog = showProgressDialog(requireContext())
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
 
-        sharedPref = requireContext().getSharedPreferences(Constants.REFRESH_STATE, Context.MODE_PRIVATE)
-        lastApiRequestTime = sharedPref.getLong(Constants.LAST_API_REQUEST_TIME, 0)
+        sharedPrefRefresh = requireContext().getSharedPreferences(Constants.REFRESH_STATE, MODE_PRIVATE)
+        lastApiRequestTime = sharedPrefRefresh.getLong(Constants.LAST_API_REQUEST_TIME, 0)
 
         viewModel.getTokensFromWallet()
         triggerAppLaunch()
@@ -143,7 +156,7 @@ class MainFragment : Fragment() {
 
                 // Save lastApiRequestTime in shared preferences
                 withContext(Dispatchers.IO) {
-                    val editor = sharedPref.edit()
+                    val editor = sharedPrefRefresh.edit()
                     editor.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
                     editor.apply()
                 }
@@ -285,7 +298,7 @@ class MainFragment : Fragment() {
 
                 // Save lastApiRequestTime in shared preferences
                 withContext(Dispatchers.IO) {
-                    val editor = sharedPref.edit()
+                    val editor = sharedPrefRefresh.edit()
                     editor.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
                     editor.apply()
                 }
