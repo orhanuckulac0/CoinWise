@@ -2,7 +2,6 @@ package com.example.investmenttracker.presentation
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -78,7 +77,7 @@ class MainFragment : Fragment() {
                 if (theme) {
                     menuItem.setIcon(R.drawable.ic_settings_gray_24)
                 } else {
-                    menuItem.setIcon(R.drawable.ic_settings_black_24)
+                    menuItem.setIcon(R.drawable.ic_settings_blue_24)
                 }
             }
 
@@ -221,9 +220,9 @@ class MainFragment : Fragment() {
             }else{
                 binding!!.tvInvestmentPercentageChange.text = "$userTotalPercentageChange%"
                 if (userTotalPercentageChange.toString().contains("-")){
-                    binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.redColorPercentage))
+                    binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.red_color_percentage))
                 }else {
-                    binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.greenColorPercentage))
+                    binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.green_color_percentage))
                 }
             }
         }else{

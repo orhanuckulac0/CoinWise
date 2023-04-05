@@ -17,9 +17,7 @@
         android:id="@+id/ivSearchedCoinResultImage"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:src="@drawable/coin_place_holder"
-        app:civ_border_color="@color/wallet_civ_border_color"
-        app:civ_border_width="0.5dp" />
+        android:src="@drawable/coin_place_holder"/>
 
     <LinearLayout
         android:layout_width="200dp"
@@ -32,7 +30,7 @@
             android:id="@+id/tvCoinName"
             android:layout_width="160dp"
             android:layout_height="wrap_content"
-            android:textColor="@color/coin_name_wallet_color"
+            style="@style/TITLE_COLOR"
             android:textSize="18sp"
             android:textStyle="bold"
             tools:text="Coin Name" />
@@ -46,7 +44,7 @@
                 android:id="@+id/tvCoinPrice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/wallet_color_price_value_color"
+                style="@style/SECONDARY_TEXT_COLOR"
                 android:textSize="14sp"
                 tools:text="10.000" />
 
@@ -76,7 +74,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="end"
-            android:textColor="@color/coin_held_amount_color"
+            style="@style/SECONDARY_TEXT_COLOR"
             android:textSize="14sp"
             tools:text="Coin Held Amount" />
 
@@ -85,7 +83,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="end"
-            android:textColor="@color/wallet_color_price_value_color"
+            style="@style/WALLET_TOKEN_VALUE_TEXT_STYLE"
             android:textSize="14sp"
             tools:text="10.000" />
     </LinearLayout>

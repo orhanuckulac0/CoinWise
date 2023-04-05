@@ -7,23 +7,25 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="yellow">#FFEB3B</color>
+    <color name="red">#F44336</color>
     <color name="divider_color">#EAEAEA</color>
 
-    <color name="mainColor">#0e1419</color>
-    <color name="searchCoinButtonColor">#0286ff</color>
-    <color name="redColorPercentage">#bd2729</color>
-    <color name="greenColorPercentage">#03764f</color>
+    <!-- for dark theme -->
+    <color name="main_color_dark_theme">#0e1419</color>
+    <color name="search_coin_button_color">#0286ff</color>
+    <color name="red_color_percentage">#bd2729</color>
+    <color name="green_color_percentage">#03764f</color>
 
-    <color name="bottomNavSelected">#EAEAEA</color>
-    <color name="bottomNavUnselected">#808080</color>
+    <color name="bottom_nav_selected">#EAEAEA</color>
+    <color name="bottom_nav_unselected">#808080</color>
 
-    <color name ="tokenDetailPageTitleColor">#808080</color>
+    <color name ="token_detail_page_title_color">#808080</color>
     <color name="coin_price_value_color">#7A8089</color>
     <color name="civ_border_color_img">#363A43</color>
     <color name="coin_name_wallet_color">#f2f2f2</color>
     <color name="coin_held_amount_color">#d5d6d7</color>
     <color name="wallet_color_price_value_color">#6f7070</color>
-    <color name="wallet_civ_border_color">#363A43</color>
     <color name="sort_color">#5d5e5e</color>
     <color name="tokens_text_color">#f6f6f6</color>
     <color name="view_divider_color">#5c5e5f</color>
@@ -32,8 +34,15 @@
     <color name="search_text_color_hint">#777776</color>
     <color name="tv_no_results_color">#D0D0D0</color>
 
-    <color name="yellow">#FFEB3B</color>
-    <color name="red">#F44336</color>
 
+    <!-- for light theme -->
+    <color name="light_background_main">#D3D3D3</color>
+    <color name="light_title_text_color">@color/black</color>
+    <color name="light_secondary_text_color">#525252</color>
+    <color name="light_button_click_event_color">#1c65e8</color>
+    <color name="light_bottom_nav_item_color">#1c65e8</color>
+
+    <color name="light_bottom_nav_selected">#1c65e8</color>
+    <color name="light_bottom_nav_unselected">#808080</color>
 
 </resources>

@@ -2,16 +2,18 @@
     <!-- Base application theme. -->
     <style name="Theme.MyApp" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/mainColor</item>
-        <item name="colorPrimaryVariant">@color/mainColor</item>
+        <item name="colorPrimary">@color/main_color_dark_theme</item>
+        <item name="colorPrimaryVariant">@color/main_color_dark_theme</item>
         <item name="colorOnPrimary">@color/black</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_200</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">@color/mainColor</item>
+        <item name="android:statusBarColor">@color/main_color_dark_theme</item>
         <!-- Customize your theme here. -->
+        <item name="itemIconTint">@color/bottom_nav_item_color_dark_theme</item>
+        <item name="itemTextColor">@color/bottom_nav_item_color_dark_theme</item>
     </style>
 
     <style parent="ThemeOverlay.AppCompat.Dark.ActionBar" name="AppTheme.AppBarOverlay"/>
@@ -21,13 +23,58 @@
         <item name="android:windowBackground">@drawable/dialog_rounded</item>
     </style>
 
+    <!-- for views -->
     <style name="SCREEN_BACKGROUND">
-        <item name="android:background">@color/mainColor</item>
+        <item name="android:background">@color/main_color_dark_theme</item>
+    </style>
+
+    <style name="WALLET_INFO_SQUARE">
+        <item name="android:background">@color/main_color_dark_theme</item>
+        <item name="android:layout_marginStart">0dp</item>
+        <item name="android:layout_marginEnd">0dp</item>
+        <item name="android:layout_marginBottom">0dp</item>
+        <item name="android:layout_marginTop">40dp</item>
     </style>
 
     <style name="TOOLBAR_THEME" parent="Widget.AppCompat.Toolbar">
-        <item name="android:background">@color/mainColor</item>
+        <item name="android:background">@color/main_color_dark_theme</item>
         <item name="titleTextColor">@color/white</item>
     </style>
+
+    <style name="WALLET_RV_BACKGROUND">
+        <item name="android:background">@color/main_color_dark_theme</item>
+    </style>
+
+    <style name="SORT_TOKENS_BACKGROUND">
+        <item name="android:background">@color/main_color_dark_theme</item>
+    </style>
+
+    <style name="VIEW_VISIBILITY">
+        <item name="android:visibility">visible</item>
+    </style>
+
+    <style name="BOTTOM_NAV_BACKGROUND">
+        <item name="background">@color/black</item>
+    </style>
+
+    <!-- for texts-->
+    <style name="TITLE_COLOR">
+        <item name="android:textColor">@color/tv_total_balance_color</item>
+    </style>
+
+    <style name="SECONDARY_TEXT_COLOR">
+        <item name="android:textColor">@color/wallet_color_price_value_color</item>
+    </style>
+
+    <style name="BOLD_NORMAL">
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <!-- wallet token specific texts -->
+    <style name="WALLET_TOKEN_VALUE_TEXT_STYLE">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/tv_total_balance_color</item>
+    </style>
+
 
 </resources>

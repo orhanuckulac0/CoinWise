@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:id="@+id/mainFragmentCL"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainFragmentCL"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/mainColor"
     android:orientation="vertical"
+    style="@style/SCREEN_BACKGROUND"
     tools:context=".presentation.MainFragment">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -21,84 +20,102 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbarMainFragment"
+            style="@style/TOOLBAR_THEME"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            style="@style/TOOLBAR_THEME"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <TextView
-        android:id="@+id/tvTotalBalanceText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:textSize="14sp"
-        android:text="@string/total_balance"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayoutMainFragment" />
-
-    <TextView
-        android:id="@+id/tvTotalBalance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text=""
-        android:textColor="@color/tv_total_balance_color"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTotalBalanceText" />
-
-    <TextView
-        android:id="@+id/tvInvestmentPercentageChange"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text=""
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTotalBalance" />
-
-    <View
-        android:id="@+id/viewDivider"
-        android:layout_width="0dp"
-        android:layout_height="2dp"
-        android:background="@color/view_divider_color"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayoutMainFragment"
-        app:layout_constraintVertical_bias="0.298" />
 
     <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end"
-        android:padding="10dp"
+        android:id="@+id/llBalanceInfo"
+        android:layout_width="match_parent"
+        android:layout_height="230dp"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        style="@style/SCREEN_BACKGROUND"
+        app:layout_constraintBottom_toTopOf="@+id/llSortTokens"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/viewDivider">
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayoutMainFragment">
+
+        <LinearLayout
+            android:id="@+id/llWalletBalanceInfoSquare"
+            style="@style/WALLET_INFO_SQUARE"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:elevation="10dp"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvTotalBalanceText"
+                style="@style/SECONDARY_TEXT_COLOR"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:text="@string/total_balance"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvTotalBalance"
+                style="@style/TITLE_COLOR"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:text=""
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/tvInvestmentPercentageChange"
+                style="@style/BOLD_NORMAL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/viewDivider"
+            style="@style/VIEW_VISIBILITY"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/view_divider_color" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/llSortTokens"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        style="@style/SORT_TOKENS_BACKGROUND"
+        android:elevation="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llBalanceInfo">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/tokens"
-            android:textColor="@color/tokens_text_color"
-            android:textSize="20sp"
-            android:layout_weight="1"/>
+            style="@style/TITLE_COLOR"
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/tvSortTokensByValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
             android:layout_gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
             android:gravity="center_vertical"
             android:text="@string/sort"
             android:textColor="@color/sort_color"
@@ -111,28 +128,29 @@
         android:id="@+id/rvTokens"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:visibility="visible"
+        style="@style/WALLET_RV_BACKGROUND"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:visibility="visible"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/llSortTokens" />
 
     <TextView
         android:id="@+id/tvEmptyWalletText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
         android:text="@string/empty_wallet_please_add_coin_n_click_search_button_below"
         android:textColor="#f6f6f6"
         android:textSize="15sp"
-        android:gravity="center_horizontal"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/llSortTokens"
         app:layout_constraintVertical_bias="0.123" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

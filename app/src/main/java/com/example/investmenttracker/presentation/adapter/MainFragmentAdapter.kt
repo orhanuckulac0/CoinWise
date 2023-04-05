@@ -69,10 +69,10 @@ class MainFragmentAdapter(
             binding.tvTokenTotalValue.text = "$${formatTokenTotalValue(coinModel.price, coinModel.totalTokenHeldAmount)}"
 
             if (coinModel.percentChange24h.toString().contains("-")){
-                binding.tvCoinPriceChangeDaily.setTextColor(context.getColor(R.color.redColorPercentage))
+                binding.tvCoinPriceChangeDaily.setTextColor(context.getColor(R.color.red_color_percentage))
                 binding.tvCoinPriceChangeDaily.text = String.format("%.2f", coinModel.percentChange24h)+"%"
             }else {
-                binding.tvCoinPriceChangeDaily.setTextColor(context.getColor(R.color.greenColorPercentage))
+                binding.tvCoinPriceChangeDaily.setTextColor(context.getColor(R.color.green_color_percentage))
                 binding.tvCoinPriceChangeDaily.text = "+"+String.format("%.2f", coinModel.percentChange24h)+"%"
             }
 

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.investmenttracker.R
@@ -35,6 +36,12 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        if (theme){
+            bottomNavigationView.setBackgroundColor(ContextCompat.getColor(this, R.color.black))
+        }else{
+            bottomNavigationView.setBackgroundColor(ContextCompat.getColor(this, R.color.white))
+        }
+
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.home -> {

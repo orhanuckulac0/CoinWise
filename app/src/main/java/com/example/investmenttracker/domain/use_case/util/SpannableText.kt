@@ -12,7 +12,7 @@ fun spannableTextRed(fullText: String, string: String, context:Context): Spannab
     val spannableString = SpannableString(fullText)
     val startIndex = fullText.indexOf(string)
     val endIndex = startIndex + string.length
-    val redColor = context.getColor(R.color.redColorPercentage)
+    val redColor = context.getColor(R.color.red_color_percentage)
     spannableString.setSpan(
         ForegroundColorSpan(redColor),
         startIndex,
@@ -32,7 +32,7 @@ fun spannableTextGreen(fullText: String, string: String, context:Context): Spann
     val spannableString = SpannableString(fullText)
     val startIndex = fullText.indexOf(string)
     val endIndex = startIndex + string.length
-    val redColor = context.getColor(R.color.greenColorPercentage)
+    val redColor = context.getColor(R.color.green_color_percentage)
     spannableString.setSpan(
         ForegroundColorSpan(redColor),
         startIndex,

@@ -124,10 +124,10 @@ class AnalyticsFragment : Fragment() {
         val holder = investmentReturnPercentage.replace("%","").toDouble()
         if (!holder.isNaN() || holder != 0.0){
             if (investmentReturnPercentage.contains("-")){
-                binding!!.tvInvestmentReturnPercentage.setTextColor(requireContext().getColor(R.color.redColorPercentage))
+                binding!!.tvInvestmentReturnPercentage.setTextColor(requireContext().getColor(R.color.red_color_percentage))
                 binding!!.tvInvestmentReturnPercentage.text = investmentReturnPercentage
             }else{
-                binding!!.tvInvestmentReturnPercentage.setTextColor(requireContext().getColor(R.color.greenColorPercentage))
+                binding!!.tvInvestmentReturnPercentage.setTextColor(requireContext().getColor(R.color.green_color_percentage))
                 binding!!.tvInvestmentReturnPercentage.text = investmentReturnPercentage
             }
         }else{
@@ -137,10 +137,10 @@ class AnalyticsFragment : Fragment() {
 
         var investmentProfitLoss = formatToTwoDecimal(userInvestmentWorth-userInvestment).toString()
         if (investmentProfitLoss.contains("-")){
-            binding!!.tvInvestmentProfitLoss.setTextColor(requireContext().getColor(R.color.redColorPercentage))
+            binding!!.tvInvestmentProfitLoss.setTextColor(requireContext().getColor(R.color.red_color_percentage))
             investmentProfitLoss = investmentProfitLoss.replace("-","")
         }else if (investmentProfitLoss.toDouble() != 0.0 || !investmentProfitLoss.toDouble().isNaN()){
-            binding!!.tvInvestmentProfitLoss.setTextColor(requireContext().getColor(R.color.greenColorPercentage))
+            binding!!.tvInvestmentProfitLoss.setTextColor(requireContext().getColor(R.color.green_color_percentage))
         }else {
             binding!!.tvInvestmentProfitLoss.setTextColor(requireContext().getColor(R.color.white))
         }

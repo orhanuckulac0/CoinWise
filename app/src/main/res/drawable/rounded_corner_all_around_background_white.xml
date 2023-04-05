@@ -1,0 +1,13 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners
+        android:topLeftRadius="20dp"
+        android:topRightRadius="20dp"
+        android:bottomLeftRadius="20dp"
+        android:bottomRightRadius="20dp"/>
+    <solid android:color="@android:color/white" /> <!-- Set a transparent color or use "@color/your_color_with_alpha_0" -->
+    <padding
+        android:bottom="0dp"
+        android:left="0dp"
+        android:right="0dp"
+        android:top="0dp" /> <!-- Set padding to 0dp to fill the rounded corners with color -->
+</shape>

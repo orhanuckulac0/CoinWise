@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/mainColor"
+    android:background="@color/main_color_dark_theme"
     android:orientation="vertical"
     tools:context=".presentation.TokenDetailsFragment">
 
@@ -90,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/total_token_held_detail"
                 android:textStyle="bold"
-                android:textColor="@color/tokenDetailPageTitleColor"
+                android:textColor="@color/token_detail_page_title_color"
                 />
 
             <TextView
@@ -115,7 +115,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/total_investment_detail"
                 android:textStyle="bold"
-                android:textColor="@color/tokenDetailPageTitleColor"
+                android:textColor="@color/token_detail_page_title_color"
                 />
 
             <TextView
@@ -140,7 +140,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/current_investment_value"
                 android:textStyle="bold"
-                android:textColor="@color/tokenDetailPageTitleColor"
+                android:textColor="@color/token_detail_page_title_color"
                 />
 
             <TextView
@@ -165,7 +165,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/profit_loss_amount"
                 android:textStyle="bold"
-                android:textColor="@color/tokenDetailPageTitleColor"
+                android:textColor="@color/token_detail_page_title_color"
                 />
 
             <TextView
@@ -173,7 +173,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textColor="@color/greenColorPercentage"
+                android:textColor="@color/green_color_percentage"
                 android:layout_marginStart="15dp"
                 />
 
@@ -191,7 +191,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/profit_loss_percentage"
                 android:textStyle="bold"
-                android:textColor="@color/tokenDetailPageTitleColor"
+                android:textColor="@color/token_detail_page_title_color"
                 />
 
             <TextView
@@ -199,7 +199,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textColor="@color/greenColorPercentage"
+                android:textColor="@color/green_color_percentage"
                 android:layout_marginStart="15dp"
                 />
 
