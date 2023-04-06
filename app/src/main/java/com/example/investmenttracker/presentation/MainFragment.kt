@@ -41,10 +41,12 @@ class MainFragment : Fragment() {
     private var walletAdapter: MainFragmentAdapter? = null
     private var constraintLayout: ConstraintLayout? = null
     private var navigation: BottomNavigationView? = null
+    private var menuHost: MenuHost? = null
+    private var menuItem: MenuItem? = null
 
     private var mProgressDialog: Dialog? = null
-    private lateinit var sharedPrefRefresh: SharedPreferences
-    private lateinit var sharedPrefTheme: SharedPreferences
+    private var sharedPrefRefresh: SharedPreferences? = null
+    private var sharedPrefTheme: SharedPreferences? = null
     private var lastApiRequestTime: Long = 0
     private var populated = false
     private var sorted = false
@@ -65,19 +67,19 @@ class MainFragment : Fragment() {
         viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
         walletAdapter = MainFragmentAdapter(requireContext())
         sharedPrefTheme = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
-        val menuHost: MenuHost = requireActivity()
+        menuHost = requireActivity()
 
-        menuHost.addMenuProvider(object : MenuProvider {
+        menuHost?.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_settings, menu)
 
                 // change icon depending on the theme
-                val menuItem = menu.findItem(R.id.actionSettings)
-                val theme = sharedPrefTheme.getBoolean(Constants.SWITCH_STATE_KEY, true)
-                if (theme) {
-                    menuItem.setIcon(R.drawable.ic_settings_gray_24)
+                menuItem = menu.findItem(R.id.actionSettings)
+                val theme = sharedPrefTheme?.getBoolean(Constants.SWITCH_STATE_KEY, true)
+                if (theme!!) {
+                    menuItem?.setIcon(R.drawable.ic_settings_gray_24)
                 } else {
-                    menuItem.setIcon(R.drawable.ic_settings_blue_24)
+                    menuItem?.setIcon(R.drawable.ic_settings_blue_24)
                 }
             }
 
@@ -103,7 +105,7 @@ class MainFragment : Fragment() {
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
 
         sharedPrefRefresh = requireContext().getSharedPreferences(Constants.REFRESH_STATE, MODE_PRIVATE)
-        lastApiRequestTime = sharedPrefRefresh.getLong(Constants.LAST_API_REQUEST_TIME, 0)
+        lastApiRequestTime = sharedPrefRefresh!!.getLong(Constants.LAST_API_REQUEST_TIME, 0)
 
         viewModel.getTokensFromWallet()
         triggerAppLaunch()
@@ -155,9 +157,9 @@ class MainFragment : Fragment() {
 
                 // Save lastApiRequestTime in shared preferences
                 withContext(Dispatchers.IO) {
-                    val editor = sharedPrefRefresh.edit()
-                    editor.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
-                    editor.apply()
+                    val editor = sharedPrefRefresh?.edit()
+                    editor?.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
+                    editor?.apply()
                 }
             }
         }else{
@@ -297,9 +299,9 @@ class MainFragment : Fragment() {
 
                 // Save lastApiRequestTime in shared preferences
                 withContext(Dispatchers.IO) {
-                    val editor = sharedPrefRefresh.edit()
-                    editor.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
-                    editor.apply()
+                    val editor = sharedPrefRefresh?.edit()
+                    editor?.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
+                    editor?.apply()
                 }
 
                 // pass empty list to adapter
@@ -354,11 +356,15 @@ class MainFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+        constraintLayout = null
+        sharedPrefTheme = null
+        sharedPrefRefresh = null
+        menuItem = null
+        menuHost = null
+        navigation = null
         walletAdapter = null
         mProgressDialog?.dismiss()
         mProgressDialog = null
-        constraintLayout = null
-        navigation = null
         viewModel.multipleCoinsListResponse.removeObservers(viewLifecycleOwner)
     }
 

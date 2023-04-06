@@ -3,19 +3,20 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_gravity="center_vertical"
     android:orientation="horizontal"
+    android:background="@drawable/rounded_corner_all_around_background_white"
+    android:elevation="8dp"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
     android:padding="10dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/ivSearchedCoinResultImage"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:src="@drawable/coin_place_holder"
-        app:civ_border_color="@color/civ_border_color_img"
-        app:civ_border_width="0.5dp" />
+        android:src="@drawable/coin_place_holder" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -30,14 +31,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:textColor="@color/white"
+            style="@style/SEARCHED_COIN_TITLE_COLOR"
             tools:text="Coin Name" />
 
         <TextView
             android:id="@+id/tvCoinPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/coin_price_value_color"
+            style="@style/SECONDARY_TEXT_COLOR"
             android:textSize="14sp"
             tools:text="10.000" />
     </LinearLayout>
@@ -49,7 +50,7 @@
         android:layout_gravity="center_vertical|end"
         android:layout_marginEnd="10dp"
         android:contentDescription="@string/image_description"
-        android:src="@drawable/white_plus_add_coin"
+        android:background="@drawable/ic_plus_black_24"
         />
 
 

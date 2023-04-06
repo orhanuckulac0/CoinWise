@@ -1,12 +1,13 @@
 package com.example.investmenttracker.presentation
 
 import android.app.Dialog
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -15,7 +16,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
@@ -43,11 +43,12 @@ class SearchCoinFragment : Fragment() {
     lateinit var factory: SearchCoinViewModelFactory
     private lateinit var viewModel: SearchCoinViewModel
     private var adapter: SearchCoinAdapter? = null
+    private var menuHost: MenuHost? = null
+    private var menuItem: MenuItem? = null
     private var userData: UserData? = null
+    private var sharedPref: SharedPreferences? = null
 
     private var navigation: BottomNavigationView? = null
-
-    private var dividerCreated: Boolean = false
 
     private var mProgressDialog: Dialog? = null
     private var coin: CoinModel? = null
@@ -76,12 +77,22 @@ class SearchCoinFragment : Fragment() {
             userData = it
         }
 
-        val menuHost: MenuHost = requireActivity()
+        menuHost = requireActivity()
 
-        menuHost.addMenuProvider(object : MenuProvider {
+        menuHost?.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                // Add menu items here
                 menuInflater.inflate(R.menu.menu_information, menu)
+
+                // change icon depending on the theme
+                menuItem = menu.findItem(R.id.actionAddCoinInformation)
+
+                sharedPref = requireContext().getSharedPreferences(Constants.THEME_PREF, Context.MODE_PRIVATE)
+                val theme = sharedPref?.getBoolean(Constants.SWITCH_STATE_KEY, true)
+                if (theme!!) {
+                    menuItem?.setIcon(R.drawable.ic_info_white_24)
+                } else {
+                    menuItem?.setIcon(R.drawable.ic_info_blue_24)
+                }
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -232,6 +243,8 @@ class SearchCoinFragment : Fragment() {
     private fun setupView(coinList: MutableList<CoinModel>) {
 
         if (coinList.isNotEmpty()){
+            // first set the currentList to null to avoid showing previous list on the UI
+            adapter?.differ?.submitList(null)
             adapter?.differ?.submitList(coinList)
 
             val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
@@ -307,12 +320,6 @@ class SearchCoinFragment : Fragment() {
                     }
                 }
             })
-            if (!dividerCreated && coinList.size > 1){
-                val decorator = DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
-                decorator.setDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.line_divider)!!)
-                rvCoinSearchResults.addItemDecoration(decorator)
-                dividerCreated = true
-            }
 
         }else{
             binding!!.tvNoResults.visibility = View.VISIBLE
@@ -321,12 +328,19 @@ class SearchCoinFragment : Fragment() {
     }
 
     private fun setupActionBar() {
+        val sharedPref = requireContext().getSharedPreferences(Constants.THEME_PREF, Context.MODE_PRIVATE)
+        val theme = sharedPref.getBoolean(Constants.SWITCH_STATE_KEY, true)
+
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding!!.toolbarSearchCoinFragment)
         val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
         if (actionBar != null){
             actionBar.title = "Add Coin"
             actionBar.setDisplayHomeAsUpEnabled(true)
-            actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_white)
+            if (theme){
+                actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_white)
+            }else{
+                actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_black)
+            }
             binding!!.toolbarSearchCoinFragment.setNavigationOnClickListener {
                 findNavController().navigate(R.id.action_searchCoinFragment_to_mainFragment)
                 navigation?.selectedItemId = R.id.home
@@ -337,9 +351,14 @@ class SearchCoinFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+        sharedPref = null
+        menuItem = null
+        menuHost = null
+        navigation = null
         adapter = null
-        coin = null
         mProgressDialog = null
+        coin = null
+        coinIDs = null
         userData = null
         viewModel.coinSearchedBySymbol.removeObservers(viewLifecycleOwner)
         viewModel.coinSearchedBySlug.removeObservers(viewLifecycleOwner)

@@ -53,8 +53,16 @@
         <item name="android:visibility">visible</item>
     </style>
 
+    <style name="DIVIDER_COLOR_SEARCH_COIN_FRAGMENT">
+        <item name="background">@color/divider_color</item>
+    </style>
+
     <style name="BOTTOM_NAV_BACKGROUND">
         <item name="background">@color/black</item>
+    </style>
+
+    <style name="ADD_COIN_PLUS_BUTTON">
+        <item name="android:src">@drawable/ic_plus_white_24</item>
     </style>
 
     <!-- for texts-->
@@ -68,6 +76,14 @@
 
     <style name="BOLD_NORMAL">
         <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="SEARCH_COIN_ET_HINT_COLOR">
+        <item name="hintTextColor">@color/search_text_color_hint</item>
+    </style>
+
+    <style name="SEARCHED_COIN_TITLE_COLOR">
+        <item name="android:textColor">@color/black</item>
     </style>
 
     <!-- wallet token specific texts -->

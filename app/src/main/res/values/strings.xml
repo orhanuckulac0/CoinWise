@@ -35,4 +35,5 @@
     <string name="empty_wallet_please_add_coin_n_click_search_button_below">Empty wallet, please add coin. \n Click \'Search\' button below.</string>
     <string name="dark_mode">Dark Mode</string>
     <string name="action_settings_text">Settings</string>
+    <string name="information">Information</string>
 </resources>
