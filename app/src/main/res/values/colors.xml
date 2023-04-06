@@ -10,7 +10,6 @@
     <color name="yellow">#FFEB3B</color>
     <color name="red">#F44336</color>
     <color name="divider_color">#EAEAEA</color>
-    <color name="transparent">#00000000</color>
 
     <!-- for dark theme -->
     <color name="main_color_dark_theme">#0e1419</color>

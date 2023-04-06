@@ -19,9 +19,7 @@ import com.example.investmenttracker.domain.use_case.util.Constants
 import com.example.investmenttracker.domain.use_case.util.changeAppTheme
 import com.example.investmenttracker.domain.use_case.util.customGetSerializable
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class SettingsFragment : Fragment() {
 
     private var binding: FragmentSettingsBinding? = null

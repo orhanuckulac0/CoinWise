@@ -36,9 +36,4 @@
     <string name="dark_mode">Dark Mode</string>
     <string name="action_settings_text">Settings</string>
     <string name="information">Information</string>
-    <string name="about_us">About Us</string>
-    <string name="support">Support</string>
-    <string name="native_currency">Native Currency</string>
-    <string name="support_icon">SupportIcon</string>
-    <string name="about_us_icon">AboutUsIcon</string>
 </resources>
