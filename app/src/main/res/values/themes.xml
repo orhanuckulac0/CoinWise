@@ -44,7 +44,7 @@
     </style>
 
     <style name="SORT_TOKENS_BACKGROUND">
-        <item name="android:background">@drawable/rounded_corner_background</item>
+        <item name="android:background">@drawable/rounded_corner_background_white</item>
     </style>
 
     <style name="VIEW_VISIBILITY">
@@ -61,6 +61,14 @@
 
     <style name="ADD_COIN_PLUS_BUTTON">
         <item name="android:src">@drawable/ic_plus_black_24</item>
+    </style>
+
+    <style name="SETTINGS_SUPPORT_ICON">
+        <item name="android:src">@drawable/ic_support_black_24</item>
+    </style>
+
+    <style name="SETTINGS_ABOUT_US_ICON">
+        <item name="android:src">@drawable/ic_info_black_24</item>
     </style>
 
     <!-- for texts-->
