@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.fragment.findNavController
 import com.example.investmenttracker.R
@@ -26,6 +27,7 @@ class SettingsFragment : Fragment() {
     private var userData: UserData? = null
     private var constraintLayout: ConstraintLayout? = null
     private lateinit var sharedPref: SharedPreferences
+    private var switchButton: SwitchCompat? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +41,7 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSettingsBinding.bind(view)
         constraintLayout = binding?.settingsFragmentCL
+        switchButton = binding?.customSwitch
 
         // set back pressed and nav
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
@@ -54,13 +57,12 @@ class SettingsFragment : Fragment() {
         arguments?.let {
             userData = it.customGetSerializable(Constants.PASSED_USER)
         }
-        println(userData!!.userTotalBalanceWorth)
 
         // set sharedPref for theme
         sharedPref = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
-        binding!!.customSwitch.isChecked = sharedPref.getBoolean(Constants.SWITCH_STATE_KEY, true)
+        switchButton?.isChecked = sharedPref.getBoolean(Constants.SWITCH_STATE_KEY, true)
 
-        binding!!.customSwitch.setOnCheckedChangeListener{ _, isChecked->
+        switchButton?.setOnCheckedChangeListener{ _, isChecked->
             val editor = sharedPref.edit()
             editor.putBoolean(Constants.SWITCH_STATE_KEY, isChecked)
             editor.apply()
@@ -72,12 +74,19 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupActionBar() {
+        val sharedPref = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
+        val theme = sharedPref.getBoolean(Constants.SWITCH_STATE_KEY, true)
+
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding!!.toolbarSettingsFragment)
         val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
         if (actionBar != null){
             actionBar.title = "Settings"
             actionBar.setDisplayHomeAsUpEnabled(true)
-            actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_white)
+            if (theme){
+                actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_white)
+            }else{
+                actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_black)
+            }
             binding!!.toolbarSettingsFragment.setNavigationOnClickListener {
                 findNavController().navigate(R.id.action_settingsFragment_to_mainFragment)
                 navigation?.selectedItemId = R.id.home
@@ -89,6 +98,7 @@ class SettingsFragment : Fragment() {
         super.onDestroyView()
         binding = null
         constraintLayout = null
+        switchButton = null
         navigation = null
         userData = null
     }
