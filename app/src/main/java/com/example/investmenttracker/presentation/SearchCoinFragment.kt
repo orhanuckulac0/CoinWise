@@ -43,6 +43,7 @@ class SearchCoinFragment : Fragment() {
     lateinit var factory: SearchCoinViewModelFactory
     private lateinit var viewModel: SearchCoinViewModel
     private var adapter: SearchCoinAdapter? = null
+    private var menuProvider: MenuProvider? = null
     private var menuHost: MenuHost? = null
     private var menuItem: MenuItem? = null
     private var userData: UserData? = null
@@ -78,8 +79,7 @@ class SearchCoinFragment : Fragment() {
         }
 
         menuHost = requireActivity()
-
-        menuHost?.addMenuProvider(object : MenuProvider {
+        menuProvider = object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_information, menu)
 
@@ -103,7 +103,9 @@ class SearchCoinFragment : Fragment() {
                 }
                 return true
             }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
+        }
+        menuHost?.addMenuProvider(menuProvider!!, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -351,9 +353,11 @@ class SearchCoinFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-        sharedPref = null
+        menuHost?.removeMenuProvider(menuProvider!!)
+        menuProvider = null
         menuItem = null
         menuHost = null
+        sharedPref = null
         navigation = null
         adapter = null
         mProgressDialog = null

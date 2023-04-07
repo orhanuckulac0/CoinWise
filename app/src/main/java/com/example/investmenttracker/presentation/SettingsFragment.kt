@@ -7,9 +7,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
+import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.fragment.findNavController
 import com.example.investmenttracker.R
@@ -28,6 +30,9 @@ class SettingsFragment : Fragment() {
     private var navigation: BottomNavigationView? = null
     private var userData: UserData? = null
     private var constraintLayout: ConstraintLayout? = null
+    private var ibAboutUs: ImageButton? = null
+    private var ibSupport: ImageButton? = null
+    private var toolbar: Toolbar? = null
     private lateinit var sharedPref: SharedPreferences
     private var switchButton: SwitchCompat? = null
 
@@ -44,7 +49,9 @@ class SettingsFragment : Fragment() {
         binding = FragmentSettingsBinding.bind(view)
         constraintLayout = binding?.settingsFragmentCL
         switchButton = binding?.customSwitch
-
+        ibAboutUs = binding?.ibAboutUs
+        ibSupport = binding?.ibSupport
+        toolbar = binding?.toolbarSettingsFragment
         // set back pressed and nav
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
 
@@ -76,10 +83,10 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupActionBar() {
-        val sharedPref = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
-        val theme = sharedPref.getBoolean(Constants.SWITCH_STATE_KEY, true)
+        val sharedPrefTheme = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
+        val theme = sharedPrefTheme.getBoolean(Constants.SWITCH_STATE_KEY, true)
 
-        (requireActivity() as AppCompatActivity).setSupportActionBar(binding!!.toolbarSettingsFragment)
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
         val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
         if (actionBar != null){
             actionBar.title = "Settings"
@@ -101,6 +108,9 @@ class SettingsFragment : Fragment() {
         binding = null
         constraintLayout = null
         switchButton = null
+        ibAboutUs = null
+        ibSupport = null
+        toolbar = null
         navigation = null
         userData = null
     }

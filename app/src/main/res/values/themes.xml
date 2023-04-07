@@ -71,6 +71,10 @@
         <item name="android:src">@drawable/ic_info_black_24</item>
     </style>
 
+    <style name="TOKEN_DETAILS_INVESTMENT_DETAILS_SQUARE">
+        <item name="background">@drawable/rounded_corner_all_around_background_white</item>
+    </style>
+
     <!-- for texts-->
     <style name="TITLE_COLOR">
         <item name="android:textColor">@color/light_title_text_color</item>

@@ -41,6 +41,7 @@ class MainFragment : Fragment() {
     private var walletAdapter: MainFragmentAdapter? = null
     private var constraintLayout: ConstraintLayout? = null
     private var navigation: BottomNavigationView? = null
+    private var menuProvider: MenuProvider? = null
     private var menuHost: MenuHost? = null
     private var menuItem: MenuItem? = null
 
@@ -66,13 +67,13 @@ class MainFragment : Fragment() {
 
         viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
         walletAdapter = MainFragmentAdapter(requireContext())
-        sharedPrefTheme = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
-        menuHost = requireActivity()
 
-        menuHost?.addMenuProvider(object : MenuProvider {
+        sharedPrefTheme = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
+
+        menuHost = requireActivity()
+        menuProvider = object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_settings, menu)
-
                 // change icon depending on the theme
                 menuItem = menu.findItem(R.id.actionSettings)
                 val theme = sharedPrefTheme?.getBoolean(Constants.SWITCH_STATE_KEY, true)
@@ -98,7 +99,8 @@ class MainFragment : Fragment() {
                 }
                 return true
             }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        }
+        menuHost?.addMenuProvider(menuProvider!!, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         setupActionBar()
         mProgressDialog = showProgressDialog(requireContext())
@@ -357,12 +359,14 @@ class MainFragment : Fragment() {
         super.onDestroyView()
         binding = null
         constraintLayout = null
-        sharedPrefTheme = null
-        sharedPrefRefresh = null
+        menuHost?.removeMenuProvider(menuProvider!!)
+        menuProvider = null
         menuItem = null
         menuHost = null
         navigation = null
         walletAdapter = null
+        sharedPrefTheme = null
+        sharedPrefRefresh = null
         mProgressDialog?.dismiss()
         mProgressDialog = null
         viewModel.multipleCoinsListResponse.removeObservers(viewLifecycleOwner)

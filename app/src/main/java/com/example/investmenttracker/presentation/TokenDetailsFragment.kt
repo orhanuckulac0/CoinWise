@@ -1,6 +1,8 @@
 package com.example.investmenttracker.presentation
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
 import androidx.activity.OnBackPressedCallback
@@ -11,6 +13,7 @@ import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.investmenttracker.R
@@ -24,6 +27,7 @@ import com.example.investmenttracker.presentation.view_model.TokenDetailsViewMod
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -33,9 +37,14 @@ class TokenDetailsFragment : Fragment() {
     @Inject
     lateinit var factory: TokenDetailsViewModelFactory
     lateinit var viewModel: TokenDetailsViewModel
+    private var menuHost: MenuHost? = null
+    private var menuItem: MenuItem? = null
+    private var menuProvider: MenuProvider? = null
+    private var sharedPrefTheme: SharedPreferences? = null
     private var currentCoin: CoinModel? = null
     private var userData: UserData? = null
     private var navigation: BottomNavigationView? = null
+    private var theme: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,19 +59,24 @@ class TokenDetailsFragment : Fragment() {
         binding = FragmentTokenDetailsBinding.bind(view)
 
         viewModel = ViewModelProvider(this, factory)[TokenDetailsViewModel::class.java]
-        setupActionBar()
 
         arguments?.let {
             currentCoin = it.customGetSerializable(Constants.PASSED_COIN)
             userData = it.customGetSerializable(Constants.PASSED_USER)
         }
+
+        sharedPrefTheme = requireContext().getSharedPreferences(Constants.THEME_PREF,
+            Context.MODE_PRIVATE
+        )
+        theme = sharedPrefTheme!!.getBoolean(Constants.SWITCH_STATE_KEY, true)
+        setupActionBar()
         setupView()
 
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
         navigation?.selectedItemId = 0 // set the selected item to be null
 
-        val menuHost: MenuHost = requireActivity()
-        menuHost.addMenuProvider(object : MenuProvider {
+        menuHost = requireActivity()
+        menuProvider = object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
                 menuInflater.inflate(R.menu.menu_delete_coin, menu)
@@ -100,14 +114,19 @@ class TokenDetailsFragment : Fragment() {
                 }
                 return true
             }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        }
+        menuHost!!.addMenuProvider(menuProvider!!, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
-        lifecycleScope.launchWhenStarted {
-            viewModel.eventFlow.collect {event->
-                when(event) {
-                    is UiEvent.ShowErrorSnackbar -> {
-                        Snackbar.make(binding!!.root, event.message, Snackbar.LENGTH_LONG).show()
-                    }else -> {}
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.eventFlow.collect { event ->
+                    when (event) {
+                        is UiEvent.ShowErrorSnackbar -> {
+                            Snackbar.make(binding!!.root, event.message, Snackbar.LENGTH_LONG)
+                                .show()
+                        }
+                        else -> {}
+                    }
                 }
             }
         }
@@ -191,7 +210,11 @@ class TokenDetailsFragment : Fragment() {
         if (actionBar != null){
             actionBar.title = "Token Details"
             actionBar.setDisplayHomeAsUpEnabled(true)
-            actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_white)
+            if (theme){
+                actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_white)
+            }else{
+                actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_black)
+            }
             binding!!.toolbarTokenDetailsFragment.setNavigationOnClickListener {
                 findNavController().navigate(R.id.action_tokenDetailsFragment_to_mainFragment)
                 navigation?.selectedItemId = R.id.home
@@ -201,9 +224,14 @@ class TokenDetailsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        currentCoin = null
         binding = null
-        userData = null
         navigation = null
+        menuHost?.removeMenuProvider(menuProvider!!)
+        menuProvider = null
+        menuItem = null
+        menuHost = null
+        sharedPrefTheme = null
+        currentCoin = null
+        userData = null
     }
 }

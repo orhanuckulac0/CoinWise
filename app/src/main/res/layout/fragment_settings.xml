@@ -91,6 +91,7 @@
                 android:textSize="20sp" />
 
             <ImageButton
+                android:id="@+id/ibAboutUs"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="@color/transparent"
@@ -122,6 +123,7 @@
                 android:textSize="20sp" />
 
             <ImageButton
+                android:id="@+id/ibSupport"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="@color/transparent"
