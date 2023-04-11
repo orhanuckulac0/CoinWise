@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
+    android:id="@+id/svAnalyticFragment"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,7 +9,7 @@
     tools:context=".presentation.AnalyticsFragment"
     android:paddingStart="5dp"
     android:paddingEnd="5dp"
-    android:background="@color/main_color_dark_theme">
+    style="@style/SCREEN_BACKGROUND">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,6 +17,7 @@
         android:orientation="vertical">
 
         <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayoutAnalyticsFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/AppTheme.AppBarOverlay">
@@ -24,7 +26,7 @@
                 android:id="@+id/toolbarAnalyticsFragment"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
+                style="@style/TOOLBAR_THEME"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -35,7 +37,7 @@
             android:gravity="center_horizontal"
             android:textSize="22sp"
             android:text="@string/investment_details_text"
-            android:textColor="@color/white"
+            style="@style/TITLE_COLOR"
             android:layout_marginTop="20dp"
             />
 
@@ -60,7 +62,7 @@
                 android:id="@+id/tvTotalUserInvestment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
+                style="@style/TITLE_COLOR"
                 android:layout_marginStart="5dp"
                 />
 
@@ -86,7 +88,7 @@
                 android:id="@+id/tvTotalUserInvestmentWorth"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
+                style="@style/TITLE_COLOR"
                 android:layout_marginStart="5dp"
                 />
 
@@ -112,7 +114,7 @@
                 android:id="@+id/tvInvestmentProfitLoss"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
+                style="@style/TITLE_COLOR"
                 android:textStyle="bold"
                 android:layout_marginStart="5dp"
                 />
@@ -139,7 +141,7 @@
                 android:id="@+id/tvInvestmentReturnPercentage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
+                style="@style/TITLE_COLOR"
                 android:textStyle="bold"
                 android:layout_marginStart="5dp"
                 />
@@ -153,7 +155,7 @@
             android:gravity="center_horizontal"
             android:textSize="22sp"
             android:text="@string/investment_insights"
-            android:textColor="@color/white"
+            style="@style/TITLE_COLOR"
             android:layout_marginTop="25dp"
             />
 
@@ -178,7 +180,7 @@
                 android:id="@+id/tvMostProfitToken"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
+                style="@style/TITLE_COLOR"
                 android:layout_marginStart="5dp"
                 />
 
@@ -205,7 +207,7 @@
                 android:id="@+id/tvMostProfitByPercentage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
+                style="@style/TITLE_COLOR"
                 android:layout_marginStart="5dp"
                 />
 
@@ -231,7 +233,7 @@
                 android:id="@+id/tvMostLossToken"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
+                style="@style/TITLE_COLOR"
                 android:layout_marginStart="5dp"
                 />
 
@@ -256,7 +258,7 @@
                 android:id="@+id/tvMostLossTokenByPercentage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
+                style="@style/TITLE_COLOR"
                 android:layout_marginStart="5dp"
                 />
 
@@ -267,7 +269,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/investment_diversity"
-            android:textColor="@color/white"
+            style="@style/TITLE_COLOR"
             android:textSize="22sp"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"

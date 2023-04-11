@@ -6,7 +6,9 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuHost
 import androidx.fragment.app.Fragment
 import androidx.core.view.MenuProvider
@@ -24,6 +26,7 @@ import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModel
 import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModelFactory
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,11 +43,15 @@ class TokenDetailsFragment : Fragment() {
     private var menuHost: MenuHost? = null
     private var menuItem: MenuItem? = null
     private var menuProvider: MenuProvider? = null
+    private var toolbar: Toolbar? = null
+    private var appBarLayout: AppBarLayout? = null
+    private var actionBar: ActionBar? = null
     private var sharedPrefTheme: SharedPreferences? = null
     private var currentCoin: CoinModel? = null
     private var userData: UserData? = null
     private var navigation: BottomNavigationView? = null
     private var theme: Boolean = false
+    private var onBackPressedCallback: OnBackPressedCallback? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,7 +64,8 @@ class TokenDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentTokenDetailsBinding.bind(view)
-
+        toolbar = binding?.toolbarTokenDetailsFragment
+        appBarLayout = binding?.appBarLayoutTokenDetailsFragment
         viewModel = ViewModelProvider(this, factory)[TokenDetailsViewModel::class.java]
 
         arguments?.let {
@@ -80,6 +88,13 @@ class TokenDetailsFragment : Fragment() {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
                 menuInflater.inflate(R.menu.menu_delete_coin, menu)
+                // change icon depending on the theme
+                menuItem = menu.findItem(R.id.actionDeleteCoin)
+                if (theme) {
+                    menuItem?.setIcon(R.drawable.ic_delete_24)
+                } else {
+                    menuItem?.setIcon(R.drawable.ic_delete_blue_24)
+                }
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -158,13 +173,13 @@ class TokenDetailsFragment : Fragment() {
             }
         }
 
-        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+        onBackPressedCallback = object : OnBackPressedCallback(true){
             override fun handleOnBackPressed() {
                 findNavController().navigate(R.id.action_tokenDetailsFragment_to_mainFragment)
                 navigation?.selectedItemId = R.id.home
             }
-        })
-
+        }
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, onBackPressedCallback!!)
     }
 
     @SuppressLint("SetTextI18n")
@@ -205,17 +220,17 @@ class TokenDetailsFragment : Fragment() {
     }
 
     private fun setupActionBar(){
-        (requireActivity() as AppCompatActivity).setSupportActionBar(binding!!.toolbarTokenDetailsFragment)
-        val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+        actionBar = (requireActivity() as AppCompatActivity).supportActionBar
         if (actionBar != null){
-            actionBar.title = "Token Details"
-            actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar?.title = "Token Details"
+            actionBar?.setDisplayHomeAsUpEnabled(true)
             if (theme){
-                actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_white)
+                actionBar?.setHomeAsUpIndicator(R.drawable.back_arrow_white)
             }else{
-                actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_black)
+                actionBar?.setHomeAsUpIndicator(R.drawable.back_arrow_black)
             }
-            binding!!.toolbarTokenDetailsFragment.setNavigationOnClickListener {
+            toolbar?.setNavigationOnClickListener {
                 findNavController().navigate(R.id.action_tokenDetailsFragment_to_mainFragment)
                 navigation?.selectedItemId = R.id.home
             }
@@ -224,13 +239,20 @@ class TokenDetailsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        toolbar = null
+        appBarLayout = null
+        actionBar = null
         binding = null
-        navigation = null
-        menuHost?.removeMenuProvider(menuProvider!!)
-        menuProvider = null
         menuItem = null
+        menuProvider?.let { provider ->
+            menuHost?.removeMenuProvider(provider)
+            menuProvider = null
+        }
         menuHost = null
+        navigation = null
         sharedPrefTheme = null
+        onBackPressedCallback?.remove()
+        onBackPressedCallback = null
         currentCoin = null
         userData = null
     }

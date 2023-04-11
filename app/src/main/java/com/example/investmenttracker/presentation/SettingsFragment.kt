@@ -9,7 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -20,6 +22,7 @@ import com.example.investmenttracker.databinding.FragmentSettingsBinding
 import com.example.investmenttracker.domain.use_case.util.Constants
 import com.example.investmenttracker.domain.use_case.util.changeAppTheme
 import com.example.investmenttracker.domain.use_case.util.customGetSerializable
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -32,9 +35,12 @@ class SettingsFragment : Fragment() {
     private var constraintLayout: ConstraintLayout? = null
     private var ibAboutUs: ImageButton? = null
     private var ibSupport: ImageButton? = null
+    private var appBarLayout: AppBarLayout? = null
     private var toolbar: Toolbar? = null
-    private lateinit var sharedPref: SharedPreferences
+    private var actionBar: ActionBar? = null
+    private var sharedPref: SharedPreferences? = null
     private var switchButton: SwitchCompat? = null
+    private var onBackPressedCallback: OnBackPressedCallback? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,15 +58,18 @@ class SettingsFragment : Fragment() {
         ibAboutUs = binding?.ibAboutUs
         ibSupport = binding?.ibSupport
         toolbar = binding?.toolbarSettingsFragment
+        appBarLayout = binding?.appBarLayoutSettingsFragment
         // set back pressed and nav
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
 
-        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+        onBackPressedCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigate(R.id.action_settingsFragment_to_mainFragment)
                 navigation?.selectedItemId = R.id.home
             }
-        })
+        }
+
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, onBackPressedCallback!!)
 
         // set the user
         arguments?.let {
@@ -69,34 +78,34 @@ class SettingsFragment : Fragment() {
 
         // set sharedPref for theme
         sharedPref = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
-        switchButton?.isChecked = sharedPref.getBoolean(Constants.SWITCH_STATE_KEY, true)
-
-        switchButton?.setOnCheckedChangeListener{ _, isChecked->
-            val editor = sharedPref.edit()
-            editor.putBoolean(Constants.SWITCH_STATE_KEY, isChecked)
-            editor.apply()
-
-            changeAppTheme(sharedPref.getBoolean(Constants.SWITCH_STATE_KEY, true))
-        }
+        val theme = sharedPref!!.getBoolean(Constants.SWITCH_STATE_KEY, true)
+        switchButton?.isChecked = theme
 
         setupActionBar()
+
+        switchButton?.setOnCheckedChangeListener{ _, isChecked->
+            val editor = sharedPref?.edit()
+            editor?.putBoolean(Constants.SWITCH_STATE_KEY, isChecked)
+            editor?.apply()
+
+            changeAppTheme(sharedPref!!.getBoolean(Constants.SWITCH_STATE_KEY, true))
+        }
     }
 
     private fun setupActionBar() {
-        val sharedPrefTheme = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
-        val theme = sharedPrefTheme.getBoolean(Constants.SWITCH_STATE_KEY, true)
+        val theme = sharedPref?.getBoolean(Constants.SWITCH_STATE_KEY, true)
 
         (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
-        val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
+        actionBar = (requireActivity() as AppCompatActivity).supportActionBar
         if (actionBar != null){
-            actionBar.title = "Settings"
-            actionBar.setDisplayHomeAsUpEnabled(true)
-            if (theme){
-                actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_white)
+            actionBar?.title = "Settings"
+            actionBar?.setDisplayHomeAsUpEnabled(true)
+            if (theme!!){
+                actionBar?.setHomeAsUpIndicator(R.drawable.back_arrow_white)
             }else{
-                actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_black)
+                actionBar?.setHomeAsUpIndicator(R.drawable.back_arrow_black)
             }
-            binding!!.toolbarSettingsFragment.setNavigationOnClickListener {
+            toolbar?.setNavigationOnClickListener {
                 findNavController().navigate(R.id.action_settingsFragment_to_mainFragment)
                 navigation?.selectedItemId = R.id.home
             }
@@ -110,8 +119,13 @@ class SettingsFragment : Fragment() {
         switchButton = null
         ibAboutUs = null
         ibSupport = null
+        actionBar = null
+        appBarLayout = null
         toolbar = null
         navigation = null
+        onBackPressedCallback?.remove()
+        onBackPressedCallback = null
+        sharedPref = null
         userData = null
     }
 }

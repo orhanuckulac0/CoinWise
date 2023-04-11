@@ -7,7 +7,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -27,6 +29,7 @@ import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.events.UiEventActions
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModel
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModelFactory
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,10 +49,14 @@ class SearchCoinFragment : Fragment() {
     private var menuProvider: MenuProvider? = null
     private var menuHost: MenuHost? = null
     private var menuItem: MenuItem? = null
+    private var toolbar: Toolbar? = null
+    private var appBarLayout: AppBarLayout? = null
+    private var actionBar: ActionBar? = null
     private var userData: UserData? = null
     private var sharedPref: SharedPreferences? = null
 
     private var navigation: BottomNavigationView? = null
+    private var onBackPressedCallback: OnBackPressedCallback? = null
 
     private var mProgressDialog: Dialog? = null
     private var coin: CoinModel? = null
@@ -67,8 +74,8 @@ class SearchCoinFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSearchCoinBinding.bind(view)
-
-        setupActionBar()
+        toolbar = binding?.toolbarSearchCoinFragment
+        appBarLayout = binding?.appBarLayoutSearchCoinFragment
         mProgressDialog = showProgressDialog(requireContext())
 
         viewModel = ViewModelProvider(this, factory)[SearchCoinViewModel::class.java]
@@ -77,6 +84,7 @@ class SearchCoinFragment : Fragment() {
         viewModel.userData.observe(viewLifecycleOwner){
             userData = it
         }
+        sharedPref = requireContext().getSharedPreferences(Constants.THEME_PREF, Context.MODE_PRIVATE)
 
         menuHost = requireActivity()
         menuProvider = object : MenuProvider {
@@ -86,7 +94,6 @@ class SearchCoinFragment : Fragment() {
                 // change icon depending on the theme
                 menuItem = menu.findItem(R.id.actionAddCoinInformation)
 
-                sharedPref = requireContext().getSharedPreferences(Constants.THEME_PREF, Context.MODE_PRIVATE)
                 val theme = sharedPref?.getBoolean(Constants.SWITCH_STATE_KEY, true)
                 if (theme!!) {
                     menuItem?.setIcon(R.drawable.ic_info_white_24)
@@ -145,12 +152,17 @@ class SearchCoinFragment : Fragment() {
 
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
 
-        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+        onBackPressedCallback = object : OnBackPressedCallback(true){
             override fun handleOnBackPressed() {
                 findNavController().navigate(R.id.action_searchCoinFragment_to_mainFragment)
                 navigation?.selectedItemId = R.id.home
             }
-        })
+
+        }
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, onBackPressedCallback!!)
+
+        setupActionBar()
+
     }
 
     // search coins by slug, bitcoin - ethereum
@@ -330,20 +342,19 @@ class SearchCoinFragment : Fragment() {
     }
 
     private fun setupActionBar() {
-        val sharedPref = requireContext().getSharedPreferences(Constants.THEME_PREF, Context.MODE_PRIVATE)
-        val theme = sharedPref.getBoolean(Constants.SWITCH_STATE_KEY, true)
+        val theme = sharedPref?.getBoolean(Constants.SWITCH_STATE_KEY, true)
 
-        (requireActivity() as AppCompatActivity).setSupportActionBar(binding!!.toolbarSearchCoinFragment)
-        val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+        actionBar = (requireActivity() as AppCompatActivity).supportActionBar
         if (actionBar != null){
-            actionBar.title = "Add Coin"
-            actionBar.setDisplayHomeAsUpEnabled(true)
-            if (theme){
-                actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_white)
+            actionBar?.title = "Add Coin"
+            actionBar?.setDisplayHomeAsUpEnabled(true)
+            if (theme!!){
+                actionBar?.setHomeAsUpIndicator(R.drawable.back_arrow_white)
             }else{
-                actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_black)
+                actionBar?.setHomeAsUpIndicator(R.drawable.back_arrow_black)
             }
-            binding!!.toolbarSearchCoinFragment.setNavigationOnClickListener {
+            toolbar?.setNavigationOnClickListener {
                 findNavController().navigate(R.id.action_searchCoinFragment_to_mainFragment)
                 navigation?.selectedItemId = R.id.home
             }
@@ -352,20 +363,26 @@ class SearchCoinFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding = null
-        menuHost?.removeMenuProvider(menuProvider!!)
-        menuProvider = null
-        menuItem = null
-        menuHost = null
-        sharedPref = null
-        navigation = null
-        adapter = null
-        mProgressDialog = null
-        coin = null
-        coinIDs = null
-        userData = null
         viewModel.coinSearchedBySymbol.removeObservers(viewLifecycleOwner)
         viewModel.coinSearchedBySlug.removeObservers(viewLifecycleOwner)
         viewModel.userData.removeObservers(viewLifecycleOwner)
+        binding = null
+        adapter = null
+        menuItem = null
+        menuProvider?.let { provider ->
+            menuHost?.removeMenuProvider(provider)
+            menuProvider = null
+        }
+        menuHost = null
+        actionBar = null
+        appBarLayout = null
+        toolbar = null
+        navigation = null
+        sharedPref = null
+        coin = null
+        coinIDs = null
+        mProgressDialog = null
+        onBackPressedCallback?.remove()
+        onBackPressedCallback = null
     }
 }

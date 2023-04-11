@@ -8,8 +8,10 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.ActionBar
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -26,6 +28,7 @@ import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.adapter.MainFragmentAdapter
 import com.example.investmenttracker.presentation.view_model.MainViewModel
 import com.example.investmenttracker.presentation.view_model.MainViewModelFactory
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -44,10 +47,14 @@ class MainFragment : Fragment() {
     private var menuProvider: MenuProvider? = null
     private var menuHost: MenuHost? = null
     private var menuItem: MenuItem? = null
+    private var toolbar: Toolbar? = null
+    private var appBarLayout: AppBarLayout? = null
+    private var actionBar: ActionBar? = null
 
     private var mProgressDialog: Dialog? = null
     private var sharedPrefRefresh: SharedPreferences? = null
     private var sharedPrefTheme: SharedPreferences? = null
+    private var onBackPressedCallback: OnBackPressedCallback? = null
     private var lastApiRequestTime: Long = 0
     private var populated = false
     private var sorted = false
@@ -64,11 +71,13 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentMainBinding.bind(view)
-
+        toolbar = binding?.toolbarMainFragment
+        appBarLayout = binding?.appBarLayoutMainFragment
         viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
         walletAdapter = MainFragmentAdapter(requireContext())
 
         sharedPrefTheme = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
+        val theme = sharedPrefTheme?.getBoolean(Constants.SWITCH_STATE_KEY, true)
 
         menuHost = requireActivity()
         menuProvider = object : MenuProvider {
@@ -76,8 +85,7 @@ class MainFragment : Fragment() {
                 menuInflater.inflate(R.menu.menu_settings, menu)
                 // change icon depending on the theme
                 menuItem = menu.findItem(R.id.actionSettings)
-                val theme = sharedPrefTheme?.getBoolean(Constants.SWITCH_STATE_KEY, true)
-                if (theme!!) {
+                if (theme == true) {
                     menuItem?.setIcon(R.drawable.ic_settings_gray_24)
                 } else {
                     menuItem?.setIcon(R.drawable.ic_settings_blue_24)
@@ -100,7 +108,7 @@ class MainFragment : Fragment() {
                 return true
             }
         }
-        menuHost?.addMenuProvider(menuProvider!!, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        menuHost?.addMenuProvider(menuProvider!!, viewLifecycleOwner, Lifecycle.State.STARTED)
 
         setupActionBar()
         mProgressDialog = showProgressDialog(requireContext())
@@ -133,11 +141,12 @@ class MainFragment : Fragment() {
             })
         }
 
-        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+        onBackPressedCallback = object : OnBackPressedCallback(true){
             override fun handleOnBackPressed() {
                 requireActivity().finish()
             }
-        })
+        }
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, onBackPressedCallback!!)
     }
 
     private fun triggerAppLaunch() {
@@ -158,7 +167,7 @@ class MainFragment : Fragment() {
                 lastApiRequestTime = System.currentTimeMillis()
 
                 // Save lastApiRequestTime in shared preferences
-                withContext(Dispatchers.IO) {
+                lifecycleScope.launch(Dispatchers.IO) {
                     val editor = sharedPrefRefresh?.edit()
                     editor?.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
                     editor?.apply()
@@ -170,10 +179,8 @@ class MainFragment : Fragment() {
     }
 
     private fun populateFromCache(){
-        lifecycleScope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.Main){
-                setupView(viewModel.currentWalletCoins)
-            }
+        lifecycleScope.launch(Dispatchers.Main) {
+            setupView(viewModel.currentWalletCoins)
         }
     }
 
@@ -237,7 +244,9 @@ class MainFragment : Fragment() {
         }
 
 
-        cancelProgressDialog(mProgressDialog!!)
+        if (mProgressDialog != null){
+            cancelProgressDialog(mProgressDialog!!)
+        }
 
         walletAdapter?.setOnClickListener(object: MainFragmentAdapter.OnClickListener {
             override fun onClick(position: Int, coinModel: CoinModel) {
@@ -253,7 +262,6 @@ class MainFragment : Fragment() {
             }
         })
     }
-
 
     private suspend fun requestNewDataForWalletCoins(){
 
@@ -300,7 +308,7 @@ class MainFragment : Fragment() {
                 lastApiRequestTime = 60
 
                 // Save lastApiRequestTime in shared preferences
-                withContext(Dispatchers.IO) {
+                lifecycleScope.launch(Dispatchers.IO) {
                     val editor = sharedPrefRefresh?.edit()
                     editor?.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
                     editor?.apply()
@@ -348,28 +356,34 @@ class MainFragment : Fragment() {
     }
 
     private fun setupActionBar() {
-        (requireActivity() as AppCompatActivity).setSupportActionBar(binding!!.toolbarMainFragment)
-        val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+        actionBar = (requireActivity() as AppCompatActivity).supportActionBar
         if (actionBar != null) {
-            actionBar.title = "CoinWise"
+            actionBar?.title = "CoinWise"
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding = null
-        constraintLayout = null
-        menuHost?.removeMenuProvider(menuProvider!!)
-        menuProvider = null
+        viewModel.multipleCoinsListResponse.removeObservers(viewLifecycleOwner)
         menuItem = null
+        menuProvider?.let { provider ->
+            menuHost?.removeMenuProvider(provider)
+            menuProvider = null
+        }
         menuHost = null
-        navigation = null
+        toolbar = null
+        appBarLayout = null
+        actionBar = null
+        constraintLayout = null
+        binding = null
         walletAdapter = null
+        navigation = null
         sharedPrefTheme = null
         sharedPrefRefresh = null
         mProgressDialog?.dismiss()
         mProgressDialog = null
-        viewModel.multipleCoinsListResponse.removeObservers(viewLifecycleOwner)
+        onBackPressedCallback?.remove()
+        onBackPressedCallback = null
     }
-
 }

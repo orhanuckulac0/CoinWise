@@ -2,12 +2,17 @@ package com.example.investmenttracker.presentation
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ScrollView
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -20,6 +25,7 @@ import com.example.investmenttracker.presentation.view_model.AnalyticsViewModel
 import com.example.investmenttracker.presentation.view_model.AnalyticsViewModelFactory
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.formatter.PercentFormatter
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -32,13 +38,20 @@ class AnalyticsFragment : Fragment() {
     @Inject
     lateinit var factory: AnalyticsViewModelFactory
     private lateinit var viewModel: AnalyticsViewModel
+    private var scrollView: ScrollView? = null
+    private var toolbar: Toolbar? = null
+    private var appBarLayout: AppBarLayout? = null
+    private var actionBar: ActionBar? = null
 
     private var mProgressDialog: Dialog? = null
     private var navigation: BottomNavigationView? = null
     private var pieChart: PieChart? = null
     private var percentFormatter: PercentFormatter? = null
+
     private var user: UserData? = null
     private var walletCoins: List<CoinModel>? = null
+    private var sharedPref: SharedPreferences? = null
+    private var onBackPressedCallback: OnBackPressedCallback? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,20 +65,28 @@ class AnalyticsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding = FragmentAnalyticsBinding.bind(view)
+        scrollView = binding?.svAnalyticFragment
+        toolbar = binding?.toolbarAnalyticsFragment
+        appBarLayout = binding?.appBarLayoutAnalyticsFragment
         viewModel = ViewModelProvider(this, factory)[AnalyticsViewModel::class.java]
 
         mProgressDialog = showProgressDialog(requireContext())
         pieChart = binding!!.pieChart
         percentFormatter = ChartUtil.getPercentFormatter(pieChart!!)
+        sharedPref = requireContext().getSharedPreferences(Constants.THEME_PREF,
+            Context.MODE_PRIVATE
+        )
 
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
 
-        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+        onBackPressedCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigate(R.id.action_analyticsFragment_to_mainFragment)
                 navigation?.selectedItemId = R.id.home
             }
-        })
+        }
+
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, onBackPressedCallback!!)
 
         viewModel.userDataLiveData.observe(viewLifecycleOwner) { userData ->
             user = userData
@@ -87,15 +108,17 @@ class AnalyticsFragment : Fragment() {
         viewModel.combinedLiveData.observe(viewLifecycleOwner) { (userData, coins) ->
             if (userData != null && coins.isNotEmpty()) {
 
-                cancelProgressDialog(mProgressDialog!!)
+                showProgressDialog(requireContext())
 
                 user = userData
                 walletCoins = coins
                 setupView()
                 setupActionBar()
 
-            }else{
-                showProgressDialog(requireContext())
+                view.post {
+                    cancelProgressDialog(mProgressDialog!!)
+                }
+
             }
         }
     }
@@ -105,7 +128,8 @@ class AnalyticsFragment : Fragment() {
     private fun setupView(){
         // setup pie chart
         if (walletCoins!!.isNotEmpty()){
-            createPieChart(pieChart!!, percentFormatter ,requireContext(), walletCoins!!)
+            val theme = sharedPref?.getBoolean(Constants.SWITCH_STATE_KEY, true)
+            createPieChart(pieChart!!, percentFormatter ,requireContext(), walletCoins!!, theme!!)
             binding!!.pieChart.visibility = View.VISIBLE
             binding!!.tvPieChartTitle.visibility = View.VISIBLE
         }else{
@@ -220,13 +244,19 @@ class AnalyticsFragment : Fragment() {
 
 
     private fun setupActionBar() {
-        (requireActivity() as AppCompatActivity).setSupportActionBar(binding!!.toolbarAnalyticsFragment)
-        val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
+        val theme = sharedPref?.getBoolean(Constants.SWITCH_STATE_KEY, true)
+
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+        actionBar = (requireActivity() as AppCompatActivity).supportActionBar
         if (actionBar != null){
-            actionBar.title = "Analytics"
-            actionBar.setDisplayHomeAsUpEnabled(true)
-            actionBar.setHomeAsUpIndicator(R.drawable.back_arrow_white)
-            binding!!.toolbarAnalyticsFragment.setNavigationOnClickListener {
+            actionBar?.title = "Analytics"
+            actionBar?.setDisplayHomeAsUpEnabled(true)
+            if (theme!!){
+                actionBar?.setHomeAsUpIndicator(R.drawable.back_arrow_white)
+            }else{
+                actionBar?.setHomeAsUpIndicator(R.drawable.back_arrow_black)
+            }
+            toolbar?.setNavigationOnClickListener {
                 findNavController().navigate(R.id.action_analyticsFragment_to_mainFragment)
                 navigation?.selectedItemId = R.id.home
             }
@@ -235,16 +265,22 @@ class AnalyticsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        viewModel.userDataLiveData.removeObservers(viewLifecycleOwner)
+        viewModel.walletCoins.removeObservers(viewLifecycleOwner)
+        viewModel.combinedLiveData.removeObservers(viewLifecycleOwner)
         binding = null
+        scrollView = null
+        actionBar = null
+        appBarLayout = null
+        toolbar = null
+        onBackPressedCallback?.remove()
+        onBackPressedCallback = null
+        navigation = null
         mProgressDialog = null
         pieChart = null
         percentFormatter = null
-        navigation = null
+        sharedPref = null
         user = null
         walletCoins = null
-
-        viewModel.combinedLiveData.removeObservers(viewLifecycleOwner)
-        viewModel.userDataLiveData.removeObservers(viewLifecycleOwner)
-        viewModel.walletCoins.removeObservers(viewLifecycleOwner)
     }
 }

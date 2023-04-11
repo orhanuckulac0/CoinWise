@@ -1,5 +1,7 @@
 package com.example.investmenttracker.presentation
 
+import android.app.Activity
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
@@ -18,8 +20,13 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private var binding: ActivityMainBinding? = null
-    private lateinit var navController: NavController
+    private var navController: NavController? = null
     private var lastMenuItem: MenuItem? = null
+    private var sharedPref: SharedPreferences? = null
+
+    private var navHostFragment: NavHostFragment? = null
+    private var bottomNavigationView: BottomNavigationView? = null
+    private var onBackPressedCallback: OnBackPressedCallback? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,38 +35,38 @@ class MainActivity : AppCompatActivity() {
 
         // Set the default night mode to follow the system's theme preference
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-        val sharedPref = getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
-        val theme = sharedPref.getBoolean(Constants.SWITCH_STATE_KEY, true)
+        sharedPref = getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
+        val theme = sharedPref!!.getBoolean(Constants.SWITCH_STATE_KEY, true)
         changeAppTheme(theme)
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
-        navController = navHostFragment.navController
+        navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+        navController = navHostFragment?.navController
 
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNavigationView = binding?.bottomNavigation
         if (theme){
-            bottomNavigationView.setBackgroundColor(ContextCompat.getColor(this, R.color.black))
+            bottomNavigationView?.setBackgroundColor(ContextCompat.getColor(this, R.color.black))
         }else{
-            bottomNavigationView.setBackgroundColor(ContextCompat.getColor(this, R.color.white))
+            bottomNavigationView?.setBackgroundColor(ContextCompat.getColor(this, R.color.white))
         }
 
-        bottomNavigationView.setOnItemSelectedListener { item ->
+        bottomNavigationView?.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.home -> {
-                    navController.navigate(R.id.mainFragment)
+                    navController?.navigate(R.id.mainFragment)
                     item.isEnabled = false
                     lastMenuItem?.isEnabled = true
                     lastMenuItem = item
                     true
                 }
                 R.id.analytics -> {
-                    navController.navigate(R.id.analyticsFragment)
+                    navController?.navigate(R.id.analyticsFragment)
                     item.isEnabled = false
                     lastMenuItem?.isEnabled = true
                     lastMenuItem = item
                     true
                 }
                 R.id.search -> {
-                    navController.navigate(R.id.searchCoinFragment)
+                    navController?.navigate(R.id.searchCoinFragment)
                     item.isEnabled = false
                     lastMenuItem?.isEnabled = true
                     lastMenuItem = item
@@ -74,16 +81,26 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+        onBackPressedCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 finish()
             }
-        })
+        }
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback!!)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        binding = null
+        if (binding != null){
+            binding = null
+        }
+        sharedPref = null
+        navHostFragment = null
+        navController = null
+        bottomNavigationView?.setOnItemSelectedListener(null)
+        bottomNavigationView = null
         lastMenuItem = null
+        onBackPressedCallback?.remove()
+        onBackPressedCallback = null
     }
 }

@@ -21,6 +21,7 @@ fun createPieChart(
     percentFormatter: PercentFormatter?,
     context: Context,
     walletCoins: List<CoinModel>,
+    theme: Boolean
     ){
     val legend = pieChart.legend
 
@@ -60,7 +61,11 @@ fun createPieChart(
     pieChart.animateY(1400, Easing.EaseInOutQuad)
 
     // update legend data
-    legend.textColor = ContextCompat.getColor(context, R.color.white)
+    if (theme){
+        legend.textColor = ContextCompat.getColor(context, R.color.white)
+    }else{
+        legend.textColor = ContextCompat.getColor(context, R.color.black)
+    }
     legend.textSize = 15f
     legend.formSize = 15f
     legend.formToTextSpace = 8f
