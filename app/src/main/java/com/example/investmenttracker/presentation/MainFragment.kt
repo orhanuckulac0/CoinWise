@@ -5,6 +5,8 @@ import android.app.Dialog
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.*
 import androidx.activity.OnBackPressedCallback
@@ -180,6 +182,7 @@ class MainFragment : Fragment() {
 
     private fun populateFromCache(){
         lifecycleScope.launch(Dispatchers.Main) {
+            mProgressDialog!!.show()
             setupView(viewModel.currentWalletCoins)
         }
     }
@@ -243,10 +246,12 @@ class MainFragment : Fragment() {
             binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.sort_color))
         }
 
-
-        if (mProgressDialog != null){
-            cancelProgressDialog(mProgressDialog!!)
-        }
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed({
+            if (mProgressDialog != null){
+                cancelProgressDialog(mProgressDialog!!)
+            }
+        }, 250)
 
         walletAdapter?.setOnClickListener(object: MainFragmentAdapter.OnClickListener {
             override fun onClick(position: Int, coinModel: CoinModel) {

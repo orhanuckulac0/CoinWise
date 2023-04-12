@@ -5,6 +5,8 @@ import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -71,6 +73,7 @@ class AnalyticsFragment : Fragment() {
         viewModel = ViewModelProvider(this, factory)[AnalyticsViewModel::class.java]
 
         mProgressDialog = showProgressDialog(requireContext())
+        mProgressDialog!!.show()
         pieChart = binding!!.pieChart
         percentFormatter = ChartUtil.getPercentFormatter(pieChart!!)
         sharedPref = requireContext().getSharedPreferences(Constants.THEME_PREF,
@@ -95,32 +98,25 @@ class AnalyticsFragment : Fragment() {
             walletCoins = coins
         }
 
-        // set an emptylist to walletCoins if data is actually null
-        viewModel.combinedLiveData.addSource(viewModel.userDataLiveData) { userData ->
-            viewModel.combinedLiveData.value = Pair(userData, viewModel.walletCoins.value ?: emptyList())
-        }
-        viewModel.combinedLiveData.addSource(viewModel.walletCoins) { coins ->
-            viewModel.combinedLiveData.value = Pair(viewModel.userDataLiveData.value, coins)
-        }
 
         // observe combined live data for both userdata and coinsWallet,
         // this will prevent NullPointerException crashes when user tries to switch between fragments rapidly.
         viewModel.combinedLiveData.observe(viewLifecycleOwner) { (userData, coins) ->
             if (userData != null && coins.isNotEmpty()) {
 
-                showProgressDialog(requireContext())
-
                 user = userData
                 walletCoins = coins
                 setupView()
                 setupActionBar()
 
-                view.post {
-                    cancelProgressDialog(mProgressDialog!!)
-                }
-
             }
         }
+        // set timeout to dismiss progress dialog after 1 second
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed({
+            cancelProgressDialog(mProgressDialog!!)
+        }, 500)
+
     }
 
 

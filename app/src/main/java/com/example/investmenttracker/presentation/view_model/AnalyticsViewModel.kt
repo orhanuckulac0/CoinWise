@@ -37,5 +37,23 @@ class AnalyticsViewModel(
                 _walletCoins.postValue(it)
             }
         }
+
+        // Add sources to combinedLiveData
+        combinedLiveData.addSource(_userDataLiveData) { userData ->
+            combinedLiveData.value = Pair(userData, _walletCoins.value ?: emptyList())
+        }
+
+        combinedLiveData.addSource(_walletCoins) { coins ->
+            combinedLiveData.value = Pair(_userDataLiveData.value, coins)
+        }
+
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        combinedLiveData.apply {
+            removeSource(_userDataLiveData)
+            removeSource(_walletCoins)
+        }
     }
 }

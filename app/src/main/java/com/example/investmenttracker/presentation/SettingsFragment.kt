@@ -54,11 +54,11 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSettingsBinding.bind(view)
         constraintLayout = binding?.settingsFragmentCL
+        toolbar = binding?.toolbarSettingsFragment
+        appBarLayout = binding?.appBarLayoutSettingsFragment
         switchButton = binding?.customSwitch
         ibAboutUs = binding?.ibAboutUs
         ibSupport = binding?.ibSupport
-        toolbar = binding?.toolbarSettingsFragment
-        appBarLayout = binding?.appBarLayoutSettingsFragment
         // set back pressed and nav
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
 
@@ -116,12 +116,12 @@ class SettingsFragment : Fragment() {
         super.onDestroyView()
         binding = null
         constraintLayout = null
-        switchButton = null
-        ibAboutUs = null
-        ibSupport = null
         actionBar = null
         appBarLayout = null
         toolbar = null
+        switchButton = null
+        ibAboutUs = null
+        ibSupport = null
         navigation = null
         onBackPressedCallback?.remove()
         onBackPressedCallback = null
