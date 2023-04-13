@@ -65,12 +65,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="8dp"
-                android:text=""
                 android:textSize="30sp" />
 
             <TextView
                 android:id="@+id/tvInvestmentPercentageChange"
-                style="@style/BOLD_NORMAL"
+                style="@style/TITLE_COLOR"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"

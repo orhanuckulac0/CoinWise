@@ -4,16 +4,13 @@
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/main_color_dark_theme</item>
         <item name="colorPrimaryVariant">@color/main_color_dark_theme</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_200</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnPrimary">@color/main_color_dark_theme</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/main_color_dark_theme</item>
         <!-- Customize your theme here. -->
         <item name="itemIconTint">@color/bottom_nav_item_color_dark_theme</item>
         <item name="itemTextColor">@color/bottom_nav_item_color_dark_theme</item>
+        <item name="colorControlActivated">@color/light_secondary_text_color</item>
     </style>
 
     <style parent="ThemeOverlay.AppCompat.Dark.ActionBar" name="AppTheme.AppBarOverlay"/>
@@ -71,6 +68,14 @@
 
     <style name="SETTINGS_ABOUT_US_ICON">
         <item name="android:src">@drawable/ic_info_white_24</item>
+    </style>
+
+    <style name="TOKEN_DETAILS_INVESTMENT_DETAILS_SQUARE">
+        <item name="background">@drawable/rounded_corner_all_around_background_black</item>
+    </style>
+
+    <style name="ANALYTICS_FRAGMENT_LLs">
+        <item name="android:background">@drawable/rounded_corner_all_around_background_black</item>
     </style>
 
     <!-- for texts-->

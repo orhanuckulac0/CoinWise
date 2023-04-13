@@ -11,6 +11,7 @@
         <!-- Customize your theme here. -->
         <item name="itemIconTint">@color/bottom_nav_item_color_light_theme</item>
         <item name="itemTextColor">@color/bottom_nav_item_color_light_theme</item>
+        <item name="colorControlActivated">@color/light_secondary_text_color</item>
 
     </style>
 
@@ -74,6 +75,11 @@
     <style name="TOKEN_DETAILS_INVESTMENT_DETAILS_SQUARE">
         <item name="background">@drawable/rounded_corner_all_around_background_white</item>
     </style>
+
+    <style name="ANALYTICS_FRAGMENT_LLs">
+        <item name="android:background">@drawable/rounded_corner_all_around_background_white</item>
+    </style>
+
 
     <!-- for texts-->
     <style name="TITLE_COLOR">

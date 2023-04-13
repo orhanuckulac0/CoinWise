@@ -32,7 +32,7 @@
     <string name="investment_return_percentage">Investment Return Percentage:</string>
     <string name="investment_profit_loss">Investment Profit/Loss:</string>
     <string name="investment_current_value">Investment Current Value:</string>
-    <string name="empty_wallet_please_add_coin_n_click_search_button_below">Empty wallet, please add coin. \n Click \'Search\' button below.</string>
+    <string name="empty_wallet_please_add_coin_n_click_search_button_below">Empty wallet, please add coin. \n Click to\'Search\' button below.</string>
     <string name="dark_mode">Dark Mode</string>
     <string name="action_settings_text">Settings</string>
     <string name="information">Information</string>
@@ -41,4 +41,5 @@
     <string name="native_currency">Native Currency</string>
     <string name="support_icon">SupportIcon</string>
     <string name="about_us_icon">AboutUsIcon</string>
+    <string name="empty_portfolio">  Empty Portfolio  </string>
 </resources>

@@ -124,6 +124,7 @@ class TokenDetailsFragment : Fragment() {
                         findNavController().navigate(
                             R.id.action_tokenDetailsFragment_to_mainFragment
                         )
+                        navigation?.selectedItemId = R.id.home
                         return true
                     }
                 }

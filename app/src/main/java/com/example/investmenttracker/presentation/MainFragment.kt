@@ -221,7 +221,11 @@ class MainFragment : Fragment() {
             // balance text
             if (userTotalBalanceWorth == 0.0) {
                 binding!!.tvTotalBalance.text = "$0.00"
-                binding!!.tvTotalBalance.setTextColor(requireContext().getColor(R.color.white))
+                if (sharedPrefTheme!!.getBoolean(Constants.SWITCH_STATE_KEY, true)){
+                    binding!!.tvTotalBalance.setTextColor(requireContext().getColor(R.color.white))
+                }else{
+                    binding!!.tvTotalBalance.setTextColor(requireContext().getColor(R.color.black))
+                }
             }else{
                 binding!!.tvTotalBalance.text = "$"+formatTotalBalanceValue(userTotalBalanceWorth)
             }

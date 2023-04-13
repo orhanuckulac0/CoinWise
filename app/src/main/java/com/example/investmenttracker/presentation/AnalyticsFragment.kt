@@ -102,13 +102,22 @@ class AnalyticsFragment : Fragment() {
         // observe combined live data for both userdata and coinsWallet,
         // this will prevent NullPointerException crashes when user tries to switch between fragments rapidly.
         viewModel.combinedLiveData.observe(viewLifecycleOwner) { (userData, coins) ->
-            if (userData != null && coins.isNotEmpty()) {
-
+            if (
+                userData != null &&
+                coins.isNotEmpty() &&
+                userData.userTotalInvestment != 0.0  // in case user just added the coin
+            ) {
                 user = userData
                 walletCoins = coins
                 setupView()
                 setupActionBar()
-
+            }else{
+                setupActionBar()
+                binding!!.pieChart.visibility = View.GONE
+                binding!!.tvPieChartTitle.visibility = View.GONE
+                binding!!.llInvestmentDetails.visibility = View.GONE
+                binding!!.llInvestmentInsights.visibility = View.GONE
+                binding!!.tvEmptyWallet.visibility = View.VISIBLE
             }
         }
         // set timeout to dismiss progress dialog after 1 second
@@ -128,9 +137,9 @@ class AnalyticsFragment : Fragment() {
             createPieChart(pieChart!!, percentFormatter ,requireContext(), walletCoins!!, theme!!)
             binding!!.pieChart.visibility = View.VISIBLE
             binding!!.tvPieChartTitle.visibility = View.VISIBLE
-        }else{
-            binding!!.pieChart.visibility = View.GONE
-            binding!!.tvPieChartTitle.visibility = View.GONE
+            binding!!.llInvestmentDetails.visibility = View.VISIBLE
+            binding!!.llInvestmentInsights.visibility = View.VISIBLE
+            binding!!.tvEmptyWallet.visibility = View.GONE
         }
         // setup Investment Details section
         val userInvestment = user!!.userTotalInvestment
@@ -139,7 +148,6 @@ class AnalyticsFragment : Fragment() {
         binding!!.tvTotalUserInvestmentWorth.text = "$"+ formatToTwoDecimal(userInvestmentWorth).toString()
 
         val investmentReturnPercentage = calculateProfitLossPercentage(userInvestmentWorth, userInvestment)
-        println(investmentReturnPercentage)
         // first check for NaN and 0.0 values to avoid crashes
         val holder = investmentReturnPercentage.replace("%","").toDouble()
         if (!holder.isNaN() || holder != 0.0){
@@ -171,16 +179,18 @@ class AnalyticsFragment : Fragment() {
         try {
             val mostProfitByCoin = mostProfitByCoin(walletCoins!!)
             val mostProfitAmount = "$"+ formatToTwoDecimal(mostProfitByCoin.totalInvestmentWorth - mostProfitByCoin.totalInvestmentAmount)
-            val tvMostProfitTokenText = spannableTextGreen(
-                formatCoinNameText(mostProfitByCoin.symbol) + " $mostProfitAmount profit on investment.",
-                mostProfitAmount,
-                requireContext()
-            )
-            binding!!.tvMostProfitToken.text = tvMostProfitTokenText
-            binding!!.tvMostProfitToken.visibility = View.VISIBLE
+            if (mostProfitAmount.contains("-") || mostProfitAmount == "$0.0"){
+                binding!!.tvMostProfitToken.text = "$0 profit on investments."
+            }else{
+                val tvMostProfitTokenText = spannableTextGreen(
+                    formatCoinNameText(mostProfitByCoin.symbol) + " $mostProfitAmount profit on investment.",
+                    mostProfitAmount,
+                    requireContext()
+                )
+                binding!!.tvMostProfitToken.text = tvMostProfitTokenText
+            }
         }catch (e: NoSuchElementException){
             e.printStackTrace()
-            binding!!.tvMostProfitToken.visibility = View.GONE
         }
 
         try {
@@ -188,19 +198,19 @@ class AnalyticsFragment : Fragment() {
             var mostLossAmount = formatToTwoDecimal((mostLossByCoin.totalInvestmentWorth - mostLossByCoin.totalInvestmentAmount)).toString()
             if (mostLossAmount.contains("-")){
                 mostLossAmount = mostLossAmount.replace("-","")
-            }
-            mostLossAmount = "$$mostLossAmount"
+                mostLossAmount = "$$mostLossAmount"
+                val tvMostLossTokenText = spannableTextRed(
+                    formatCoinNameText(mostLossByCoin.symbol) + " $mostLossAmount loss on investment.",
+                    mostLossAmount,
+                    requireContext()
+                )
+                binding!!.tvMostLossToken.text = tvMostLossTokenText
 
-            val tvMostLossTokenText = spannableTextRed(
-                formatCoinNameText(mostLossByCoin.symbol) + " $mostLossAmount loss on investment.",
-                mostLossAmount,
-                requireContext()
-            )
-            binding!!.tvMostLossToken.text = tvMostLossTokenText
-            binding!!.tvMostLossToken.visibility = View.VISIBLE
+            }else{
+                binding!!.tvMostLossToken.text = "$0 loss on investments."
+            }
         }catch (e: NoSuchElementException){
             e.printStackTrace()
-            binding!!.tvMostLossToken.visibility = View.GONE
         }
 
         // most profit - loss percentage texts
@@ -214,10 +224,12 @@ class AnalyticsFragment : Fragment() {
                 mostProfitPercentage,
                 requireContext()
             )
-            binding!!.tvMostProfitByPercentage.visibility = View.VISIBLE
         }catch (e: NoSuchElementException){
             e.printStackTrace()
-            binding!!.tvMostProfitByPercentage.visibility = View.GONE
+            binding!!.tvMostProfitByPercentage.text = "0.0%"
+        }catch (e: NullPointerException){
+            e.printStackTrace()
+            binding!!.tvMostProfitByPercentage.text = "0.0%"
         }
 
         // most loss
@@ -230,12 +242,13 @@ class AnalyticsFragment : Fragment() {
                 mostLossPercentage,
                 requireContext()
             )
-            binding!!.tvMostLossTokenByPercentage.visibility = View.VISIBLE
         }catch (e: NoSuchElementException){
+            binding!!.tvMostLossTokenByPercentage.text = "0.0%"
             e.printStackTrace()
-            binding!!.tvMostLossTokenByPercentage.visibility = View.GONE
+        }catch (e: NullPointerException){
+            e.printStackTrace()
+            binding!!.tvMostLossTokenByPercentage.text = "0.0%"
         }
-
     }
 
 
