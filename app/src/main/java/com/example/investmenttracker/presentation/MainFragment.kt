@@ -66,13 +66,13 @@ class MainFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        constraintLayout = view?.findViewById(R.id.mainFragmentCL)
         return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentMainBinding.bind(view)
+        constraintLayout = binding?.mainFragmentCL
         toolbar = binding?.toolbarMainFragment
         appBarLayout = binding?.appBarLayoutMainFragment
         viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
@@ -375,6 +375,8 @@ class MainFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.multipleCoinsListResponse.removeObservers(viewLifecycleOwner)
+        binding = null
+        constraintLayout = null
         menuItem = null
         menuProvider?.let { provider ->
             menuHost?.removeMenuProvider(provider)
@@ -384,8 +386,6 @@ class MainFragment : Fragment() {
         toolbar = null
         appBarLayout = null
         actionBar = null
-        constraintLayout = null
-        binding = null
         walletAdapter = null
         navigation = null
         sharedPrefTheme = null

@@ -54,8 +54,8 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSettingsBinding.bind(view)
         constraintLayout = binding?.settingsFragmentCL
-        toolbar = binding?.toolbarSettingsFragment
         appBarLayout = binding?.appBarLayoutSettingsFragment
+        toolbar = binding?.toolbarSettingsFragment
         switchButton = binding?.customSwitch
         ibAboutUs = binding?.ibAboutUs
         ibSupport = binding?.ibSupport
@@ -116,9 +116,9 @@ class SettingsFragment : Fragment() {
         super.onDestroyView()
         binding = null
         constraintLayout = null
-        actionBar = null
-        appBarLayout = null
         toolbar = null
+        appBarLayout = null
+        actionBar = null
         switchButton = null
         ibAboutUs = null
         ibSupport = null

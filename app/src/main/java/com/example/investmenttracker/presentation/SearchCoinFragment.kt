@@ -59,6 +59,7 @@ class SearchCoinFragment : Fragment() {
     private var onBackPressedCallback: OnBackPressedCallback? = null
 
     private var mProgressDialog: Dialog? = null
+    private var mInformationDialog: Dialog? = null
     private var coin: CoinModel? = null
     private var coinIDs: ArrayList<String>? = null
 
@@ -77,7 +78,7 @@ class SearchCoinFragment : Fragment() {
         toolbar = binding?.toolbarSearchCoinFragment
         appBarLayout = binding?.appBarLayoutSearchCoinFragment
         mProgressDialog = showProgressDialog(requireContext())
-
+        mInformationDialog = showAddCoinInformationDialog(requireContext())
         viewModel = ViewModelProvider(this, factory)[SearchCoinViewModel::class.java]
         adapter = SearchCoinAdapter(requireContext())
 
@@ -105,7 +106,8 @@ class SearchCoinFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 when(menuItem.itemId) {
                     R.id.actionAddCoinInformation -> {
-                        return false
+                        mInformationDialog!!.show()
+                        return true
                     }
                 }
                 return true
@@ -382,6 +384,7 @@ class SearchCoinFragment : Fragment() {
         coin = null
         coinIDs = null
         mProgressDialog = null
+        mInformationDialog = null
         onBackPressedCallback?.remove()
         onBackPressedCallback = null
     }

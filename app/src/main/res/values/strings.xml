@@ -32,7 +32,7 @@
     <string name="investment_return_percentage">Investment Return Percentage:</string>
     <string name="investment_profit_loss">Investment Profit/Loss:</string>
     <string name="investment_current_value">Investment Current Value:</string>
-    <string name="empty_wallet_please_add_coin_n_click_search_button_below">Empty wallet, please add coin. \n Click to\'Search\' button below.</string>
+    <string name="empty_wallet_please_add_coin_n_click_search_button_below">Empty wallet, please add coin. \n Click to \Search\ button below.</string>
     <string name="dark_mode">Dark Mode</string>
     <string name="action_settings_text">Settings</string>
     <string name="information">Information</string>
@@ -42,4 +42,12 @@
     <string name="support_icon">SupportIcon</string>
     <string name="about_us_icon">AboutUsIcon</string>
     <string name="empty_portfolio">  Empty Portfolio  </string>
+    <string name="coin_name_examples">Coin name examples: bitcoin, ethereum, polkadot etc.</string>
+    <string name="search_coin_by_name">Search Coin by Name</string>
+    <string name="coin_symbol_examples">Symbol examples: BTC, ETH, DOT etc. \nSome coins have - in their symbol, example: floki-inu</string>
+    <string name="note">Note:</string>
+    <string name="note_explanation">*Lowercase or uppercase letters are not important. \n*Search only 1 coin name/symbol at a time. \n*If searched coin has more than 10 decimals, It\'s price might not be supported in this app.</string>
+    <string name="btn_close_search_coin">Close</string>
+    <string name="how_to_add_coins">How to Add Coins?</string>
+    <string name="search_coin_by_name_title">Search Coin by Name</string>
 </resources>
