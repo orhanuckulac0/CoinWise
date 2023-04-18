@@ -1,4 +1,4 @@
-package com.example.investmenttracker.presentation
+package com.example.investmenttracker.presentation.fragments
 
 import android.annotation.SuppressLint
 import android.app.Dialog
@@ -29,7 +29,7 @@ import com.example.investmenttracker.databinding.FragmentMainBinding
 import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.adapter.MainFragmentAdapter
 import com.example.investmenttracker.presentation.view_model.MainViewModel
-import com.example.investmenttracker.presentation.view_model.MainViewModelFactory
+import com.example.investmenttracker.presentation.view_model_factory.MainViewModelFactory
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
@@ -75,44 +75,13 @@ class MainFragment : Fragment() {
         constraintLayout = binding?.mainFragmentCL
         toolbar = binding?.toolbarMainFragment
         appBarLayout = binding?.appBarLayoutMainFragment
+        menuHost = requireActivity()
+
         viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
         walletAdapter = MainFragmentAdapter(requireContext())
 
         sharedPrefTheme = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
-        val theme = sharedPrefTheme?.getBoolean(Constants.SWITCH_STATE_KEY, true)
 
-        menuHost = requireActivity()
-        menuProvider = object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_settings, menu)
-                // change icon depending on the theme
-                menuItem = menu.findItem(R.id.actionSettings)
-                if (theme == true) {
-                    menuItem?.setIcon(R.drawable.ic_settings_gray_24)
-                } else {
-                    menuItem?.setIcon(R.drawable.ic_settings_blue_24)
-                }
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                when(menuItem.itemId) {
-                    R.id.actionSettings -> {
-                        val bundle = Bundle().apply {
-                            putSerializable(Constants.PASSED_USER, viewModel.userData)
-                        }
-                        findNavController().navigate(
-                            R.id.action_mainFragment_to_settingsFragment,
-                            bundle
-                        )
-                        navigation?.selectedItemId = R.id.invisibleItem
-                    }
-                }
-                return true
-            }
-        }
-        menuHost?.addMenuProvider(menuProvider!!, viewLifecycleOwner, Lifecycle.State.STARTED)
-
-        setupActionBar()
         mProgressDialog = showProgressDialog(requireContext())
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
 
@@ -149,6 +118,9 @@ class MainFragment : Fragment() {
             }
         }
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, onBackPressedCallback!!)
+
+        setupActionBar()
+        setupMenu()
     }
 
     private fun triggerAppLaunch() {
@@ -372,27 +344,62 @@ class MainFragment : Fragment() {
         }
     }
 
+    private fun setupMenu(){
+        menuProvider = object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_settings, menu)
+                // change icon depending on the theme
+                menuItem = menu.findItem(R.id.actionSettings)
+                if (sharedPrefTheme?.getBoolean(Constants.SWITCH_STATE_KEY, true) == true) {
+                    menuItem?.setIcon(R.drawable.ic_settings_gray_24)
+                } else {
+                    menuItem?.setIcon(R.drawable.ic_settings_blue_24)
+                }
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when(menuItem.itemId) {
+                    R.id.actionSettings -> {
+                        val bundle = Bundle().apply {
+                            putSerializable(Constants.PASSED_USER, viewModel.userData)
+                        }
+                        findNavController().navigate(
+                            R.id.action_mainFragment_to_settingsFragment,
+                            bundle
+                        )
+                        navigation?.selectedItemId = R.id.invisibleItem
+                    }
+                }
+                return false
+            }
+        }
+        menuHost?.addMenuProvider(menuProvider!!, viewLifecycleOwner, Lifecycle.State.STARTED)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.multipleCoinsListResponse.removeObservers(viewLifecycleOwner)
-        binding = null
-        constraintLayout = null
+        walletAdapter = null
+        navigation = null
+        menuItem?.setOnMenuItemClickListener(null)
         menuItem = null
         menuProvider?.let { provider ->
             menuHost?.removeMenuProvider(provider)
             menuProvider = null
         }
         menuHost = null
+        toolbar?.setOnClickListener(null)
         toolbar = null
         appBarLayout = null
         actionBar = null
-        walletAdapter = null
-        navigation = null
         sharedPrefTheme = null
         sharedPrefRefresh = null
         mProgressDialog?.dismiss()
         mProgressDialog = null
         onBackPressedCallback?.remove()
         onBackPressedCallback = null
+        constraintLayout?.removeAllViews()
+        constraintLayout = null
+        binding = null
     }
 }

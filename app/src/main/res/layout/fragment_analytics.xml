@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".presentation.AnalyticsFragment"
+    tools:context=".presentation.fragments.AnalyticsFragment"
     android:paddingStart="5dp"
     android:paddingEnd="5dp"
     style="@style/SCREEN_BACKGROUND">

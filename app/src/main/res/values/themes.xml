@@ -68,7 +68,7 @@
         <item name="android:src">@drawable/ic_support_black_24</item>
     </style>
 
-    <style name="SETTINGS_ABOUT_US_ICON">
+    <style name="SETTINGS_ABOUT_APP_ICON">
         <item name="android:src">@drawable/ic_info_black_24</item>
     </style>
 

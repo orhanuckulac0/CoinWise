@@ -1,10 +1,11 @@
-package com.example.investmenttracker.presentation.view_model
+package com.example.investmenttracker.presentation.view_model_factory
 
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
 import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
+import com.example.investmenttracker.presentation.view_model.AnalyticsViewModel
 
 class AnalyticsViewModelFactory(
     private val app: Application,

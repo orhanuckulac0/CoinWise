@@ -10,17 +10,16 @@ fun formatPrice(number: Double): String {
 }
 
 fun convertScientificNotationToString(number: Double): String {
-    val numberStr = number.toString()
-    return if (numberStr.contains('-')) {
-        val parts = numberStr.split('E')
-        val coeffStr = parts[0].replace(".", "").replace("-", "")
-        val expStr = parts[1].replace("-", "")
-        val exp = expStr.toInt()
-        val coeffWithDecimal = "0." + "0".repeat(exp - 1) + coeffStr
-        String.format("%.10f", coeffWithDecimal.toDouble())
+    val numberAsString = number.toString()
+    return if (numberAsString.contains('-')) {
+        val parts = numberAsString.split('E')
+        val coefficient = parts[0].replace(".", "").replace("-", "")
+        val exponent = parts[1].replace("-", "").toInt()
+        val coefficientWithDecimal = "0." + "0".repeat(exponent - 1) + coefficient
+        String.format("%.10f", coefficientWithDecimal.toDouble())
     } else {
-        val decimalPlaces = if (numberStr.contains(".")) {
-            numberStr.split(".")[1].length
+        val decimalPlaces = if (numberAsString.contains(".")) {
+            numberAsString.split(".")[1].length
         } else {
             0
         }

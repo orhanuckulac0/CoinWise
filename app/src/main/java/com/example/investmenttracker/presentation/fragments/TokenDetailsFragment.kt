@@ -1,4 +1,4 @@
-package com.example.investmenttracker.presentation
+package com.example.investmenttracker.presentation.fragments
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -25,7 +25,7 @@ import com.example.investmenttracker.databinding.FragmentTokenDetailsBinding
 import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModel
-import com.example.investmenttracker.presentation.view_model.TokenDetailsViewModelFactory
+import com.example.investmenttracker.presentation.view_model_factory.TokenDetailsViewModelFactory
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar

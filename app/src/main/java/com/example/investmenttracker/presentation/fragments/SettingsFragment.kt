@@ -1,5 +1,6 @@
-package com.example.investmenttracker.presentation
+package com.example.investmenttracker.presentation.fragments
 
+import android.app.Dialog
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -11,36 +12,43 @@ import android.widget.ImageButton
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.UserData
 import com.example.investmenttracker.databinding.FragmentSettingsBinding
 import com.example.investmenttracker.domain.use_case.util.Constants
-import com.example.investmenttracker.domain.use_case.util.changeAppTheme
 import com.example.investmenttracker.domain.use_case.util.customGetSerializable
+import com.example.investmenttracker.domain.use_case.util.showAboutAppDialog
+import com.example.investmenttracker.presentation.view_model.SettingsViewModel
+import com.example.investmenttracker.presentation.view_model_factory.SettingsViewModelFactory
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsFragment : Fragment() {
 
     private var binding: FragmentSettingsBinding? = null
+    @Inject
+    lateinit var factory: SettingsViewModelFactory
+    lateinit var viewModel: SettingsViewModel
     private var navigation: BottomNavigationView? = null
     private var userData: UserData? = null
     private var constraintLayout: ConstraintLayout? = null
-    private var ibAboutUs: ImageButton? = null
-    private var ibSupport: ImageButton? = null
     private var appBarLayout: AppBarLayout? = null
     private var toolbar: Toolbar? = null
     private var actionBar: ActionBar? = null
     private var sharedPref: SharedPreferences? = null
     private var switchButton: SwitchCompat? = null
+    private var aboutAppButton: ImageButton? = null
     private var onBackPressedCallback: OnBackPressedCallback? = null
+
+    private var aboutAppDialog: Dialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,8 +65,10 @@ class SettingsFragment : Fragment() {
         appBarLayout = binding?.appBarLayoutSettingsFragment
         toolbar = binding?.toolbarSettingsFragment
         switchButton = binding?.customSwitch
-        ibAboutUs = binding?.ibAboutUs
-        ibSupport = binding?.ibSupport
+        aboutAppButton = binding?.ibAboutApp
+        aboutAppDialog = showAboutAppDialog(requireContext())
+
+        viewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
         // set back pressed and nav
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
 
@@ -79,17 +89,25 @@ class SettingsFragment : Fragment() {
         // set sharedPref for theme
         sharedPref = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
         val theme = sharedPref!!.getBoolean(Constants.SWITCH_STATE_KEY, true)
-        switchButton?.isChecked = theme
+
+
+        switchButton?.let { switch ->
+            switchButton?.isChecked = theme
+
+            switch.setOnCheckedChangeListener { _, isChecked ->
+                val editor = sharedPref?.edit()
+                editor?.putBoolean(Constants.SWITCH_STATE_KEY, isChecked)
+                editor?.apply()
+
+                viewModel.changeTheme(isChecked)
+            }
+        }
+
+        aboutAppButton?.setOnClickListener{
+            aboutAppDialog?.show()
+        }
 
         setupActionBar()
-
-        switchButton?.setOnCheckedChangeListener{ _, isChecked->
-            val editor = sharedPref?.edit()
-            editor?.putBoolean(Constants.SWITCH_STATE_KEY, isChecked)
-            editor?.apply()
-
-            changeAppTheme(sharedPref!!.getBoolean(Constants.SWITCH_STATE_KEY, true))
-        }
     }
 
     private fun setupActionBar() {
@@ -114,18 +132,22 @@ class SettingsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding = null
-        constraintLayout = null
+        toolbar?.setOnClickListener(null)
         toolbar = null
         appBarLayout = null
         actionBar = null
+        switchButton?.setOnClickListener(null)
         switchButton = null
-        ibAboutUs = null
-        ibSupport = null
+        aboutAppButton?.setOnClickListener(null)
+        aboutAppButton = null
+        aboutAppDialog = null
         navigation = null
         onBackPressedCallback?.remove()
         onBackPressedCallback = null
         sharedPref = null
         userData = null
+        constraintLayout?.removeAllViews()
+        constraintLayout = null
+        binding = null
     }
 }

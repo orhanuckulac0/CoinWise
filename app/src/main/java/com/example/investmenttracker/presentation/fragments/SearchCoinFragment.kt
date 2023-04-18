@@ -1,4 +1,4 @@
-package com.example.investmenttracker.presentation
+package com.example.investmenttracker.presentation.fragments
 
 import android.app.Dialog
 import android.content.Context
@@ -28,7 +28,7 @@ import com.example.investmenttracker.presentation.adapter.SearchCoinAdapter
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.events.UiEventActions
 import com.example.investmenttracker.presentation.view_model.SearchCoinViewModel
-import com.example.investmenttracker.presentation.view_model.SearchCoinViewModelFactory
+import com.example.investmenttracker.presentation.view_model_factory.SearchCoinViewModelFactory
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar

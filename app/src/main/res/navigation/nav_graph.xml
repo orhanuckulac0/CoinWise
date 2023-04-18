@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.investmenttracker.presentation.MainFragment"
+        android:name="com.example.investmenttracker.presentation.fragments.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" >
         <action
@@ -25,7 +25,7 @@
     </fragment>
     <fragment
         android:id="@+id/searchCoinFragment"
-        android:name="com.example.investmenttracker.presentation.SearchCoinFragment"
+        android:name="com.example.investmenttracker.presentation.fragments.SearchCoinFragment"
         android:label="fragment_search_coin"
         tools:layout="@layout/fragment_search_coin" >
         <argument
@@ -37,7 +37,7 @@
     </fragment>
     <fragment
         android:id="@+id/tokenDetailsFragment"
-        android:name="com.example.investmenttracker.presentation.TokenDetailsFragment"
+        android:name="com.example.investmenttracker.presentation.fragments.TokenDetailsFragment"
         android:label="fragment_token_details"
         tools:layout="@layout/fragment_token_details" >
         <argument
@@ -49,7 +49,7 @@
     </fragment>
     <fragment
         android:id="@+id/analyticsFragment"
-        android:name="com.example.investmenttracker.presentation.AnalyticsFragment"
+        android:name="com.example.investmenttracker.presentation.fragments.AnalyticsFragment"
         android:label="fragment_analytics"
         tools:layout="@layout/fragment_analytics" >
         <action
@@ -58,7 +58,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.investmenttracker.presentation.SettingsFragment"
+        android:name="com.example.investmenttracker.presentation.fragments.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" >
         <argument

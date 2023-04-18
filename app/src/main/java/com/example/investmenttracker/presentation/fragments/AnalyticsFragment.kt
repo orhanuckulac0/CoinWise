@@ -1,4 +1,4 @@
-package com.example.investmenttracker.presentation
+package com.example.investmenttracker.presentation.fragments
 
 import android.annotation.SuppressLint
 import android.app.Dialog
@@ -24,7 +24,7 @@ import com.example.investmenttracker.data.model.UserData
 import com.example.investmenttracker.databinding.FragmentAnalyticsBinding
 import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.view_model.AnalyticsViewModel
-import com.example.investmenttracker.presentation.view_model.AnalyticsViewModelFactory
+import com.example.investmenttracker.presentation.view_model_factory.AnalyticsViewModelFactory
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.google.android.material.appbar.AppBarLayout

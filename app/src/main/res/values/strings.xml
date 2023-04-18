@@ -36,11 +36,11 @@
     <string name="dark_mode">Dark Mode</string>
     <string name="action_settings_text">Settings</string>
     <string name="information">Information</string>
-    <string name="about_us">About Us</string>
+    <string name="about_app">About App</string>
     <string name="support">Support</string>
     <string name="native_currency">Native Currency</string>
     <string name="support_icon">SupportIcon</string>
-    <string name="about_us_icon">AboutUsIcon</string>
+    <string name="about_app_icon">AboutUsIcon</string>
     <string name="empty_portfolio">  Empty Portfolio  </string>
     <string name="coin_name_examples">Coin name examples: bitcoin, ethereum, polkadot etc.</string>
     <string name="search_coin_by_name">Search Coin by Name</string>
@@ -50,4 +50,7 @@
     <string name="btn_close_search_coin">Close</string>
     <string name="how_to_add_coins">How to Add Coins?</string>
     <string name="search_coin_by_name_title">Search Coin by Name</string>
+    <string name="about_app_string1">This is a non-profit, user friendly investment tracking app. Users can enter their investments and keep the track of their up to date value.</string>
+    <string name="about_app_string2">You don\'t need to and also you can not connect your WEB-3 wallet to this app (MetaMask, TrustWallet etc). This app is not a WEB-3 wallet. It does not contains your cryptocurrencies or NFTs.</string>
+    <string name="about_app_string3">This app does not store your private data. Everything you enter to this app is stored only in your phone.</string>
 </resources>

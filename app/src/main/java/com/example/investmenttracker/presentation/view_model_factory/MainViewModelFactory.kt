@@ -1,4 +1,4 @@
-package com.example.investmenttracker.presentation.view_model
+package com.example.investmenttracker.presentation.view_model_factory
 
 import android.app.Application
 import androidx.lifecycle.ViewModel
@@ -9,6 +9,7 @@ import com.example.investmenttracker.domain.use_case.coin.UpdateCoinDetailsUseCa
 import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.InsertUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
+import com.example.investmenttracker.presentation.view_model.MainViewModel
 
 class MainViewModelFactory(
     private val app: Application,

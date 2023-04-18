@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     style="@style/SCREEN_BACKGROUND"
     android:orientation="vertical"
-    tools:context=".presentation.TokenDetailsFragment">
+    tools:context=".presentation.fragments.TokenDetailsFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayoutTokenDetailsFragment"

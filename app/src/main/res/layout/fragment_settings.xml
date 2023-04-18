@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     style="@style/SCREEN_BACKGROUND"
-    tools:context=".presentation.SettingsFragment">
+    tools:context=".presentation.fragments.SettingsFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayoutSettingsFragment"
@@ -86,53 +86,53 @@
                 android:layout_height="match_parent"
                 android:layout_marginEnd="15dp"
                 android:gravity="center_vertical"
-                android:text="@string/about_us"
+                android:text="@string/about_app"
                 style="@style/TITLE_COLOR"
                 android:textSize="20sp" />
 
             <ImageButton
-                android:id="@+id/ibAboutUs"
+                android:id="@+id/ibAboutApp"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="@color/transparent"
-                style="@style/SETTINGS_ABOUT_US_ICON"
+                style="@style/SETTINGS_ABOUT_APP_ICON"
                 android:scaleType="fitXY"
                 android:padding="10dp"
-                android:contentDescription="@string/about_us_icon"
+                android:contentDescription="@string/about_app_icon"
                 />
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center_vertical"
-            android:layout_marginTop="10dp"
-            android:paddingStart="5dp"
-            android:paddingEnd="5dp"
-            >
+<!--        <LinearLayout-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:layout_gravity="center_vertical"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            android:paddingStart="5dp"-->
+<!--            android:paddingEnd="5dp"-->
+<!--            >-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="15dp"
-                android:gravity="center_vertical"
-                android:text="@string/support"
-                style="@style/TITLE_COLOR"
-                android:textSize="20sp" />
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_marginEnd="15dp"-->
+<!--                android:gravity="center_vertical"-->
+<!--                android:text="@string/support"-->
+<!--                style="@style/TITLE_COLOR"-->
+<!--                android:textSize="20sp" />-->
 
-            <ImageButton
-                android:id="@+id/ibSupport"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:background="@color/transparent"
-                style="@style/SETTINGS_SUPPORT_ICON"
-                android:scaleType="fitCenter"
-                android:contentDescription="@string/support_icon"
-                android:padding="10dp" />
+<!--            <ImageButton-->
+<!--                android:id="@+id/ibSupport"-->
+<!--                android:layout_width="60dp"-->
+<!--                android:layout_height="60dp"-->
+<!--                android:background="@color/transparent"-->
+<!--                style="@style/SETTINGS_SUPPORT_ICON"-->
+<!--                android:scaleType="fitCenter"-->
+<!--                android:contentDescription="@string/support_icon"-->
+<!--                android:padding="10dp" />-->
 
-        </LinearLayout>
+<!--        </LinearLayout>-->
 
 
     </LinearLayout>
