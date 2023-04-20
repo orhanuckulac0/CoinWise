@@ -110,6 +110,17 @@ fun parseSlugResponseUtil(result: JSONObject): CoinModel? {
     return null
 }
 
+fun parseCurrencyAPIResponse(result: JsonObject, resultCurrency: String): String? {
+    try {
+        val rateObj = result.getAsJsonObject("rates")
+        val currencyObj = rateObj.getAsJsonObject(resultCurrency)
+        return currencyObj.get("rate_for_amount").toString().replace("\"", "")
+    }catch (e: java.lang.Exception){
+        Log.e("MYTAG", "Error parsing JSON: ${e.message}")
+    }
+    return null
+}
+
 // to remove "" from coin symbols coming with api response
 fun formatCoinNameText(symbol: String): String {
     val regex = Regex("[^A-Za-z0-9 ]")

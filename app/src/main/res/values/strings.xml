@@ -53,4 +53,6 @@
     <string name="about_app_string1">This is a non-profit, user friendly investment tracking app. Users can enter their investments and keep the track of their up to date value.</string>
     <string name="about_app_string2">You don\'t need to and also you can not connect your WEB-3 wallet to this app (MetaMask, TrustWallet etc). This app is not a WEB-3 wallet. It does not contains your cryptocurrencies or NFTs.</string>
     <string name="about_app_string3">This app does not store your private data. Everything you enter to this app is stored only in your phone.</string>
+    <string name="preference_file_key">"coinWiseSharedPrefs_"</string>
+    <string name="currency">Balance Currency</string>
 </resources>

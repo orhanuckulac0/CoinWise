@@ -15,9 +15,9 @@ android {
         targetSdk 33
         versionCode 1
         versionName "1.0"
-
         buildConfigField("String", "API_KEY", MY_KEY)
         buildConfigField("String", "BASE_URL", MY_URL)
+        buildConfigField("String", "CURRENCY_KEY", MY_KEY_CURRENCY_API)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -112,5 +112,5 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.8.1'
+//    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.8.1'
 }

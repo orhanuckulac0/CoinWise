@@ -21,8 +21,11 @@ fun setUserValues(currentUser: UserData, coinsList: List<CoinModel>): UserData {
 
     currentUser.userTotalInvestment = formatToTwoDecimal(userTotalInvestment)
     currentUser.userTotalBalanceWorth = formatToTwoDecimal(userTotalInvestmentWorth)
+    currentUser.userConvertedTotalBalanceWorth = 0.0
     currentUser.userTotalProfitAndLoss = userTotalProfitAndLoss
     currentUser.userTotalProfitAndLossPercentage = userTotalProfitAndLossPercentage
+    currentUser.userCurrentCurrency = currentUser.userCurrentCurrency
+    currentUser.userPreviousCurrency = currentUser.userPreviousCurrency
     currentUser.userTotalCoinInvestedQuantity = coinsList.size
     return currentUser
 }

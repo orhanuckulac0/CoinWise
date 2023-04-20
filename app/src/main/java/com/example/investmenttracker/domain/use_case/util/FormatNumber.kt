@@ -47,7 +47,7 @@ fun formatTokenTotalValue(coinPrice: Double, totalInvestment: Double): String {
 }
 
 fun formatTotalBalanceValue(totalInvestment: Double): String {
-    return String.format("%.2f", totalInvestment)
+    return String.format("%,.2f", totalInvestment)
 }
 
 fun formatTotalProfitAmountUI(currentCoin: CoinModel): String{

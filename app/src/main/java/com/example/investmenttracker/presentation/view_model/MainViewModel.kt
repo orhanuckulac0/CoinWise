@@ -11,6 +11,7 @@ import com.example.investmenttracker.data.model.UserData
 import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetMultipleCoinsUseCase
 import com.example.investmenttracker.domain.use_case.coin.UpdateCoinDetailsUseCase
+import com.example.investmenttracker.domain.use_case.user.GetNewCurrencyValueUseCase
 import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.InsertUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
@@ -29,6 +30,7 @@ class MainViewModel(
     private val updateUserDataUseCase: UpdateUserDataUseCase,
     private val getMultipleCoinsUseCase: GetMultipleCoinsUseCase,
     private val updateCoinDetailsUseCase: UpdateCoinDetailsUseCase,
+    private val getNewCurrencyValueUseCase: GetNewCurrencyValueUseCase
 ): AndroidViewModel(app) {
 
     var userData: UserData? = null
@@ -39,6 +41,8 @@ class MainViewModel(
     var temporaryTokenListToUseOnFragment = mutableListOf<CoinModel>()
     var walletTokensToUpdateDB = mutableListOf<CoinModel>()
     var slugNames = ""
+
+    var convertedBalance: MutableLiveData<String> = MutableLiveData()
 
     init {
         // get current user and set it in viewModel to later use in Fragment
@@ -138,7 +142,23 @@ class MainViewModel(
         updateCoinDetailsUseCase.execute(walletTokensToUpdateDB)
     }
 
-    fun parseAPIResponse(data: JsonObject) {
+    fun parseCoinAPIResponse(data: JsonObject) {
         newTokensDataResponse = parseMultipleCoinsResponseUtil(data)
+    }
+
+    fun getNewCurrencyValue(){
+        if (isNetworkAvailable(app)){
+            val baseCurrency = Constants.USD.substringAfter(" ").trim()
+            val userCurrency = userData?.userCurrentCurrency!!.substringAfter(" ").trim()
+            val amount = userData?.userTotalBalanceWorth!!
+
+            viewModelScope.launch(Dispatchers.IO) {
+                getNewCurrencyValueUseCase.execute(baseCurrency, userCurrency, amount).let { result->
+                    convertedBalance.postValue(parseCurrencyAPIResponse(result, userCurrency)!!)
+                }
+            }
+        }else{
+            // TODO show dialog for no internet connection, apply this throughout the app
+        }
     }
 }

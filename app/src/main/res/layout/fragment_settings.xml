@@ -76,7 +76,36 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_gravity="center_vertical"
-            android:layout_marginTop="10dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="15dp"
+                android:gravity="center_vertical"
+                android:text="@string/currency"
+                style="@style/TITLE_COLOR"
+                android:textSize="20sp" />
+
+            <Spinner
+                android:id="@+id/spinnerCurrencyConverter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                app:track="@drawable/track_selector"
+                android:thumb="@drawable/thumb_selector"
+                android:padding="20dp"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical"
             android:paddingStart="5dp"
             android:paddingEnd="5dp"
             >
@@ -102,38 +131,6 @@
                 />
 
         </LinearLayout>
-
-<!--        <LinearLayout-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:layout_gravity="center_vertical"-->
-<!--            android:layout_marginTop="10dp"-->
-<!--            android:paddingStart="5dp"-->
-<!--            android:paddingEnd="5dp"-->
-<!--            >-->
-
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_marginEnd="15dp"-->
-<!--                android:gravity="center_vertical"-->
-<!--                android:text="@string/support"-->
-<!--                style="@style/TITLE_COLOR"-->
-<!--                android:textSize="20sp" />-->
-
-<!--            <ImageButton-->
-<!--                android:id="@+id/ibSupport"-->
-<!--                android:layout_width="60dp"-->
-<!--                android:layout_height="60dp"-->
-<!--                android:background="@color/transparent"-->
-<!--                style="@style/SETTINGS_SUPPORT_ICON"-->
-<!--                android:scaleType="fitCenter"-->
-<!--                android:contentDescription="@string/support_icon"-->
-<!--                android:padding="10dp" />-->
-
-<!--        </LinearLayout>-->
-
 
     </LinearLayout>
 

@@ -1,6 +1,7 @@
 package com.example.investmenttracker.presentation.di
 
 import com.example.investmenttracker.domain.repository.CoinRepository
+import com.example.investmenttracker.domain.repository.CurrencyRepository
 import com.example.investmenttracker.domain.repository.UserDataRepository
 import com.example.investmenttracker.domain.use_case.*
 import com.example.investmenttracker.domain.use_case.coin.*
@@ -92,6 +93,12 @@ class UseCaseModule {
     @Provides
     fun provideUpdateUserdata(userDataRepository: UserDataRepository): UpdateUserDataUseCase {
         return UpdateUserDataUseCase(userDataRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGetNewCurrencyValueUseCase(currencyRepository: CurrencyRepository): GetNewCurrencyValueUseCase {
+        return GetNewCurrencyValueUseCase(currencyRepository)
     }
 
     @Singleton

@@ -3,10 +3,7 @@ package com.example.investmenttracker.presentation.di
 import android.app.Application
 import com.example.investmenttracker.domain.use_case.*
 import com.example.investmenttracker.domain.use_case.coin.*
-import com.example.investmenttracker.domain.use_case.user.ChangeAppThemeUseCase
-import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
-import com.example.investmenttracker.domain.use_case.user.InsertUserDataUseCase
-import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
+import com.example.investmenttracker.domain.use_case.user.*
 import com.example.investmenttracker.presentation.view_model_factory.*
 import dagger.Module
 import dagger.Provides
@@ -20,7 +17,7 @@ class FactoryModule {
 
     @Singleton
     @Provides
-    fun provideCoinViewModelFactory(
+    fun provideMainViewModelFactory(
         app: Application,
         getAllCoinsUseCase: GetAllCoinsUseCase,
         insertUserDataUseCase: InsertUserDataUseCase,
@@ -28,6 +25,7 @@ class FactoryModule {
         updateUserDataUseCase: UpdateUserDataUseCase,
         getMultipleCoinsUseCase: GetMultipleCoinsUseCase,
         updateCoinDetailsUseCase: UpdateCoinDetailsUseCase,
+        getNewCurrencyValueUseCase: GetNewCurrencyValueUseCase
     ): MainViewModelFactory {
         return MainViewModelFactory(
             app,
@@ -37,6 +35,7 @@ class FactoryModule {
             updateUserDataUseCase,
             getMultipleCoinsUseCase,
             updateCoinDetailsUseCase,
+            getNewCurrencyValueUseCase
         )
     }
 
@@ -98,11 +97,13 @@ class FactoryModule {
     @Provides
     fun provideSettingsViewModelFactory(
         app: Application,
-        changeAppThemeUseCase: ChangeAppThemeUseCase
+        changeAppThemeUseCase: ChangeAppThemeUseCase,
+        updateUserDataUseCase: UpdateUserDataUseCase
     ): SettingsViewModelFactory {
         return SettingsViewModelFactory(
             app,
-            changeAppThemeUseCase
+            changeAppThemeUseCase,
+            updateUserDataUseCase
         )
     }
 

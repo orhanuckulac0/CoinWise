@@ -1,6 +1,7 @@
 package com.example.investmenttracker.presentation.di
 
 import com.example.investmenttracker.data.api.CoinSearchAPIService
+import com.example.investmenttracker.data.api.CurrencyConverterAPIService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,5 +28,11 @@ class NetModule {
     @Provides
     fun provideCoinSearchAPIService(retrofit: Retrofit): CoinSearchAPIService{
         return retrofit.create(CoinSearchAPIService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideCurrencyConverterAPIService(retrofit: Retrofit): CurrencyConverterAPIService{
+        return retrofit.create(CurrencyConverterAPIService::class.java)
     }
 }

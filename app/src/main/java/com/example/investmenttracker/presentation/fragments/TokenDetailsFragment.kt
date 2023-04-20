@@ -107,6 +107,8 @@ class TokenDetailsFragment : Fragment() {
                                 userTotalInvestment = 0.0,
                                 userTotalBalanceWorth = 0.0,
                                 userTotalProfitAndLoss = 0.0,
+                                userCurrentCurrency = Constants.USD,
+                                userPreviousCurrency = Constants.USD,
                                 userTotalProfitAndLossPercentage = 0.0,
                                 userTotalCoinInvestedQuantity = 0
                             ))

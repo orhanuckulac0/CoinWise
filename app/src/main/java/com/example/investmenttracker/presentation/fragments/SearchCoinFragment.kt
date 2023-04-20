@@ -315,6 +315,9 @@ class SearchCoinFragment : Fragment() {
                                     0.0,
                                     0.0,
                                     0.0,
+                                    0.0,
+                                    Constants.USD,
+                                    Constants.USD,
                                     1
                                 ))
                         }

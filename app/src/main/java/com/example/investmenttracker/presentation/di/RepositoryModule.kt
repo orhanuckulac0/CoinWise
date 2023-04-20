@@ -1,12 +1,14 @@
 package com.example.investmenttracker.presentation.di
 
 import com.example.investmenttracker.data.repository.CoinRepositoryImpl
+import com.example.investmenttracker.data.repository.CurrencyRepositoryImpl
 import com.example.investmenttracker.data.repository.UserDataRepositoryImpl
 import com.example.investmenttracker.data.repository.datasource.CoinLocalDataSource
 import com.example.investmenttracker.data.repository.datasource.CoinRemoteDataSource
+import com.example.investmenttracker.data.repository.datasource.CurrencyRemoteDataSource
 import com.example.investmenttracker.data.repository.datasource.UserDataLocalDataSource
-import com.example.investmenttracker.data.repository.datasource_impl.UserDataLocalDataSourceImpl
 import com.example.investmenttracker.domain.repository.CoinRepository
+import com.example.investmenttracker.domain.repository.CurrencyRepository
 import com.example.investmenttracker.domain.repository.UserDataRepository
 import dagger.Module
 import dagger.Provides
@@ -33,5 +35,13 @@ class RepositoryModule {
         userDataLocalDataSource: UserDataLocalDataSource
     ): UserDataRepository {
         return UserDataRepositoryImpl(userDataLocalDataSource)
+    }
+
+    @Singleton
+    @Provides
+    fun funProvideCurrencyRepository(
+        currencyRemoteDataSource: CurrencyRemoteDataSource
+    ): CurrencyRepository {
+        return CurrencyRepositoryImpl(currencyRemoteDataSource)
     }
 }

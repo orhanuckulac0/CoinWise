@@ -8,7 +8,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.ArrayAdapter
 import android.widget.ImageButton
+import android.widget.Spinner
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
@@ -46,6 +50,9 @@ class SettingsFragment : Fragment() {
     private var sharedPref: SharedPreferences? = null
     private var switchButton: SwitchCompat? = null
     private var aboutAppButton: ImageButton? = null
+    private var spinner: Spinner? = null
+    private var arrayAdapter: ArrayAdapter<String>? = null
+    private var onItemSelectedListener: OnItemSelectedListener? = null
     private var onBackPressedCallback: OnBackPressedCallback? = null
 
     private var aboutAppDialog: Dialog? = null
@@ -66,6 +73,7 @@ class SettingsFragment : Fragment() {
         toolbar = binding?.toolbarSettingsFragment
         switchButton = binding?.customSwitch
         aboutAppButton = binding?.ibAboutApp
+        spinner = binding?.spinnerCurrencyConverter
         aboutAppDialog = showAboutAppDialog(requireContext())
 
         viewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
@@ -108,6 +116,7 @@ class SettingsFragment : Fragment() {
         }
 
         setupActionBar()
+        setupArrayAdapter()
     }
 
     private fun setupActionBar() {
@@ -130,6 +139,48 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    private fun setupArrayAdapter(){
+
+        val currencies = arrayOf(
+            Constants.TRY,
+            Constants.USD,
+            Constants.CAD,
+            Constants.AUD,
+            Constants.EUR,
+            Constants.NZD,
+            Constants.SGD
+        )
+        arrayAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, currencies)
+        spinner?.adapter = arrayAdapter
+
+        val defaultCurrencyIndex = currencies.indexOfFirst { it == (userData?.userCurrentCurrency ?: "") }
+        spinner?.setSelection(defaultCurrencyIndex)
+
+        val currencyBeforeChange = userData?.userCurrentCurrency
+        onItemSelectedListener = object: OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long,
+            ) {
+                // update current currency of the user
+                val updatedUser = userData?.copy(
+                    userCurrentCurrency = currencies[position],
+                    userPreviousCurrency = currencyBeforeChange!!
+                    )
+                viewModel.updateUser(updatedUser!!)
+
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // do nothing
+            }
+        }
+
+        spinner?.onItemSelectedListener = onItemSelectedListener
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         toolbar?.setOnClickListener(null)
@@ -140,6 +191,10 @@ class SettingsFragment : Fragment() {
         switchButton = null
         aboutAppButton?.setOnClickListener(null)
         aboutAppButton = null
+        spinner?.onItemSelectedListener = null
+        spinner = null
+        onItemSelectedListener = null
+        arrayAdapter = null
         aboutAppDialog = null
         navigation = null
         onBackPressedCallback?.remove()
