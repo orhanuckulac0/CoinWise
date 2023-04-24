@@ -1,4 +1,4 @@
-package com.example.investmenttracker.domain.use_case.user
+package com.example.investmenttracker.domain.use_case.currency
 
 import com.example.investmenttracker.domain.repository.CurrencyRepository
 import com.google.gson.JsonObject
@@ -6,13 +6,9 @@ import com.google.gson.JsonObject
 class GetNewCurrencyValueUseCase(private val currencyRepository: CurrencyRepository) {
 
     suspend fun execute(
-        from: String,
-        to: String,
-        amount:Double
+        base: String,
     ): JsonObject = currencyRepository.convertCurrencies(
-        from,
-        to,
-        amount
+        base,
     )
 
 }

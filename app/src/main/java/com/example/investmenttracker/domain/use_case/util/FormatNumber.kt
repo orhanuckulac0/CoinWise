@@ -50,17 +50,13 @@ fun formatTotalBalanceValue(totalInvestment: Double): String {
     return String.format("%,.2f", totalInvestment)
 }
 
-fun formatTotalProfitAmountUI(currentCoin: CoinModel): String{
+fun formatTotalProfitAmountUI(currencySymbol: String, currentCoin: CoinModel): String{
     val profitLoss = (currentCoin.totalInvestmentWorth-currentCoin.totalInvestmentAmount).toString()
 
     return if (currentCoin.totalInvestmentAmount == 0.0){
-        "$"+currentCoin.totalInvestmentAmount
+        currencySymbol+currentCoin.totalInvestmentAmount
     }else{
-        if (profitLoss.contains("-")){
-            String.format("-$%.2f", abs(profitLoss.toDouble()))
-        }else {
-            String.format("+$%.2f", abs(profitLoss.toDouble()))
-        }
+        String.format("$currencySymbol%,.2f", abs(profitLoss.toDouble()))
     }
 }
 
@@ -71,4 +67,8 @@ fun calculateProfitLossPercentage(currentWorth: Double, initialInvestment: Doubl
 
 fun formatToTwoDecimal(number: Double): Double{
     return String.format("%.2f", number).toDouble()
+}
+
+fun formatToTwoDecimalWithComma(number: Double): String{
+    return String.format("%,.2f", number)
 }

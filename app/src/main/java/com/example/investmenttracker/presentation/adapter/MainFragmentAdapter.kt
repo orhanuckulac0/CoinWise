@@ -12,8 +12,8 @@ import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.domain.use_case.util.formatPrice
 import com.example.investmenttracker.domain.use_case.util.formatTokenHeldAmount
-import com.example.investmenttracker.domain.use_case.util.formatTokenTotalValue
 import com.example.investmenttracker.databinding.WalletTokenSingleItemBinding
+import com.example.investmenttracker.domain.use_case.util.formatTotalBalanceValue
 
 class MainFragmentAdapter(
     private val context: Context,
@@ -66,7 +66,7 @@ class MainFragmentAdapter(
             binding.tvCoinName.text = coinModel.name
             binding.tvCoinPrice.text = "$${formatPrice(coinModel.price)}"
             binding.tvTokenHeldAmount.text = formatTokenHeldAmount(coinModel.totalTokenHeldAmount)
-            binding.tvTokenTotalValue.text = "$${formatTokenTotalValue(coinModel.price, coinModel.totalTokenHeldAmount)}"
+            binding.tvTokenTotalValue.text = coinModel.userCurrencySymbol+formatTotalBalanceValue(coinModel.totalInvestmentWorth)
 
             if (coinModel.percentChange24h.toString().contains("-")){
                 binding.tvCoinPriceChangeDaily.setTextColor(context.getColor(R.color.red_color_percentage))

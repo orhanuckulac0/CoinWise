@@ -5,6 +5,9 @@ import com.example.investmenttracker.domain.repository.CurrencyRepository
 import com.example.investmenttracker.domain.repository.UserDataRepository
 import com.example.investmenttracker.domain.use_case.*
 import com.example.investmenttracker.domain.use_case.coin.*
+import com.example.investmenttracker.domain.use_case.currency.AddCurrencyDataToDBUseCase
+import com.example.investmenttracker.domain.use_case.currency.GetCurrencyValueFromDBUseCase
+import com.example.investmenttracker.domain.use_case.currency.GetNewCurrencyValueUseCase
 import com.example.investmenttracker.domain.use_case.user.*
 import dagger.Module
 import dagger.Provides
@@ -97,14 +100,26 @@ class UseCaseModule {
 
     @Singleton
     @Provides
+    fun provideChangeAppThemeUserCase(): ChangeAppThemeUseCase {
+        return ChangeAppThemeUseCase()
+    }
+
+    // currency
+    @Singleton
+    @Provides
     fun provideGetNewCurrencyValueUseCase(currencyRepository: CurrencyRepository): GetNewCurrencyValueUseCase {
         return GetNewCurrencyValueUseCase(currencyRepository)
     }
 
     @Singleton
     @Provides
-    fun provideChangeAppThemeUserCase(): ChangeAppThemeUseCase {
-        return ChangeAppThemeUseCase()
+    fun provideGetCurrencyValuesFromDBUseCase(currencyRepository: CurrencyRepository): GetCurrencyValueFromDBUseCase {
+        return GetCurrencyValueFromDBUseCase(currencyRepository)
+    }
+    @Singleton
+    @Provides
+    fun provideAddCurrencyDataToDBUseCase(currencyRepository: CurrencyRepository): AddCurrencyDataToDBUseCase {
+        return AddCurrencyDataToDBUseCase(currencyRepository)
     }
 
 }

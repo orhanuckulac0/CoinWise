@@ -131,6 +131,7 @@ class AnalyticsFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun setupView(){
+        val userCurrency = user!!.userCurrentCurrency.substringBefore(" ").trim()
         // setup pie chart
         if (walletCoins!!.isNotEmpty()){
             val theme = sharedPref?.getBoolean(Constants.SWITCH_STATE_KEY, true)
@@ -144,8 +145,8 @@ class AnalyticsFragment : Fragment() {
         // setup Investment Details section
         val userInvestment = user!!.userTotalInvestment
         val userInvestmentWorth = user!!.userTotalBalanceWorth
-        binding!!.tvTotalUserInvestment.text = "$"+ formatToTwoDecimal(userInvestment).toString()
-        binding!!.tvTotalUserInvestmentWorth.text = "$"+ formatToTwoDecimal(userInvestmentWorth).toString()
+        binding!!.tvTotalUserInvestment.text = userCurrency + formatToTwoDecimalWithComma(userInvestment)
+        binding!!.tvTotalUserInvestmentWorth.text = userCurrency + formatToTwoDecimalWithComma(userInvestmentWorth)
 
         val investmentReturnPercentage = calculateProfitLossPercentage(userInvestmentWorth, userInvestment)
         // first check for NaN and 0.0 values to avoid crashes
@@ -172,15 +173,15 @@ class AnalyticsFragment : Fragment() {
         }else {
             binding!!.tvInvestmentProfitLoss.setTextColor(requireContext().getColor(R.color.white))
         }
-        binding!!.tvInvestmentProfitLoss.text = "$$investmentProfitLoss"
+        binding!!.tvInvestmentProfitLoss.text = userCurrency+ formatToTwoDecimalWithComma(userInvestmentWorth-userInvestment)
 
         // setup Insight section
         // most profit- loss texts
         try {
             val mostProfitByCoin = mostProfitByCoin(walletCoins!!)
-            val mostProfitAmount = "$"+ formatToTwoDecimal(mostProfitByCoin.totalInvestmentWorth - mostProfitByCoin.totalInvestmentAmount)
+            val mostProfitAmount = userCurrency + formatToTwoDecimalWithComma(mostProfitByCoin.totalInvestmentWorth - mostProfitByCoin.totalInvestmentAmount)
             if (mostProfitAmount.contains("-") || mostProfitAmount == "$0.0"){
-                binding!!.tvMostProfitToken.text = "$0 profit on investments."
+                binding!!.tvMostProfitToken.text = "${userCurrency}0 profit on investments."
             }else{
                 val tvMostProfitTokenText = spannableTextGreen(
                     formatCoinNameText(mostProfitByCoin.symbol) + " $mostProfitAmount profit on investment.",
@@ -195,10 +196,10 @@ class AnalyticsFragment : Fragment() {
 
         try {
             val mostLossByCoin = mostLossByCoin(walletCoins!!)
-            var mostLossAmount = formatToTwoDecimal((mostLossByCoin.totalInvestmentWorth - mostLossByCoin.totalInvestmentAmount)).toString()
+            var mostLossAmount = formatToTwoDecimalWithComma((mostLossByCoin.totalInvestmentWorth - mostLossByCoin.totalInvestmentAmount))
             if (mostLossAmount.contains("-")){
                 mostLossAmount = mostLossAmount.replace("-","")
-                mostLossAmount = "$$mostLossAmount"
+                mostLossAmount = userCurrency+mostLossAmount
                 val tvMostLossTokenText = spannableTextRed(
                     formatCoinNameText(mostLossByCoin.symbol) + " $mostLossAmount loss on investment.",
                     mostLossAmount,
@@ -207,7 +208,7 @@ class AnalyticsFragment : Fragment() {
                 binding!!.tvMostLossToken.text = tvMostLossTokenText
 
             }else{
-                binding!!.tvMostLossToken.text = "$0 loss on investments."
+                binding!!.tvMostLossToken.text = "${userCurrency}0 loss on investments."
             }
         }catch (e: NoSuchElementException){
             e.printStackTrace()

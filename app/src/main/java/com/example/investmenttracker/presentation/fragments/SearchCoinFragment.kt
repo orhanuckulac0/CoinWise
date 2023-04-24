@@ -283,25 +283,6 @@ class SearchCoinFragment : Fragment() {
                         }
                     }
                     if (!isAlreadyInWallet){
-                        // save coin to db
-                        viewModel.saveCoinToDB(
-                            CoinModel(
-                                id = coinModel.cmcId,
-                                cmcId = coinModel.cmcId,
-                                name = coinModel.name,
-                                slug = coinModel.slug,
-                                symbol = coinModel.symbol,
-                                price = formatPrice(coinModel.price).toDouble(),
-                                marketCap = formatPrice(coinModel.marketCap).toDouble(),
-                                percentChange1h = coinModel.percentChange1h,
-                                percentChange24h = coinModel.percentChange24h,
-                                percentChange7d = coinModel.percentChange7d,
-                                percentChange30d = coinModel.percentChange30d,
-                                0.0,
-                                0.0,
-                                0.0
-                            )
-                        )
                         if (userData != null){
                             viewModel.updateUserDataDB(
                                 userData!!.copy(
@@ -318,9 +299,30 @@ class SearchCoinFragment : Fragment() {
                                     0.0,
                                     Constants.USD,
                                     Constants.USD,
-                                    1
+                                    1,
                                 ))
                         }
+
+                        // save coin to db
+                        viewModel.saveCoinToDB(
+                            CoinModel(
+                                id = coinModel.cmcId,
+                                cmcId = coinModel.cmcId,
+                                name = coinModel.name,
+                                slug = coinModel.slug,
+                                symbol = coinModel.symbol,
+                                price = formatPrice(coinModel.price).toDouble(),
+                                marketCap = formatPrice(coinModel.marketCap).toDouble(),
+                                percentChange1h = coinModel.percentChange1h,
+                                percentChange24h = coinModel.percentChange24h,
+                                percentChange7d = coinModel.percentChange7d,
+                                percentChange30d = coinModel.percentChange30d,
+                                0.0,
+                                0.0,
+                                0.0,
+                                Constants.USD.substringBefore(" ").trim()
+                            )
+                        )
                         coinList.removeAt(position)
                         adapter?.notifyItemRemoved(position)
 

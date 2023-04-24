@@ -6,4 +6,5 @@ import com.example.investmenttracker.domain.repository.UserDataRepository
 class UpdateUserDataUseCase(private val userDataRepository: UserDataRepository) {
 
     suspend fun execute(data: UserData) = userDataRepository.updateData(data)
+
 }

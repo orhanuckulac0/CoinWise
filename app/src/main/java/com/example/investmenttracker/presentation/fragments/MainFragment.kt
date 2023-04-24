@@ -137,7 +137,10 @@ class MainFragment : Fragment() {
                 withContext(Dispatchers.Main){
                     viewModel.multipleCoinsListResponse.value = null
                 }
-                // make request
+                // make request for currency api
+                requestCurrencyData()
+
+                // make request for coin api
                 requestNewDataForWalletCoins()
 
                 // Update lastApiRequestTime
@@ -165,16 +168,27 @@ class MainFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun setupView(coinsList: MutableList<CoinModel>) {
 
-        binding!!.rvTokens.apply {
-            adapter = walletAdapter
-            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        var updatedCoinsList: List<CoinModel>
+        var user: UserData? = null
+
+        try {
+            binding!!.rvTokens.apply {
+                adapter = walletAdapter
+                layoutManager = LinearLayoutManager(
+                    requireContext(),
+                    LinearLayoutManager.VERTICAL,
+                    false
+                )
+            }
+        }catch (e: NullPointerException){
+            e.printStackTrace()
         }
+
         if (coinsList.isEmpty() && !populated){
             populated = true
             populateFromCache()
         }
 
-        walletAdapter?.differ?.submitList(coinsList)
         if (coinsList.isEmpty()){
             binding!!.rvTokens.visibility = View.GONE
             binding!!.tvEmptyWalletText.visibility = View.VISIBLE
@@ -185,7 +199,7 @@ class MainFragment : Fragment() {
 
         // update UI only, in 60 seconds db user data will update itself
         if (viewModel.userData != null){
-            val user = viewModel.userData!!
+            user = viewModel.userData!!
 
             var userTotalBalanceWorth = 0.0
             val userTotalPercentageChange: Double
@@ -195,40 +209,40 @@ class MainFragment : Fragment() {
                 userTotalBalanceWorth += coin.price * coin.totalTokenHeldAmount
                 userTotalInvestment += coin.totalInvestmentAmount
             }
+
             // balance text
-            if (userTotalBalanceWorth == 0.0) {
-                binding!!.tvTotalBalance.text = "$0.00"
-                if (sharedPrefTheme!!.getBoolean(Constants.SWITCH_STATE_KEY, true)){
-                    binding!!.tvTotalBalance.setTextColor(requireContext().getColor(R.color.white))
-                }else{
-                    binding!!.tvTotalBalance.setTextColor(requireContext().getColor(R.color.black))
-                }
+            val currencySymbol = user.userCurrentCurrency.substringBefore(" ").trim()
+            val userCurrency = user.userCurrentCurrency.substringAfter(" ").trim()
+
+            if (user.userCurrentCurrency == Constants.USD){
+                binding!!.tvTotalBalance.text = currencySymbol+formatTotalBalanceValue(user.userTotalBalanceWorth)
+                walletAdapter?.differ?.submitList(coinsList)
+
             }else{
-                if (user.userCurrentCurrency != Constants.USD){
-                    val currencySymbol = user.userCurrentCurrency.substringBefore(" ").trim()
+                // get currency data from db
+                viewModel.getCurrencyDataFromDB(userCurrency)
 
-                    if (user.userCurrentCurrency != user.userPreviousCurrency){
-                        // call the api request for currency conversion
-                        // TODO limit the time for user to change currency or put daily limit to currency change amount
-                        viewModel.getNewCurrencyValue()
+                // observe the user current currency data
+                // update current wallet list with new currency data
+                // set that new list to wallet
+                viewModel.currencyData.observe(viewLifecycleOwner){currency->
 
-                        // observe api result for conversion
-                        viewModel.convertedBalance.observe(viewLifecycleOwner){
-                                result->
-                            if (result != null){
-                                viewModel.updateUserdata(user.copy(userConvertedTotalBalanceWorth = formatToTwoDecimal(result.toDouble())))
-                                binding!!.tvTotalBalance.text = currencySymbol+formatTotalBalanceValue(result.toDouble())
-                            }else{
-                                binding!!.tvTotalBalance.text = currencySymbol+formatTotalBalanceValue(user.userConvertedTotalBalanceWorth)
-                            }
-                        }
-                    }else{
-                        // show previous converted result because user didn't change it
-                        binding!!.tvTotalBalance.text = currencySymbol+formatTotalBalanceValue(user.userConvertedTotalBalanceWorth)
+                    updatedCoinsList = coinsList.map { coin ->
+                        coin.copy(
+                            totalInvestmentWorth = formatToTwoDecimal(coin.totalInvestmentWorth * currency.currencyRate.toDouble()),
+                            userCurrencySymbol = currencySymbol
+                        )
                     }
-                }else{
-                    // show base balance which is in $, no need for conversion api request
-                    binding!!.tvTotalBalance.text = "$"+formatTotalBalanceValue(userTotalBalanceWorth)
+
+                    if (userTotalBalanceWorth == 0.0){
+                        binding!!.tvTotalBalance.text = currencySymbol+"0.00"
+                        walletAdapter?.differ?.submitList(updatedCoinsList)
+                    }else{
+                        binding!!.tvTotalBalance.text = currencySymbol+formatTotalBalanceValue(
+                            user.userTotalBalanceWorth*currency.currencyRate.toDouble()
+                        )
+                        walletAdapter?.differ?.submitList(updatedCoinsList)
+                    }
                 }
             }
 
@@ -263,7 +277,7 @@ class MainFragment : Fragment() {
             override fun onClick(position: Int, coinModel: CoinModel) {
                 val bundle = Bundle().apply {
                     putSerializable(Constants.PASSED_COIN, coinModel)
-                    putSerializable(Constants.PASSED_USER, viewModel.userData)
+                    putSerializable(Constants.PASSED_USER, user)
                 }
                 findNavController().navigate(
                     R.id.action_mainFragment_to_tokenDetailsFragment,
@@ -272,6 +286,30 @@ class MainFragment : Fragment() {
                 navigation?.selectedItemId = R.id.invisibleItem
             }
         })
+    }
+
+    private fun requestCurrencyData(){
+        Log.i("MYTAG", "making currency api request")
+        viewModel.getNewCurrencyValuesAPIRequest()
+
+        // observe api result for conversion
+        lifecycleScope.launch(Dispatchers.Main){
+            viewModel.currencyRequestResult.observe(viewLifecycleOwner){
+                    resource->
+                when (resource) {
+                    is Resource.Success -> {
+                        Log.e("MYTAG", "Success fetching currency data: ${resource.message}")
+                    }
+                    is Resource.Error -> {
+                        Log.e("MYTAG", "Error fetching currency data: ${resource.message}")
+                    }
+
+                    is Resource.Loading -> {
+                        mProgressDialog!!.show()
+                    }
+                }
+            }
+        }
     }
 
     private suspend fun requestNewDataForWalletCoins(){
@@ -309,7 +347,7 @@ class MainFragment : Fragment() {
                             setupView(mutableListOf())
                         }
                         is Resource.Loading -> {
-                            mProgressDialog!!.show()
+                            // do nothing since progress dialog is showing
                         }
                     }
                 }
@@ -360,9 +398,8 @@ class MainFragment : Fragment() {
                     0.0,
                     0.0,
                     Constants.USD,
-                    Constants.USD
-                    ,
-                    0
+                    Constants.USD,
+                    0,
                 )
             )
         }
@@ -414,8 +451,9 @@ class MainFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        viewModel.currencyData.removeObservers(viewLifecycleOwner)
         viewModel.multipleCoinsListResponse.removeObservers(viewLifecycleOwner)
-        viewModel.convertedBalance.removeObservers(viewLifecycleOwner)
+        viewModel.currencyRequestResult.removeObservers(viewLifecycleOwner)
         walletAdapter = null
         navigation = null
         menuItem?.setOnMenuItemClickListener(null)

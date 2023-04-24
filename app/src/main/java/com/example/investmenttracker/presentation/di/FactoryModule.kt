@@ -3,6 +3,9 @@ package com.example.investmenttracker.presentation.di
 import android.app.Application
 import com.example.investmenttracker.domain.use_case.*
 import com.example.investmenttracker.domain.use_case.coin.*
+import com.example.investmenttracker.domain.use_case.currency.AddCurrencyDataToDBUseCase
+import com.example.investmenttracker.domain.use_case.currency.GetCurrencyValueFromDBUseCase
+import com.example.investmenttracker.domain.use_case.currency.GetNewCurrencyValueUseCase
 import com.example.investmenttracker.domain.use_case.user.*
 import com.example.investmenttracker.presentation.view_model_factory.*
 import dagger.Module
@@ -25,7 +28,9 @@ class FactoryModule {
         updateUserDataUseCase: UpdateUserDataUseCase,
         getMultipleCoinsUseCase: GetMultipleCoinsUseCase,
         updateCoinDetailsUseCase: UpdateCoinDetailsUseCase,
-        getNewCurrencyValueUseCase: GetNewCurrencyValueUseCase
+        getNewCurrencyValueUseCase: GetNewCurrencyValueUseCase,
+        addCurrencyDataToDBUseCase: AddCurrencyDataToDBUseCase,
+        getCurrencyValueFromDBUseCase: GetCurrencyValueFromDBUseCase
     ): MainViewModelFactory {
         return MainViewModelFactory(
             app,
@@ -35,7 +40,9 @@ class FactoryModule {
             updateUserDataUseCase,
             getMultipleCoinsUseCase,
             updateCoinDetailsUseCase,
-            getNewCurrencyValueUseCase
+            getNewCurrencyValueUseCase,
+            addCurrencyDataToDBUseCase,
+            getCurrencyValueFromDBUseCase
         )
     }
 

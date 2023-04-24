@@ -7,11 +7,14 @@ import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.investmenttracker.data.model.CoinModel
+import com.example.investmenttracker.data.model.CurrencyModel
 import com.example.investmenttracker.data.model.UserData
 import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetMultipleCoinsUseCase
 import com.example.investmenttracker.domain.use_case.coin.UpdateCoinDetailsUseCase
-import com.example.investmenttracker.domain.use_case.user.GetNewCurrencyValueUseCase
+import com.example.investmenttracker.domain.use_case.currency.AddCurrencyDataToDBUseCase
+import com.example.investmenttracker.domain.use_case.currency.GetCurrencyValueFromDBUseCase
+import com.example.investmenttracker.domain.use_case.currency.GetNewCurrencyValueUseCase
 import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.InsertUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
@@ -30,7 +33,9 @@ class MainViewModel(
     private val updateUserDataUseCase: UpdateUserDataUseCase,
     private val getMultipleCoinsUseCase: GetMultipleCoinsUseCase,
     private val updateCoinDetailsUseCase: UpdateCoinDetailsUseCase,
-    private val getNewCurrencyValueUseCase: GetNewCurrencyValueUseCase
+    private val getNewCurrencyValueUseCase: GetNewCurrencyValueUseCase,
+    private val addCurrencyDataToDBUseCase: AddCurrencyDataToDBUseCase,
+    private val getCurrencyValueFromDBUseCase: GetCurrencyValueFromDBUseCase
 ): AndroidViewModel(app) {
 
     var userData: UserData? = null
@@ -42,7 +47,8 @@ class MainViewModel(
     var walletTokensToUpdateDB = mutableListOf<CoinModel>()
     var slugNames = ""
 
-    var convertedBalance: MutableLiveData<String> = MutableLiveData()
+    var currencyRequestResult: MutableLiveData<Resource<Map<String, Float>>> = MutableLiveData()
+    var currencyData: MutableLiveData<CurrencyModel> = MutableLiveData()
 
     init {
         // get current user and set it in viewModel to later use in Fragment
@@ -146,19 +152,49 @@ class MainViewModel(
         newTokensDataResponse = parseMultipleCoinsResponseUtil(data)
     }
 
-    fun getNewCurrencyValue(){
-        if (isNetworkAvailable(app)){
-            val baseCurrency = Constants.USD.substringAfter(" ").trim()
-            val userCurrency = userData?.userCurrentCurrency!!.substringAfter(" ").trim()
-            val amount = userData?.userTotalBalanceWorth!!
+    fun getNewCurrencyValuesAPIRequest() {
+        viewModelScope.launch(Dispatchers.IO) {
+            currencyRequestResult.postValue(Resource.Loading())
 
-            viewModelScope.launch(Dispatchers.IO) {
-                getNewCurrencyValueUseCase.execute(baseCurrency, userCurrency, amount).let { result->
-                    convertedBalance.postValue(parseCurrencyAPIResponse(result, userCurrency)!!)
+            try {
+                if (isNetworkAvailable(app)) {
+                    val baseCurrency = Constants.USD.substringAfter(" ").trim()
+
+                    getNewCurrencyValueUseCase.execute(baseCurrency).let { result ->
+                        val parsedResult = parseCurrencyAPIResponse(result)!!
+                        currencyRequestResult.postValue(Resource.Success(parsedResult))
+
+                        insertDataToCurrencyDB(parsedResult)
+                    }
+                } else {
+                    currencyRequestResult.postValue(Resource.Error(UiEventActions.NO_INTERNET_CONNECTION))
                 }
+            } catch (e: java.lang.Exception) {
+                currencyRequestResult.postValue(Resource.Error("${e.message}"))
             }
-        }else{
-            // TODO show dialog for no internet connection, apply this throughout the app
+        }
+    }
+
+    private fun insertDataToCurrencyDB(data: Map<String, Float>){
+        viewModelScope.launch(Dispatchers.IO) {
+            // use count as key to trigger OnConflict
+            var count = 1
+            data.forEach {
+                addCurrencyDataToDBUseCase.execute(CurrencyModel(
+                    count,
+                    currencyName = it.key,
+                    currencyRate = it.value
+                ))
+                count += 1
+            }
+        }
+    }
+
+    fun getCurrencyDataFromDB(currencyName: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            getCurrencyValueFromDBUseCase.execute(currencyName).collect(){
+                currencyData.postValue(it)
+            }
         }
     }
 }

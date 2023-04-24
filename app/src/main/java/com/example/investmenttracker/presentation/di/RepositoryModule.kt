@@ -3,10 +3,7 @@ package com.example.investmenttracker.presentation.di
 import com.example.investmenttracker.data.repository.CoinRepositoryImpl
 import com.example.investmenttracker.data.repository.CurrencyRepositoryImpl
 import com.example.investmenttracker.data.repository.UserDataRepositoryImpl
-import com.example.investmenttracker.data.repository.datasource.CoinLocalDataSource
-import com.example.investmenttracker.data.repository.datasource.CoinRemoteDataSource
-import com.example.investmenttracker.data.repository.datasource.CurrencyRemoteDataSource
-import com.example.investmenttracker.data.repository.datasource.UserDataLocalDataSource
+import com.example.investmenttracker.data.repository.datasource.*
 import com.example.investmenttracker.domain.repository.CoinRepository
 import com.example.investmenttracker.domain.repository.CurrencyRepository
 import com.example.investmenttracker.domain.repository.UserDataRepository
@@ -40,8 +37,9 @@ class RepositoryModule {
     @Singleton
     @Provides
     fun funProvideCurrencyRepository(
+        currencyLocalDataSource: CurrencyLocalDataSource,
         currencyRemoteDataSource: CurrencyRemoteDataSource
     ): CurrencyRepository {
-        return CurrencyRepositoryImpl(currencyRemoteDataSource)
+        return CurrencyRepositoryImpl(currencyLocalDataSource, currencyRemoteDataSource)
     }
 }

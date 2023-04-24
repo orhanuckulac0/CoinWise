@@ -4,6 +4,6 @@ import com.google.gson.JsonObject
 
 interface CurrencyRemoteDataSource {
 
-    suspend fun convertCurrencies(from: String, to: String, amount: Double): JsonObject
+    suspend fun convertCurrencies(base: String): JsonObject
 
 }

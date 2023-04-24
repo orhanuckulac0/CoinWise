@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.example.investmenttracker.data.db.UserDataDAO
 import com.example.investmenttracker.data.db.CoinDAO
 import com.example.investmenttracker.data.db.AppDatabase
+import com.example.investmenttracker.data.db.CurrencyDAO
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,6 +36,12 @@ class DatabaseModule {
     @Provides
     fun provideUserDataDAO(appDatabase: AppDatabase): UserDataDAO {
         return appDatabase.getUserDataDAO()
+    }
+
+    @Singleton
+    @Provides
+    fun provideCurrencyDAO(appDatabase: AppDatabase): CurrencyDAO {
+        return appDatabase.getCurrencyDAO()
     }
 
 }

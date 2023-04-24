@@ -8,12 +8,9 @@ class CurrencyRemoteDataSourceImpl(
     private val currencyConverterAPIService: CurrencyConverterAPIService
     ): CurrencyRemoteDataSource {
 
-
-    override suspend fun convertCurrencies(from: String, to: String, amount: Double): JsonObject {
+    override suspend fun convertCurrencies(base: String): JsonObject {
         return currencyConverterAPIService.convertCurrencies(
-            from = from,
-            to = to,
-            amount = amount
+            base = base,
         )
     }
 }

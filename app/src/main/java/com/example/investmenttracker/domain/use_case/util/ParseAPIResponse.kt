@@ -3,6 +3,7 @@ package com.example.investmenttracker.domain.use_case.util
 import android.util.Log
 import com.example.investmenttracker.data.model.CoinModel
 import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.json.JSONException
 import org.json.JSONObject
@@ -37,7 +38,8 @@ fun parseMultipleCoinsResponseUtil(data: JsonObject): MutableList<CoinModel> {
                 percentChange30d=  usdObject.getString("percent_change_30d").toDouble(),
                 totalTokenHeldAmount = 0.0,
                 totalInvestmentAmount = 0.0,
-                totalInvestmentWorth = 0.0
+                totalInvestmentWorth = 0.0,
+                Constants.USD
             )
             newTokensTempHolder.add(coin)
         }
@@ -68,7 +70,8 @@ fun parseSymbolResponseUtil(response: JsonArray?): MutableList<CoinModel>{
                 percentChange30d = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_30d").toString().toDouble(),
                 totalTokenHeldAmount = 0.toDouble(),
                 totalInvestmentAmount = 0.toDouble(),
-                totalInvestmentWorth =0.toDouble()
+                totalInvestmentWorth =0.toDouble(),
+                Constants.USD
             )
             newTokensTempHolder.add(coin)
         }
@@ -102,7 +105,8 @@ fun parseSlugResponseUtil(result: JSONObject): CoinModel? {
             percentChange30d = usdObject.get("percent_change_30d").toString().toDouble(),
             totalTokenHeldAmount = 0.toDouble(),
             totalInvestmentAmount = 0.toDouble(),
-            totalInvestmentWorth = 0.toDouble()
+            totalInvestmentWorth = 0.toDouble(),
+            Constants.USD
         )
     } catch (e: java.lang.Exception) {
         Log.e("MYTAG", "Error parsing JSON: ${e.message}")
@@ -110,12 +114,18 @@ fun parseSlugResponseUtil(result: JSONObject): CoinModel? {
     return null
 }
 
-fun parseCurrencyAPIResponse(result: JsonObject, resultCurrency: String): String? {
+fun parseCurrencyAPIResponse(result: JsonObject): Map<String, Float>? {
     try {
-        val rateObj = result.getAsJsonObject("rates")
-        val currencyObj = rateObj.getAsJsonObject(resultCurrency)
-        return currencyObj.get("rate_for_amount").toString().replace("\"", "")
-    }catch (e: java.lang.Exception){
+        val exchangeRate = result.get("exchange_rates")
+        val ratesObj = exchangeRate.asJsonObject
+        val currencyCodes = listOf("EUR", "SGD", "CAD", "AUD", "TRY", "NZD")
+
+        val rates = currencyCodes.associateWith { code ->
+            ratesObj[code].asFloat
+        }
+
+        return rates
+    } catch (e: java.lang.Exception) {
         Log.e("MYTAG", "Error parsing JSON: ${e.message}")
     }
     return null

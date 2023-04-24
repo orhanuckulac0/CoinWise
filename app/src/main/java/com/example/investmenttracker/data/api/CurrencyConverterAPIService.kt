@@ -7,18 +7,12 @@ import retrofit2.http.Query
 
 interface CurrencyConverterAPIService {
 
-    @GET("https://api.getgeoapi.com/v2/currency/convert")
+    @GET(BuildConfig.CURRENCY_API_URL)
     suspend fun convertCurrencies(
         @Query("api_key")
         API_KEY: String = BuildConfig.CURRENCY_KEY,
-        @Query("from")
-        from: String,
-        @Query("to")
-        to: String,
-        @Query("amount")
-        amount: Double,
-        @Query("format")
-        format: String = "json"
+        @Query("base")
+        base: String,
     ): JsonObject
 
 }

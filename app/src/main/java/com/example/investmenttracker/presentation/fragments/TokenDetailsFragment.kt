@@ -188,12 +188,13 @@ class TokenDetailsFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun setupView(){
         val coinIcon = Constants.COIN_IMAGE_LINK+"${currentCoin?.cmcId}"+".png"
+        val userCurrencySymbol = userData?.userCurrentCurrency!!.substringBefore(" ").trim()
 
         binding!!.tvCoinName.text = currentCoin?.name + " / " + formatCoinNameText(currentCoin!!.symbol)
         binding!!.tvTotalHeldAmount.text = formatTokenHeldAmount(currentCoin!!.totalTokenHeldAmount) + " " + formatCoinNameText(currentCoin!!.symbol)
-        binding!!.tvTotalInvestment.text = "$"+currentCoin?.totalInvestmentAmount.toString()
-        binding!!.tvCurrentInvestmentValue.text =  "$"+currentCoin?.totalInvestmentWorth.toString()
-        binding!!.tvProfitLossAmount.text = formatTotalProfitAmountUI(currentCoin!!)
+        binding!!.tvTotalInvestment.text = userCurrencySymbol+formatTotalBalanceValue(currentCoin?.totalInvestmentAmount!!)
+        binding!!.tvCurrentInvestmentValue.text =  userCurrencySymbol+formatTotalBalanceValue(currentCoin?.totalInvestmentWorth!!)
+        binding!!.tvProfitLossAmount.text = formatTotalProfitAmountUI(userCurrencySymbol,currentCoin!!)
 
         if (currentCoin?.totalInvestmentAmount == 0.0){
             binding!!.tvProfitLossAmount.setTextColor(requireContext().getColor(R.color.white))

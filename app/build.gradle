@@ -18,6 +18,7 @@ android {
         buildConfigField("String", "API_KEY", MY_KEY)
         buildConfigField("String", "BASE_URL", MY_URL)
         buildConfigField("String", "CURRENCY_KEY", MY_KEY_CURRENCY_API)
+        buildConfigField("String", "CURRENCY_API_URL", MY_KEY_CURRENCY_URL)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
