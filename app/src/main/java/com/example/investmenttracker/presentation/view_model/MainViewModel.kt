@@ -132,10 +132,7 @@ class MainViewModel(
                     val updatedCoin = walletCoin.apply {
                         price = formatPrice(coin.price).toDouble()
                         marketCap = formatPrice(coin.marketCap).toDouble()
-                        percentChange1h = coin.percentChange1h
                         percentChange24h = coin.percentChange24h
-                        percentChange7d = coin.percentChange7d
-                        percentChange30d = coin.percentChange30d
                         totalInvestmentWorth = formatToTwoDecimal(coin.price * walletCoin.totalTokenHeldAmount)
                     }
                     walletTokensToUpdateDB.add(updatedCoin)

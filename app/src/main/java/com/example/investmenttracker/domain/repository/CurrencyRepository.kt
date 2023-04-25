@@ -8,6 +8,7 @@ interface CurrencyRepository {
 
     suspend fun convertCurrencies(base: String): JsonObject
     fun getCurrencyValues(currencyName: String): Flow<CurrencyModel>
+    fun getAllCurrencies(): Flow<List<CurrencyModel>>
     suspend fun insertCurrencyData(data: CurrencyModel)
 
 }

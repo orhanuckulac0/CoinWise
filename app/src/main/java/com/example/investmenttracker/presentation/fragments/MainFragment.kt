@@ -229,6 +229,7 @@ class MainFragment : Fragment() {
 
                     updatedCoinsList = coinsList.map { coin ->
                         coin.copy(
+                            totalInvestmentAmount = formatToTwoDecimal(coin.totalInvestmentAmount*currency.currencyRate.toDouble()),
                             totalInvestmentWorth = formatToTwoDecimal(coin.totalInvestmentWorth * currency.currencyRate.toDouble()),
                             userCurrencySymbol = currencySymbol
                         )

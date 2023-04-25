@@ -3,16 +3,20 @@ package com.example.investmenttracker.presentation.view_model
 import android.app.Application
 import androidx.lifecycle.*
 import com.example.investmenttracker.data.model.CoinModel
+import com.example.investmenttracker.data.model.CurrencyModel
 import com.example.investmenttracker.data.model.UserData
 import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
+import com.example.investmenttracker.domain.use_case.currency.GetAllCurrenciesUseCase
 import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
+import com.example.investmenttracker.domain.use_case.util.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class AnalyticsViewModel(
     private val app: Application,
     private val getUserDataUseCase: GetUserDataUseCase,
-    private val getAllCoinsUseCase: GetAllCoinsUseCase
+    private val getAllCoinsUseCase: GetAllCoinsUseCase,
+    private val getAllCurrenciesUseCase: GetAllCurrenciesUseCase
     ): AndroidViewModel(app) {
 
     private val _walletCoins = MutableLiveData<List<CoinModel>>()
@@ -24,6 +28,8 @@ class AnalyticsViewModel(
         get() = _userDataLiveData
 
     val combinedLiveData = MediatorLiveData<Pair<UserData?, List<CoinModel>>>()
+
+    val currencyData: MutableLiveData<Resource<List<CurrencyModel>>> = MutableLiveData()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -47,6 +53,20 @@ class AnalyticsViewModel(
             combinedLiveData.value = Pair(_userDataLiveData.value, coins)
         }
 
+    }
+
+    fun getCurrencyData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            currencyData.postValue(Resource.Loading())
+            try {
+                getAllCurrenciesUseCase.execute().collect() {
+                    currencyData.postValue(Resource.Success(it))
+                }
+            }catch (e: java.lang.Exception){
+                e.printStackTrace()
+                currencyData.postValue(Resource.Error(e.message.toString()))
+            }
+        }
     }
 
     override fun onCleared() {

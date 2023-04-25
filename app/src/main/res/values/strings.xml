@@ -7,7 +7,7 @@
     <string name="coin_name">COIN NAME</string>
     <string name="search">Search</string>
     <string name="total_investment">Total Investment:</string>
-    <string name="dollar_warning">Enter amount in "USD"</string>
+    <string name="dollar_warning">Enter amount in USD</string>
     <string name="save">SAVE</string>
     <string name="total_token_held">Total Token Held:</string>
     <string name="update_investment">Update Investment</string>

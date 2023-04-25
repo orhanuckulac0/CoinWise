@@ -11,6 +11,10 @@ class CurrencyLocalDataSourceImpl(private val currencyDAO: CurrencyDAO): Currenc
         return currencyDAO.getUserCurrencyValue(currencyName)
     }
 
+    override fun getAllCurrencies(): Flow<List<CurrencyModel>> {
+        return currencyDAO.getAllCurrencies()
+    }
+
     override suspend fun insertCurrencyData(data: CurrencyModel) {
         return currencyDAO.insertCurrencyData(data)
     }

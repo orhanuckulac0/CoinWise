@@ -4,6 +4,7 @@ import android.app.Application
 import com.example.investmenttracker.domain.use_case.*
 import com.example.investmenttracker.domain.use_case.coin.*
 import com.example.investmenttracker.domain.use_case.currency.AddCurrencyDataToDBUseCase
+import com.example.investmenttracker.domain.use_case.currency.GetAllCurrenciesUseCase
 import com.example.investmenttracker.domain.use_case.currency.GetCurrencyValueFromDBUseCase
 import com.example.investmenttracker.domain.use_case.currency.GetNewCurrencyValueUseCase
 import com.example.investmenttracker.domain.use_case.user.*
@@ -91,12 +92,14 @@ class FactoryModule {
     fun provideAnalyticsViewModelFactory(
         app: Application,
         getUserDataUseCase: GetUserDataUseCase,
-        getAllCoinsUseCase: GetAllCoinsUseCase
+        getAllCoinsUseCase: GetAllCoinsUseCase,
+        getAllCurrenciesUseCase: GetAllCurrenciesUseCase
     ): AnalyticsViewModelFactory {
         return AnalyticsViewModelFactory(
             app,
             getUserDataUseCase,
-            getAllCoinsUseCase
+            getAllCoinsUseCase,
+            getAllCurrenciesUseCase
         )
     }
 

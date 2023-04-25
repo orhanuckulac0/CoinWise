@@ -7,6 +7,8 @@ interface CurrencyLocalDataSource {
 
     fun getUserCurrencyValue(currencyName: String): Flow<CurrencyModel>
 
+    fun getAllCurrencies(): Flow<List<CurrencyModel>>
+
     suspend fun insertCurrencyData(data: CurrencyModel)
 
 }

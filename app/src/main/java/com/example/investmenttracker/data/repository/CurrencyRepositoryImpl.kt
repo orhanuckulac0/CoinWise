@@ -21,6 +21,10 @@ class CurrencyRepositoryImpl(
         return currencyLocalDataSource.getUserCurrencyValue(currencyName)
     }
 
+    override fun getAllCurrencies(): Flow<List<CurrencyModel>> {
+        return currencyLocalDataSource.getAllCurrencies()
+    }
+
     override suspend fun insertCurrencyData(data: CurrencyModel) {
         return currencyLocalDataSource.insertCurrencyData(data)
     }

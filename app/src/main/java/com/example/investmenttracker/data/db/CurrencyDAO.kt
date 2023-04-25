@@ -16,4 +16,8 @@ interface CurrencyDAO {
     @Query("SELECT * FROM currency_table where currencyName=:currencyName ")
     fun getUserCurrencyValue(currencyName: String): Flow<CurrencyModel>
 
+    @Query("SELECT * FROM currency_table")
+    fun getAllCurrencies(): Flow<List<CurrencyModel>>
+
+
 }
