@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBar
@@ -79,10 +80,112 @@ class TokenDetailsFragment : Fragment() {
         theme = sharedPrefTheme!!.getBoolean(Constants.SWITCH_STATE_KEY, true)
         setupActionBar()
         setupView()
+        setupMenu()
 
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
         navigation?.selectedItemId = 0 // set the selected item to be null
 
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.eventFlow.collect { event ->
+                    when (event) {
+                        is UiEvent.ShowErrorSnackbar -> {
+                            Snackbar.make(binding!!.root, event.message, Snackbar.LENGTH_LONG)
+                                .show()
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        }
+
+        // to prevent copy pasting
+        binding!!.etTokenHeldAmount.setDecimalInput()
+        binding!!.etTokenInvestmentAmount.setDecimalInput()
+
+        binding!!.tokenDetailUpdateBtn.setOnClickListener {
+            val totalTokenHeld = binding!!.etTokenHeldAmount.text.toString()
+            val totalInvestment = binding!!.etTokenInvestmentAmount.text.toString()
+            updateUserAndCoinDetails(totalTokenHeld, totalInvestment)
+        }
+
+        onBackPressedCallback = object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                findNavController().navigate(R.id.action_tokenDetailsFragment_to_mainFragment)
+                navigation?.selectedItemId = R.id.home
+            }
+        }
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, onBackPressedCallback!!)
+    }
+
+    private fun updateUserAndCoinDetails(totalTokenHeld: String, totalInvestment: String) {
+        if (viewModel.checkEmptyInput(totalTokenHeld, totalInvestment)){
+            val totalInvestmentWorth = formatTokenTotalValue(currentCoin!!.price, totalTokenHeld.toDouble()).replace(",", "").toDouble()
+
+            if (totalTokenHeld.toDouble() == currentCoin!!.totalTokenHeldAmount &&
+                totalInvestment.toDouble() == currentCoin!!.totalInvestmentAmount){
+                Log.i("MYTAG", "SAME VALUES ENTERED, PASS")
+
+            }else{
+                val overallTotalInvestment: Double = (userData!!.userTotalInvestment - currentCoin!!.totalInvestmentAmount) + totalInvestment.toDouble()
+                val overallTotalInvestmentWorth: Double = (userData!!.userTotalBalanceWorth - currentCoin!!.totalInvestmentWorth) + totalInvestmentWorth
+
+                // update userData first
+                viewModel.updateUserDB(userData!!.copy(
+                    userTotalInvestment = overallTotalInvestment,
+                    userTotalBalanceWorth = overallTotalInvestmentWorth
+                ))
+
+                // update coins
+                viewModel.updateTokenDetails(currentCoin!!.cmcId, totalTokenHeld.toDouble(), totalInvestment.toDouble(), totalInvestmentWorth)
+            }
+
+            findNavController().navigate(
+                R.id.action_tokenDetailsFragment_to_mainFragment
+            )
+            navigation?.selectedItemId = R.id.home
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun setupView(){
+        val coinIcon = Constants.COIN_IMAGE_LINK+"${currentCoin?.cmcId}"+".png"
+        val userCurrencySymbol = userData?.userCurrentCurrency!!.substringBefore(" ").trim()
+
+        binding!!.tvCoinName.text = currentCoin?.name + " / " + formatCoinNameText(currentCoin!!.symbol)
+        binding!!.tvTotalHeldAmount.text = formatTokenHeldAmount(currentCoin!!.totalTokenHeldAmount) + " " + formatCoinNameText(currentCoin!!.symbol)
+        binding!!.tvTotalInvestment.text = userCurrencySymbol+formatTotalBalanceValue(currentCoin?.totalInvestmentAmount!!)
+        binding!!.tvCurrentInvestmentValue.text =  userCurrencySymbol+formatTotalBalanceValue(currentCoin?.totalInvestmentWorth!!)
+        binding!!.tvProfitLossAmount.text = formatTotalProfitAmountUI(userCurrencySymbol,currentCoin!!)
+
+        if (currentCoin?.totalInvestmentAmount == 0.0){
+            binding!!.tvProfitLossAmount.setTextColor(requireContext().getColor(R.color.white))
+            binding!!.tvProfitLossPercentage.setTextColor(requireContext().getColor(R.color.white))
+            binding!!.tvProfitLossPercentage.text = "0.0%"
+        }else{
+            val profitLoss = (currentCoin!!.totalInvestmentWorth-currentCoin!!.totalInvestmentAmount).toString()
+            val percentage = calculateProfitLossPercentage(currentCoin!!.totalInvestmentWorth, currentCoin!!.totalInvestmentAmount)
+            if (profitLoss.contains("-")){
+                binding!!.tvProfitLossAmount.setTextColor(requireContext().getColor(R.color.red_color_percentage))
+                binding!!.tvProfitLossPercentage.setTextColor(requireContext().getColor(R.color.red_color_percentage))
+            }else{
+                binding!!.tvProfitLossAmount.setTextColor(requireContext().getColor(R.color.green_color_percentage))
+                binding!!.tvProfitLossPercentage.setTextColor(requireContext().getColor(R.color.green_color_percentage))
+            }
+            binding!!.tvProfitLossPercentage.text = percentage
+        }
+
+
+        Glide
+            .with(this)
+            .load(coinIcon)
+            .thumbnail(Glide.with(this).load(R.drawable.spinner))
+            .centerCrop()
+            .placeholder(R.drawable.coin_place_holder)
+            .into(binding!!.ivTokenDetailImage)
+    }
+
+    private fun setupMenu(){
         menuHost = requireActivity()
         menuProvider = object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -134,93 +237,6 @@ class TokenDetailsFragment : Fragment() {
             }
         }
         menuHost!!.addMenuProvider(menuProvider!!, viewLifecycleOwner, Lifecycle.State.RESUMED)
-
-        lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.eventFlow.collect { event ->
-                    when (event) {
-                        is UiEvent.ShowErrorSnackbar -> {
-                            Snackbar.make(binding!!.root, event.message, Snackbar.LENGTH_LONG)
-                                .show()
-                        }
-                        else -> {}
-                    }
-                }
-            }
-        }
-
-        // to prevent copy pasting
-        binding!!.etTokenHeldAmount.setDecimalInput()
-        binding!!.etTokenInvestmentAmount.setDecimalInput()
-
-        binding!!.tokenDetailUpdateBtn.setOnClickListener {
-            val totalTokenHeld = binding!!.etTokenHeldAmount.text.toString()
-            val totalInvestment = binding!!.etTokenInvestmentAmount.text.toString()
-
-            if (viewModel.checkEmptyInput(totalTokenHeld, totalInvestment)){
-                val totalInvestmentWorth = formatTokenTotalValue(currentCoin!!.price, totalTokenHeld.toDouble()).replace(",", "").toDouble()
-                viewModel.updateTokenDetails(currentCoin!!.cmcId, totalTokenHeld.toDouble(), totalInvestment.toDouble(), totalInvestmentWorth)
-
-                // update userData
-                val overallTotalInvestment: Double = (userData!!.userTotalInvestment - currentCoin!!.totalInvestmentAmount) + totalInvestment.toDouble()
-                val overallTotalInvestmentWorth: Double = (userData!!.userTotalBalanceWorth - currentCoin!!.totalInvestmentWorth) + totalInvestmentWorth
-                viewModel.updateUserDB(userData!!.copy(
-                    userTotalInvestment = overallTotalInvestment,
-                    userTotalBalanceWorth = overallTotalInvestmentWorth
-                ))
-
-                findNavController().navigate(
-                    R.id.action_tokenDetailsFragment_to_mainFragment
-                )
-                navigation?.selectedItemId = R.id.home
-            }
-        }
-
-        onBackPressedCallback = object : OnBackPressedCallback(true){
-            override fun handleOnBackPressed() {
-                findNavController().navigate(R.id.action_tokenDetailsFragment_to_mainFragment)
-                navigation?.selectedItemId = R.id.home
-            }
-        }
-        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, onBackPressedCallback!!)
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun setupView(){
-        val coinIcon = Constants.COIN_IMAGE_LINK+"${currentCoin?.cmcId}"+".png"
-        val userCurrencySymbol = userData?.userCurrentCurrency!!.substringBefore(" ").trim()
-
-        binding!!.tvCoinName.text = currentCoin?.name + " / " + formatCoinNameText(currentCoin!!.symbol)
-        binding!!.tvTotalHeldAmount.text = formatTokenHeldAmount(currentCoin!!.totalTokenHeldAmount) + " " + formatCoinNameText(currentCoin!!.symbol)
-        binding!!.tvTotalInvestment.text = userCurrencySymbol+formatTotalBalanceValue(currentCoin?.totalInvestmentAmount!!)
-        binding!!.tvCurrentInvestmentValue.text =  userCurrencySymbol+formatTotalBalanceValue(currentCoin?.totalInvestmentWorth!!)
-        binding!!.tvProfitLossAmount.text = formatTotalProfitAmountUI(userCurrencySymbol,currentCoin!!)
-
-        if (currentCoin?.totalInvestmentAmount == 0.0){
-            binding!!.tvProfitLossAmount.setTextColor(requireContext().getColor(R.color.white))
-            binding!!.tvProfitLossPercentage.setTextColor(requireContext().getColor(R.color.white))
-            binding!!.tvProfitLossPercentage.text = "0.0%"
-        }else{
-            val profitLoss = (currentCoin!!.totalInvestmentWorth-currentCoin!!.totalInvestmentAmount).toString()
-            val percentage = calculateProfitLossPercentage(currentCoin!!.totalInvestmentWorth, currentCoin!!.totalInvestmentAmount)
-            if (profitLoss.contains("-")){
-                binding!!.tvProfitLossAmount.setTextColor(requireContext().getColor(R.color.red_color_percentage))
-                binding!!.tvProfitLossPercentage.setTextColor(requireContext().getColor(R.color.red_color_percentage))
-            }else{
-                binding!!.tvProfitLossAmount.setTextColor(requireContext().getColor(R.color.green_color_percentage))
-                binding!!.tvProfitLossPercentage.setTextColor(requireContext().getColor(R.color.green_color_percentage))
-            }
-            binding!!.tvProfitLossPercentage.text = percentage
-        }
-
-
-        Glide
-            .with(this)
-            .load(coinIcon)
-            .thumbnail(Glide.with(this).load(R.drawable.spinner))
-            .centerCrop()
-            .placeholder(R.drawable.coin_place_holder)
-            .into(binding!!.ivTokenDetailImage)
     }
 
     private fun setupActionBar(){

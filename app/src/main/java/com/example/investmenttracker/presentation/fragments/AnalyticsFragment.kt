@@ -262,13 +262,17 @@ class AnalyticsFragment : Fragment() {
         // most profit
         try {
             val calcMPPC = mostProfitPercentageByCoin(walletCoins!!)
-            val mostProfitPercentageCoin = calcMPPC[0]
-            val mostProfitPercentage = calcMPPC[1]
-            binding!!.tvMostProfitByPercentage.text = spannableTextGreen(
-                "$mostProfitPercentageCoin $mostProfitPercentage profit rate.",
-                mostProfitPercentage,
-                requireContext()
-            )
+            if (calcMPPC.isNotEmpty()){
+                val mostProfitPercentageCoin = calcMPPC[0]
+                val mostProfitPercentage = calcMPPC[1]
+                binding!!.tvMostProfitByPercentage.text = spannableTextGreen(
+                    "$mostProfitPercentageCoin $mostProfitPercentage profit rate.",
+                    mostProfitPercentage,
+                    requireContext()
+                )
+            }else{
+                binding!!.tvMostProfitByPercentage.text = "0.0% profit rate."
+            }
         }catch (e: NoSuchElementException){
             e.printStackTrace()
             binding!!.tvMostProfitByPercentage.text = "0.0%"
@@ -280,13 +284,17 @@ class AnalyticsFragment : Fragment() {
         // most loss
         try {
             val calcMLPC = mostLossPercentageByCoin(walletCoins!!)
-            val mostLossPercentageCoin = calcMLPC[0]
-            val mostLossPercentage = calcMLPC[1]
-            binding!!.tvMostLossTokenByPercentage.text = spannableTextRed(
-                "$mostLossPercentageCoin $mostLossPercentage loss rate.",
-                mostLossPercentage,
-                requireContext()
-            )
+            if (calcMLPC.isNotEmpty()){
+                val mostLossPercentageCoin = calcMLPC[0]
+                val mostLossPercentage = calcMLPC[1]
+                binding!!.tvMostLossTokenByPercentage.text = spannableTextRed(
+                    "$mostLossPercentageCoin $mostLossPercentage loss rate.",
+                    mostLossPercentage,
+                    requireContext()
+                )
+            }else{
+                binding!!.tvMostLossTokenByPercentage.text = "0.0% loss rate."
+            }
         }catch (e: NoSuchElementException){
             binding!!.tvMostLossTokenByPercentage.text = "0.0%"
             e.printStackTrace()

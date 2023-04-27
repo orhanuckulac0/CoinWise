@@ -61,7 +61,6 @@ class SearchCoinFragment : Fragment() {
     private var mProgressDialog: Dialog? = null
     private var mInformationDialog: Dialog? = null
     private var coin: CoinModel? = null
-    private var coinIDs: ArrayList<String>? = null
 
 
     override fun onCreateView(
@@ -87,35 +86,6 @@ class SearchCoinFragment : Fragment() {
         }
         sharedPref = requireContext().getSharedPreferences(Constants.THEME_PREF, Context.MODE_PRIVATE)
 
-        menuHost = requireActivity()
-        menuProvider = object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_information, menu)
-
-                // change icon depending on the theme
-                menuItem = menu.findItem(R.id.actionAddCoinInformation)
-
-                val theme = sharedPref?.getBoolean(Constants.SWITCH_STATE_KEY, true)
-                if (theme!!) {
-                    menuItem?.setIcon(R.drawable.ic_info_white_24)
-                } else {
-                    menuItem?.setIcon(R.drawable.ic_info_blue_24)
-                }
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                when(menuItem.itemId) {
-                    R.id.actionAddCoinInformation -> {
-                        mInformationDialog!!.show()
-                        return true
-                    }
-                }
-                return true
-            }
-
-        }
-        menuHost?.addMenuProvider(menuProvider!!, viewLifecycleOwner, Lifecycle.State.RESUMED)
-
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.eventFlow.collect {event->
@@ -130,8 +100,6 @@ class SearchCoinFragment : Fragment() {
                 }
             }
         }
-
-        coinIDs = requireArguments().getStringArrayList(Constants.PASSED_COIN_IDS)
 
         binding!!.searchCoinBtnSlug.setOnClickListener {
             if(binding!!.etSearchCoin.text.toString() != ""){
@@ -164,6 +132,7 @@ class SearchCoinFragment : Fragment() {
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, onBackPressedCallback!!)
 
         setupActionBar()
+        setupMenu()
 
     }
 
@@ -345,6 +314,37 @@ class SearchCoinFragment : Fragment() {
         }
     }
 
+    private fun setupMenu(){
+        menuHost = requireActivity()
+        menuProvider = object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_information, menu)
+
+                // change icon depending on the theme
+                menuItem = menu.findItem(R.id.actionAddCoinInformation)
+
+                val theme = sharedPref?.getBoolean(Constants.SWITCH_STATE_KEY, true)
+                if (theme!!) {
+                    menuItem?.setIcon(R.drawable.ic_info_white_24)
+                } else {
+                    menuItem?.setIcon(R.drawable.ic_info_blue_24)
+                }
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when(menuItem.itemId) {
+                    R.id.actionAddCoinInformation -> {
+                        mInformationDialog!!.show()
+                        return true
+                    }
+                }
+                return true
+            }
+
+        }
+        menuHost?.addMenuProvider(menuProvider!!, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
     private fun setupActionBar() {
         val theme = sharedPref?.getBoolean(Constants.SWITCH_STATE_KEY, true)
 
@@ -384,7 +384,6 @@ class SearchCoinFragment : Fragment() {
         navigation = null
         sharedPref = null
         coin = null
-        coinIDs = null
         mProgressDialog = null
         mInformationDialog = null
         onBackPressedCallback?.remove()

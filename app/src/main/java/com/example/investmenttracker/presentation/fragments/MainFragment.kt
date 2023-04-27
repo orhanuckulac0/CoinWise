@@ -20,6 +20,7 @@ import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.investmenttracker.R
@@ -28,10 +29,13 @@ import com.example.investmenttracker.data.model.UserData
 import com.example.investmenttracker.databinding.FragmentMainBinding
 import com.example.investmenttracker.domain.use_case.util.*
 import com.example.investmenttracker.presentation.adapter.MainFragmentAdapter
+import com.example.investmenttracker.presentation.events.UiEvent
+import com.example.investmenttracker.presentation.events.UiEventActions
 import com.example.investmenttracker.presentation.view_model.MainViewModel
 import com.example.investmenttracker.presentation.view_model_factory.MainViewModelFactory
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -54,6 +58,8 @@ class MainFragment : Fragment() {
     private var toolbar: Toolbar? = null
     private var appBarLayout: AppBarLayout? = null
     private var actionBar: ActionBar? = null
+
+    private var sortGlobalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
     private var mProgressDialog: Dialog? = null
     private var sharedPrefRefresh: SharedPreferences? = null
@@ -91,8 +97,44 @@ class MainFragment : Fragment() {
         sharedPrefRefresh = requireContext().getSharedPreferences(Constants.REFRESH_STATE, MODE_PRIVATE)
         lastApiRequestTime = sharedPrefRefresh!!.getLong(Constants.LAST_API_REQUEST_TIME, 0)
 
+        //get db coins first at all times
         viewModel.getTokensFromWallet()
-        triggerAppLaunch()
+
+        // if internet is off, populate from cache and show snackbar
+        if (!viewModel.isNetworkAvailable(requireContext())){
+            populateFromCache()
+            viewModel.triggerUiEvent(UiEventActions.NO_INTERNET_CONNECTION, UiEventActions.NO_INTERNET_CONNECTION)
+        }else{
+            // observe slug names for making api call
+            viewModel.slugNames.observe(viewLifecycleOwner){resource->
+                when (resource) {
+                    is Resource.Loading -> {}
+                    is Resource.Success -> {
+                        viewModel.getMultipleCoinsBySlug(listOf(resource.data!!))
+                        triggerAppLaunch()
+                    }
+                    is Resource.Error -> {
+                        Log.i("MYTAG", resource.message.toString())
+                        Log.i("MYTAG", "viewModel.getTokensFromWallet() error somehow.")
+                        // maybe show snackbar
+                    }
+                }
+            }
+        }
+
+        // to show snackbar when internet connection is off
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.eventFlow.collect {event->
+                    when(event) {
+                        is UiEvent.ShowErrorSnackbar -> {
+                            Snackbar.make(binding!!.root, event.message, Snackbar.LENGTH_LONG).show()
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        }
 
         binding!!.tvSortTokensByValue.setOnClickListener {
             sorted = if (!sorted){
@@ -104,15 +146,16 @@ class MainFragment : Fragment() {
                 walletAdapter!!.differ.submitList(sortedList)
                 !sorted
             }
-            binding!!.rvTokens.viewTreeObserver.addOnGlobalLayoutListener(object :
-                ViewTreeObserver.OnGlobalLayoutListener {
+
+            sortGlobalLayoutListener = object: ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     // Remove the listener to avoid infinite loops
                     binding!!.rvTokens.viewTreeObserver.removeOnGlobalLayoutListener(this)
                     // Scroll to the top of the list
                     binding!!.rvTokens.scrollToPosition(0)
                 }
-            })
+            }
+            binding!!.rvTokens.viewTreeObserver.addOnGlobalLayoutListener(sortGlobalLayoutListener)
         }
 
         onBackPressedCallback = object : OnBackPressedCallback(true){
@@ -130,13 +173,6 @@ class MainFragment : Fragment() {
         if (shouldMakeApiRequest(lastApiRequestTime)) {
             lifecycleScope.launch(Dispatchers.IO){
 
-                // reset current values
-                viewModel.currentWalletCoins.clear()
-                viewModel.slugNames = ""
-                viewModel.newTokensDataResponse.clear()
-                withContext(Dispatchers.Main){
-                    viewModel.multipleCoinsListResponse.value = null
-                }
                 // make request for currency api
                 requestCurrencyData()
 
@@ -225,25 +261,31 @@ class MainFragment : Fragment() {
                 // observe the user current currency data
                 // update current wallet list with new currency data
                 // set that new list to wallet
-                viewModel.currencyData.observe(viewLifecycleOwner){currency->
+                try {
+                    viewModel.currencyData.observe(viewLifecycleOwner){currency->
 
-                    updatedCoinsList = coinsList.map { coin ->
-                        coin.copy(
-                            totalInvestmentAmount = formatToTwoDecimal(coin.totalInvestmentAmount*currency.currencyRate.toDouble()),
-                            totalInvestmentWorth = formatToTwoDecimal(coin.totalInvestmentWorth * currency.currencyRate.toDouble()),
-                            userCurrencySymbol = currencySymbol
-                        )
-                    }
+                        updatedCoinsList = coinsList.map { coin ->
+                            coin.copy(
+                                totalInvestmentAmount = formatToTwoDecimal(coin.totalInvestmentAmount*currency.currencyRate.toDouble()),
+                                totalInvestmentWorth = formatToTwoDecimal(coin.totalInvestmentWorth * currency.currencyRate.toDouble()),
+                                userCurrencySymbol = currencySymbol
+                            )
+                        }
 
-                    if (userTotalBalanceWorth == 0.0){
-                        binding!!.tvTotalBalance.text = currencySymbol+"0.00"
-                        walletAdapter?.differ?.submitList(updatedCoinsList)
-                    }else{
-                        binding!!.tvTotalBalance.text = currencySymbol+formatTotalBalanceValue(
-                            user.userTotalBalanceWorth*currency.currencyRate.toDouble()
-                        )
-                        walletAdapter?.differ?.submitList(updatedCoinsList)
+                        if (userTotalBalanceWorth == 0.0){
+                            binding!!.tvTotalBalance.text = currencySymbol+"0.00"
+                            walletAdapter?.differ?.submitList(updatedCoinsList)
+                        }else{
+                            binding!!.tvTotalBalance.text = currencySymbol+formatTotalBalanceValue(
+                                user.userTotalBalanceWorth*currency.currencyRate.toDouble()
+                            )
+                            walletAdapter?.differ?.submitList(updatedCoinsList)
+                        }
+
                     }
+                }catch (e: java.lang.NullPointerException){
+                    e.printStackTrace()
+                    walletAdapter?.differ?.submitList(coinsList)
                 }
             }
 
@@ -290,7 +332,6 @@ class MainFragment : Fragment() {
     }
 
     private fun requestCurrencyData(){
-        Log.i("MYTAG", "making currency api request")
         viewModel.getNewCurrencyValuesAPIRequest()
 
         // observe api result for conversion
@@ -299,7 +340,7 @@ class MainFragment : Fragment() {
                     resource->
                 when (resource) {
                     is Resource.Success -> {
-                        Log.e("MYTAG", "Success fetching currency data: ${resource.message}")
+                        Log.e("MYTAG", "Success fetching currency data: ${resource.data}")
                     }
                     is Resource.Error -> {
                         Log.e("MYTAG", "Error fetching currency data: ${resource.message}")
@@ -307,67 +348,54 @@ class MainFragment : Fragment() {
 
                     is Resource.Loading -> {
                         mProgressDialog!!.show()
+                        Log.e("MYTAG", "Currency data loading...")
                     }
                 }
             }
         }
     }
 
-    private suspend fun requestNewDataForWalletCoins(){
+    private fun requestNewDataForWalletCoins(){
+        lifecycleScope.launch(Dispatchers.Main) {
+            viewModel.multipleCoinsListResponse.observe(viewLifecycleOwner){ resource ->
 
-        // switch to Main Thread because I will be observing a live data
-        withContext(Dispatchers.Main){
-            delay(500)
-            Log.i("MYTAG", "joined names list ${listOf(viewModel.slugNames)}")
+                when (resource) {
+                    is Resource.Success -> {
+                        val response = resource.data
+                        if (response != null){
+                            // format the api response to get coins in it
+                            viewModel.parseCoinAPIResponse(response)
+                            Log.i("MYTAG", "coin api call success: ${viewModel.newTokensDataResponse}")
 
-            // make the request
-            viewModel.getMultipleCoinsBySlug(listOf(viewModel.slugNames))
-            if (viewModel.slugNames.isNotEmpty()){
-                // observe the result
-                viewModel.multipleCoinsListResponse.observe(viewLifecycleOwner){ resource ->
+                            updateDB()
 
-                    when (resource) {
-                        is Resource.Success -> {
-                            val response = resource.data
-                            if (response != null){
-                                // format the api response to get coins in it
-                                viewModel.parseCoinAPIResponse(response)
-                                Log.i("MYTAG", "api call success: ${viewModel.newTokensDataResponse}")
-
-                                updateDB()
-
-                            } else {
-                                Log.e("MYTAG", "Response object is null")
-                            }
-                        }
-
-                        is Resource.Error -> {
-                            Log.e("MYTAG", "Error fetching data: ${resource.message}")
-                            cancelProgressDialog(mProgressDialog!!)
-                            // pass empty list to adapter
-                            setupView(mutableListOf())
-                        }
-                        is Resource.Loading -> {
-                            // do nothing since progress dialog is showing
+                        } else {
+                            Log.e("MYTAG", "Response object is null")
                         }
                     }
-                }
-            }else{
-                Log.e("MYTAG", "Empty wallet, no request has been made.")
-                // Update lastApiRequestTime
-                lastApiRequestTime = 60
 
-                // Save lastApiRequestTime in shared preferences
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val editor = sharedPrefRefresh?.edit()
-                    editor?.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
-                    editor?.apply()
-                }
+                    is Resource.Error -> {
+                        Log.e("MYTAG", "Error fetching coin data: ${resource.message}")
+                        // Update lastApiRequestTime
+                        lastApiRequestTime = 60
 
-                // pass empty list to adapter
-                setupView(mutableListOf())
-                // set empty user data
-                updateUserDataDB()
+                        // Save lastApiRequestTime in shared preferences
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            val editor = sharedPrefRefresh?.edit()
+                            editor?.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
+                            editor?.apply()
+                        }
+
+                        // pass empty list to adapter
+                        setupView(mutableListOf())
+                        // set empty user data
+                        updateUserDataDB()
+                    }
+                    is Resource.Loading -> {
+                        Log.e("MYTAG", "Coin data loading...")
+                        // do nothing since progress dialog is showing
+                    }
+                }
             }
         }
     }
@@ -385,10 +413,7 @@ class MainFragment : Fragment() {
     private fun updateUserDataDB() {
         val currentUser = viewModel.userData
 
-        if (viewModel.temporaryTokenListToUseOnFragment.isNotEmpty() && currentUser != null) {
-            val updatedUser = setUserValues(currentUser, viewModel.temporaryTokenListToUseOnFragment)
-            viewModel.updateUserdata(updatedUser)
-        } else {
+        if (currentUser == null){
             // dummy data for new users opening the app for the first time
             viewModel.insertUserData(
                 UserData(
@@ -403,7 +428,11 @@ class MainFragment : Fragment() {
                     0,
                 )
             )
+        }else{
+            val updatedUser = setUserValues(currentUser, viewModel.temporaryTokenListToUseOnFragment)
+            viewModel.updateUserdata(updatedUser)
         }
+
         // switch to Main to update UI
         lifecycleScope.launch(Dispatchers.Main){
             setupView(viewModel.temporaryTokenListToUseOnFragment)
@@ -468,6 +497,9 @@ class MainFragment : Fragment() {
         toolbar = null
         appBarLayout = null
         actionBar = null
+        binding!!.tvSortTokensByValue.setOnClickListener(null)
+        binding!!.rvTokens.viewTreeObserver.removeOnGlobalLayoutListener(sortGlobalLayoutListener)
+        sortGlobalLayoutListener = null
         sharedPrefTheme = null
         sharedPrefRefresh = null
         mProgressDialog?.dismiss()

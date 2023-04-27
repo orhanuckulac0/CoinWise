@@ -19,10 +19,13 @@ import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.InsertUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
 import com.example.investmenttracker.domain.use_case.util.*
+import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.events.UiEventActions
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel(
@@ -45,10 +48,13 @@ class MainViewModel(
     var newTokensDataResponse = mutableListOf<CoinModel>()
     var temporaryTokenListToUseOnFragment = mutableListOf<CoinModel>()
     var walletTokensToUpdateDB = mutableListOf<CoinModel>()
-    var slugNames = ""
+    var slugNames: MutableLiveData<Resource<String>> = MutableLiveData()
 
     var currencyRequestResult: MutableLiveData<Resource<Map<String, Float>>> = MutableLiveData()
     var currencyData: MutableLiveData<CurrencyModel> = MutableLiveData()
+
+    private val eventChannel = Channel<UiEvent>()
+    val eventFlow = eventChannel.receiveAsFlow()
 
     init {
         // get current user and set it in viewModel to later use in Fragment
@@ -90,20 +96,28 @@ class MainViewModel(
 
     fun getTokensFromWallet() {
         viewModelScope.launch(Dispatchers.IO) {
-            getAllCoinsUseCase.execute()
-                .distinctUntilChanged()
-                .collect { walletCoins ->
+            slugNames.postValue(Resource.Loading())
+            try {
+                getAllCoinsUseCase.execute()
+                    .distinctUntilChanged()
+                    .collect { walletCoins ->
                     Log.i("MYTAG", "db tokens $walletCoins")
 
-                    currentWalletCoins.clear()
-                    currentWalletCoins.addAll(walletCoins)
+                        currentWalletCoins.clear()
+                        currentWalletCoins.addAll(walletCoins)
+                        Log.i("MYTAG", "currentWalletCoins $currentWalletCoins")
 
-                    // to send API get request with ["slug1,slug2,slug3"] query
-                    val walletTokenNames = currentWalletCoins.map { coin -> coin.slug.replace("\"", "") }
-                    val joinedNames = walletTokenNames.joinToString(",")
-                    slugNames = joinedNames
-                    Log.i("MYTAG", "joined names for api request: -> $slugNames")
-                }
+                        // to send API get request with ["slug1,slug2,slug3"] query
+                        val walletTokenNames = currentWalletCoins.map { coin -> coin.slug.replace("\"", "") }
+                        val joinedNames = walletTokenNames.joinToString(",")
+                        slugNames.postValue(Resource.Success(joinedNames))
+                        Log.i("MYTAG", "joined names for api request: -> ${slugNames.value?.data}")
+                    }
+            }catch (e: ConcurrentModificationException){
+                e.printStackTrace()
+                Log.i("MYTAG", "${e.stackTrace}")
+                slugNames.postValue(Resource.Error(e.stackTrace.toString()))
+            }
         }
     }
 
@@ -194,4 +208,11 @@ class MainViewModel(
             }
         }
     }
+
+    fun triggerUiEvent(message: String, action: String) = viewModelScope.launch(Dispatchers.Main) {
+        if (action == UiEventActions.NO_INTERNET_CONNECTION) {
+            eventChannel.send(UiEvent.ShowErrorSnackbar(message))
+        }
+    }
+
 }

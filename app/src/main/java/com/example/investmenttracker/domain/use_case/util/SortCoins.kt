@@ -33,8 +33,13 @@ fun mostProfitPercentageByCoin(coinsList: List<CoinModel>): List<String> {
             maxProfitCoin = coin
         }
     }
-    val percentageCoin = (formatCoinNameText(maxProfitCoin!!.symbol) + " " + formatToTwoDecimal(maxProfitPercentage).toString()+"%").split(" ")
-    return percentageCoin
+    if (maxProfitCoin != null) {
+        return (formatCoinNameText(maxProfitCoin.symbol) + " " + formatToTwoDecimal(
+            maxProfitPercentage
+        ).toString() + "%").split(" ")
+    }else{
+        return emptyList()
+    }
 }
 
 fun mostLossPercentageByCoin(coinsList: List<CoinModel>): List<String> {
@@ -48,7 +53,12 @@ fun mostLossPercentageByCoin(coinsList: List<CoinModel>): List<String> {
             minProfitCoin = coin
         }
     }
-    val percentageCoin = (formatCoinNameText(minProfitCoin!!.symbol) + " " + formatToTwoDecimal(minProfitPercentage).toString()+"%").split(" ")
-    return percentageCoin
+    if (minProfitCoin != null) {
+        return (formatCoinNameText(minProfitCoin.symbol) + " " + formatToTwoDecimal(
+            minProfitPercentage
+        ).toString() + "%").split(" ")
+    }else{
+        return emptyList()
+    }
 
 }
