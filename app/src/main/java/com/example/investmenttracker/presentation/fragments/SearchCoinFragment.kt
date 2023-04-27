@@ -251,55 +251,47 @@ class SearchCoinFragment : Fragment() {
                             return@forEach
                         }
                     }
-                    if (!isAlreadyInWallet){
-                        if (userData != null){
-                            viewModel.updateUserDataDB(
-                                userData!!.copy(
-                                    userTotalCoinInvestedQuantity = userData!!.userTotalCoinInvestedQuantity + 1
-                                ))
-                        }else{
-                            viewModel.updateUserDataDB(
-                                UserData(
-                                    1,
-                                    0.0,
-                                    0.0,
-                                    0.0,
-                                    0.0,
-                                    0.0,
-                                    Constants.USD,
-                                    Constants.USD,
-                                    1,
-                                ))
-                        }
 
-                        // save coin to db
-                        viewModel.saveCoinToDB(
-                            CoinModel(
-                                id = coinModel.cmcId,
-                                cmcId = coinModel.cmcId,
-                                name = coinModel.name,
-                                slug = coinModel.slug,
-                                symbol = coinModel.symbol,
-                                price = formatPrice(coinModel.price).toDouble(),
-                                marketCap = formatPrice(coinModel.marketCap).toDouble(),
-                                percentChange24h = coinModel.percentChange24h,
-                                0.0,
-                                0.0,
-                                0.0,
-                                Constants.USD.substringBefore(" ").trim()
+                    if (userData != null){
+                        if (isAlreadyInWallet){
+                            // if coin is already in db and user not null, just trigger snackbar
+                            viewModel.triggerUiEvent("${coinModel.name} is already in wallet.", UiEventActions.ALREADY_IN_WALLET)
+                        }else{
+                            // if coin is not already in db and user data not null
+                            // update db accordingly
+                            updateUserAndCoinData(userData!!, coinModel)
+
+                            // remove that coin from adapter list
+                            coinList.removeAt(position)
+                            adapter?.notifyItemRemoved(position)
+
+                            // trigger snackbar
+                            viewModel.triggerUiEvent("${coinModel.name} added successfully!", UiEventActions.COIN_ADDED)
+                        }
+                    }else{
+                        // if user data is null
+                        val dummyUser = UserData(
+                            1,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            Constants.USD,
+                            Constants.USD,
+                            0,
                             )
-                        )
+
+                        // update database with empty user and current selected coin
+                        updateUserAndCoinData(dummyUser, coinModel)
+
                         coinList.removeAt(position)
                         adapter?.notifyItemRemoved(position)
 
-
                         // trigger snackbar
                         viewModel.triggerUiEvent("${coinModel.name} added successfully!", UiEventActions.COIN_ADDED)
-                    }else{
-
-                        // trigger snackbar
-                        viewModel.triggerUiEvent("${coinModel.name} is already in wallet.", UiEventActions.ALREADY_IN_WALLET)
                     }
+
+
                     // refresh UI
                     binding!!.etSearchCoin.setText("")
                     if (coinList.isEmpty()){
@@ -312,6 +304,29 @@ class SearchCoinFragment : Fragment() {
             binding!!.tvNoResults.visibility = View.VISIBLE
             binding!!.rvCoinSearchResults.visibility = View.GONE
         }
+    }
+
+    private fun updateUserAndCoinData(userData: UserData, coinModel: CoinModel){
+        val updatedUser = userData.copy(
+            userTotalCoinInvestedQuantity = userData.userTotalCoinInvestedQuantity + 1)
+
+        val coinData = CoinModel(
+            id = coinModel.cmcId,
+            cmcId = coinModel.cmcId,
+            name = coinModel.name,
+            slug = coinModel.slug,
+            symbol = coinModel.symbol,
+            price = formatPrice(coinModel.price).toDouble(),
+            marketCap = formatPrice(coinModel.marketCap).toDouble(),
+            percentChange24h = coinModel.percentChange24h,
+            0.0,
+            0.0,
+            0.0,
+            Constants.USD.substringBefore(" ").trim()
+        )
+
+        viewModel.updateUserDataDB(updatedUser)
+        viewModel.saveCoinToDB(coinData)
     }
 
     private fun setupMenu(){

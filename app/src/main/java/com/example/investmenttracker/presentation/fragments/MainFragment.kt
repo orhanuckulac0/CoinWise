@@ -99,6 +99,21 @@ class MainFragment : Fragment() {
 
         //get db coins first at all times
         viewModel.getTokensFromWallet()
+        // if user data is empty, add a dummy user
+        if (viewModel.userData == null){
+            viewModel.insertUserData(
+                UserData(
+                    1,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    Constants.USD,
+                    Constants.USD,
+                    0,
+                )
+            )
+        }
 
         // if internet is off, populate from cache and show snackbar
         if (!viewModel.isNetworkAvailable(requireContext())){
@@ -307,6 +322,7 @@ class MainFragment : Fragment() {
             binding!!.tvTotalBalance.setTextColor(requireContext().getColor(R.color.white))
             binding!!.tvInvestmentPercentageChange.text = "0.0%"
             binding!!.tvInvestmentPercentageChange.setTextColor(requireContext().getColor(R.color.sort_color))
+            walletAdapter?.differ?.submitList(emptyList())
         }
 
         val handler = Handler(Looper.getMainLooper())
@@ -411,27 +427,8 @@ class MainFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun updateUserDataDB() {
-        val currentUser = viewModel.userData
-
-        if (currentUser == null){
-            // dummy data for new users opening the app for the first time
-            viewModel.insertUserData(
-                UserData(
-                    1,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    Constants.USD,
-                    Constants.USD,
-                    0,
-                )
-            )
-        }else{
-            val updatedUser = setUserValues(currentUser, viewModel.temporaryTokenListToUseOnFragment)
-            viewModel.updateUserdata(updatedUser)
-        }
+        val updatedUser = setUserValues(viewModel.userData!!, viewModel.temporaryTokenListToUseOnFragment)
+        viewModel.updateUserdata(updatedUser)
 
         // switch to Main to update UI
         lifecycleScope.launch(Dispatchers.Main){
@@ -484,6 +481,7 @@ class MainFragment : Fragment() {
         viewModel.currencyData.removeObservers(viewLifecycleOwner)
         viewModel.multipleCoinsListResponse.removeObservers(viewLifecycleOwner)
         viewModel.currencyRequestResult.removeObservers(viewLifecycleOwner)
+        viewModel.slugNames.removeObservers(viewLifecycleOwner)
         walletAdapter = null
         navigation = null
         menuItem?.setOnMenuItemClickListener(null)

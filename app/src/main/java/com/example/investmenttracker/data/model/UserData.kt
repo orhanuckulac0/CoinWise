@@ -9,7 +9,6 @@ data class UserData(
     val id: Int,
     var userTotalInvestment: Double,
     var userTotalBalanceWorth: Double,
-    var userConvertedTotalBalanceWorth: Double,
     var userTotalProfitAndLoss: Double,
     var userTotalProfitAndLossPercentage: Double,
     var userCurrentCurrency: String,
