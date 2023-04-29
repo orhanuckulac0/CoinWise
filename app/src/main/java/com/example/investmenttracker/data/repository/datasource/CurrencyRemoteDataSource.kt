@@ -3,7 +3,5 @@ package com.example.investmenttracker.data.repository.datasource
 import com.google.gson.JsonObject
 
 interface CurrencyRemoteDataSource {
-
-    suspend fun convertCurrencies(base: String): JsonObject
-
+    suspend fun convertCurrencies(): JsonObject
 }

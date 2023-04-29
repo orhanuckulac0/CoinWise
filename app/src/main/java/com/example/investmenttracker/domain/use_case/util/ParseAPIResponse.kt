@@ -107,7 +107,7 @@ fun parseSlugResponseUtil(result: JSONObject): CoinModel? {
 
 fun parseCurrencyAPIResponse(result: JsonObject): Map<String, Float>? {
     try {
-        val exchangeRate = result.get("exchange_rates")
+        val exchangeRate = result.get("conversion_rates")
         val ratesObj = exchangeRate.asJsonObject
         val currencyCodes = listOf("EUR", "SGD", "CAD", "AUD", "TRY", "NZD")
 

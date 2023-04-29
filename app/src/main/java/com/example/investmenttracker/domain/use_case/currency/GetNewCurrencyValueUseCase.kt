@@ -5,10 +5,6 @@ import com.google.gson.JsonObject
 
 class GetNewCurrencyValueUseCase(private val currencyRepository: CurrencyRepository) {
 
-    suspend fun execute(
-        base: String,
-    ): JsonObject = currencyRepository.convertCurrencies(
-        base,
-    )
+    suspend fun execute(): JsonObject = currencyRepository.convertCurrencies()
 
 }

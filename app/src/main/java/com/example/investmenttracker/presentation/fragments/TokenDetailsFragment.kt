@@ -49,6 +49,7 @@ class TokenDetailsFragment : Fragment() {
     private var actionBar: ActionBar? = null
     private var sharedPrefTheme: SharedPreferences? = null
     private var currentCoin: CoinModel? = null
+    private var usdCoinData: CoinModel? = null
     private var userData: UserData? = null
     private var navigation: BottomNavigationView? = null
     private var theme: Boolean = false
@@ -71,6 +72,7 @@ class TokenDetailsFragment : Fragment() {
 
         arguments?.let {
             currentCoin = it.customGetSerializable(Constants.PASSED_COIN)
+            usdCoinData = it.customGetSerializable(Constants.BASE_COIN)
             userData = it.customGetSerializable(Constants.PASSED_USER)
         }
 
@@ -120,16 +122,15 @@ class TokenDetailsFragment : Fragment() {
 
     private fun updateUserAndCoinDetails(totalTokenHeld: String, totalInvestment: String) {
         if (viewModel.checkEmptyInput(totalTokenHeld, totalInvestment)){
-            val totalInvestmentWorth = formatTokenTotalValue(currentCoin!!.price, totalTokenHeld.toDouble()).replace(",", "").toDouble()
+            val totalInvestmentWorth = formatTokenTotalValue(usdCoinData!!.price, totalTokenHeld.toDouble()).replace(",", "").toDouble()
 
-            if (totalTokenHeld.toDouble() == currentCoin!!.totalTokenHeldAmount &&
-                totalInvestment.toDouble() == currentCoin!!.totalInvestmentAmount){
+            if (totalTokenHeld.toDouble() == usdCoinData!!.totalTokenHeldAmount &&
+                totalInvestment.toDouble() == usdCoinData!!.totalInvestmentAmount){
                 Log.i("MYTAG", "SAME VALUES ENTERED, PASS")
 
             }else{
-                val overallTotalInvestment: Double = (userData!!.userTotalInvestment - currentCoin!!.totalInvestmentAmount) + totalInvestment.toDouble()
-                val overallTotalInvestmentWorth: Double = (userData!!.userTotalBalanceWorth - currentCoin!!.totalInvestmentWorth) + totalInvestmentWorth
-
+                val overallTotalInvestment: Double = (userData!!.userTotalInvestment - usdCoinData!!.totalInvestmentAmount) + totalInvestment.toDouble()
+                val overallTotalInvestmentWorth: Double = (userData!!.userTotalBalanceWorth - usdCoinData!!.totalInvestmentWorth) + totalInvestmentWorth
                 // update userData first
                 viewModel.updateUserDB(userData!!.copy(
                     userTotalInvestment = overallTotalInvestment,
@@ -137,7 +138,7 @@ class TokenDetailsFragment : Fragment() {
                 ))
 
                 // update coins
-                viewModel.updateTokenDetails(currentCoin!!.cmcId, totalTokenHeld.toDouble(), totalInvestment.toDouble(), totalInvestmentWorth)
+                viewModel.updateTokenDetails(usdCoinData!!.cmcId, totalTokenHeld.toDouble(), totalInvestment.toDouble(), totalInvestmentWorth)
             }
 
             findNavController().navigate(
@@ -154,8 +155,8 @@ class TokenDetailsFragment : Fragment() {
 
         binding!!.tvCoinName.text = currentCoin?.name + " / " + formatCoinNameText(currentCoin!!.symbol)
         binding!!.tvTotalHeldAmount.text = formatTokenHeldAmount(currentCoin!!.totalTokenHeldAmount) + " " + formatCoinNameText(currentCoin!!.symbol)
-        binding!!.tvTotalInvestment.text = userCurrencySymbol+formatTotalBalanceValue(currentCoin?.totalInvestmentAmount!!)
-        binding!!.tvCurrentInvestmentValue.text =  userCurrencySymbol+formatTotalBalanceValue(currentCoin?.totalInvestmentWorth!!)
+        binding!!.tvTotalInvestment.text = userCurrencySymbol+ formatToTwoDecimalWithComma(currentCoin?.totalInvestmentAmount!!)
+        binding!!.tvCurrentInvestmentValue.text =  userCurrencySymbol+formatToTwoDecimalWithComma(currentCoin?.totalInvestmentWorth!!)
         binding!!.tvProfitLossAmount.text = formatTotalProfitAmountUI(userCurrencySymbol,currentCoin!!)
 
         if (currentCoin?.totalInvestmentAmount == 0.0){
@@ -217,8 +218,8 @@ class TokenDetailsFragment : Fragment() {
                             ))
                         }else{
                             viewModel.updateUserDB(user.copy(
-                                userTotalInvestment = formatToTwoDecimal(user.userTotalInvestment - currentCoin!!.totalInvestmentAmount),
-                                userTotalBalanceWorth = formatToTwoDecimal(user.userTotalBalanceWorth - currentCoin!!.totalInvestmentWorth),
+                                userTotalInvestment = formatToTwoDecimal(user.userTotalInvestment - usdCoinData!!.totalInvestmentAmount),
+                                userTotalBalanceWorth = formatToTwoDecimal(user.userTotalBalanceWorth - usdCoinData!!.totalInvestmentWorth),
                                 userTotalProfitAndLoss = formatToTwoDecimal(user.userTotalBalanceWorth - user.userTotalInvestment),
                                 userTotalProfitAndLossPercentage = calculateProfitLossPercentage(user.userTotalBalanceWorth, user.userTotalInvestment).replace("%", "").toDouble(),
                                 userTotalCoinInvestedQuantity = user.userTotalCoinInvestedQuantity - 1
@@ -274,6 +275,7 @@ class TokenDetailsFragment : Fragment() {
         onBackPressedCallback?.remove()
         onBackPressedCallback = null
         currentCoin = null
+        usdCoinData = null
         userData = null
     }
 }

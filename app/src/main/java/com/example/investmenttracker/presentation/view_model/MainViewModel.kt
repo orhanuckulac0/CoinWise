@@ -41,7 +41,7 @@ class MainViewModel(
     private val getCurrencyValueFromDBUseCase: GetCurrencyValueFromDBUseCase
 ): AndroidViewModel(app) {
 
-    var userData: UserData? = null
+    var userData: MutableLiveData<UserData> = MutableLiveData()
 
     val multipleCoinsListResponse: MutableLiveData<Resource<JsonObject>> = MutableLiveData()
     var currentWalletCoins = mutableListOf<CoinModel>()
@@ -60,7 +60,7 @@ class MainViewModel(
         // get current user and set it in viewModel to later use in Fragment
         viewModelScope.launch(Dispatchers.IO) {
             getUserDataUseCase.execute(1).collect {
-                userData = it
+                userData.postValue(it)
             }
         }
     }
@@ -125,8 +125,14 @@ class MainViewModel(
         multipleCoinsListResponse.postValue(Resource.Loading())
         try {
             if (isNetworkAvailable(app)){
-                val slugListResponse = getMultipleCoinsUseCase.execute(slugList)
-                multipleCoinsListResponse.postValue(Resource.Success(slugListResponse))
+                // validate the list first before making an api request
+                // prevent making api request with empty query, resulting HTTP 400
+                if (slugList.isNotEmpty()){
+                    val slugListResponse = getMultipleCoinsUseCase.execute(slugList)
+                    multipleCoinsListResponse.postValue(Resource.Success(slugListResponse))
+                }else{
+                    multipleCoinsListResponse.postValue(Resource.Error("empty wallet, no api request has been made."))
+                }
             }else {
                 multipleCoinsListResponse.postValue(Resource.Error(UiEventActions.NO_INTERNET_CONNECTION))
             }
@@ -169,9 +175,8 @@ class MainViewModel(
 
             try {
                 if (isNetworkAvailable(app)) {
-                    val baseCurrency = Constants.USD.substringAfter(" ").trim()
+                    getNewCurrencyValueUseCase.execute().let { result ->
 
-                    getNewCurrencyValueUseCase.execute(baseCurrency).let { result ->
                         val parsedResult = parseCurrencyAPIResponse(result)!!
                         currencyRequestResult.postValue(Resource.Success(parsedResult))
 
@@ -203,7 +208,7 @@ class MainViewModel(
 
     fun getCurrencyDataFromDB(currencyName: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            getCurrencyValueFromDBUseCase.execute(currencyName).collect(){
+            getCurrencyValueFromDBUseCase.execute(currencyName).collect {
                 currencyData.postValue(it)
             }
         }

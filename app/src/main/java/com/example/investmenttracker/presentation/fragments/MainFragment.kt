@@ -100,19 +100,22 @@ class MainFragment : Fragment() {
         //get db coins first at all times
         viewModel.getTokensFromWallet()
         // if user data is empty, add a dummy user
-        if (viewModel.userData == null){
-            viewModel.insertUserData(
-                UserData(
-                    1,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    Constants.USD,
-                    Constants.USD,
-                    0,
+        viewModel.userData.observe(viewLifecycleOwner){
+            if (it == null){
+                Log.i("MYTAG", "EMPTY USER, creating a dummy data")
+                viewModel.insertUserData(
+                    UserData(
+                        1,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        Constants.USD,
+                        Constants.USD,
+                        0,
+                    )
                 )
-            )
+            }
         }
 
         // if internet is off, populate from cache and show snackbar
@@ -125,7 +128,11 @@ class MainFragment : Fragment() {
                 when (resource) {
                     is Resource.Loading -> {}
                     is Resource.Success -> {
-                        viewModel.getMultipleCoinsBySlug(listOf(resource.data!!))
+                        if (resource.data.isNullOrEmpty()){
+                            viewModel.getMultipleCoinsBySlug(emptyList())
+                        }else{
+                            viewModel.getMultipleCoinsBySlug(listOf(resource.data))
+                        }
                         triggerAppLaunch()
                     }
                     is Resource.Error -> {
@@ -249,8 +256,8 @@ class MainFragment : Fragment() {
         }
 
         // update UI only, in 60 seconds db user data will update itself
-        if (viewModel.userData != null){
-            user = viewModel.userData!!
+        if (viewModel.userData.value != null){
+            user = viewModel.userData.value!!
 
             var userTotalBalanceWorth = 0.0
             val userTotalPercentageChange: Double
@@ -336,6 +343,7 @@ class MainFragment : Fragment() {
             override fun onClick(position: Int, coinModel: CoinModel) {
                 val bundle = Bundle().apply {
                     putSerializable(Constants.PASSED_COIN, coinModel)
+                    putSerializable(Constants.BASE_COIN, coinsList[position])
                     putSerializable(Constants.PASSED_USER, user)
                 }
                 findNavController().navigate(
@@ -427,7 +435,7 @@ class MainFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun updateUserDataDB() {
-        val updatedUser = setUserValues(viewModel.userData!!, viewModel.temporaryTokenListToUseOnFragment)
+        val updatedUser = setUserValues(viewModel.userData.value!!, viewModel.temporaryTokenListToUseOnFragment)
         viewModel.updateUserdata(updatedUser)
 
         // switch to Main to update UI
@@ -461,7 +469,7 @@ class MainFragment : Fragment() {
                 when(menuItem.itemId) {
                     R.id.actionSettings -> {
                         val bundle = Bundle().apply {
-                            putSerializable(Constants.PASSED_USER, viewModel.userData)
+                            putSerializable(Constants.PASSED_USER, viewModel.userData.value!!)
                         }
                         findNavController().navigate(
                             R.id.action_mainFragment_to_settingsFragment,
@@ -478,6 +486,7 @@ class MainFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        viewModel.userData.removeObservers(viewLifecycleOwner)
         viewModel.currencyData.removeObservers(viewLifecycleOwner)
         viewModel.multipleCoinsListResponse.removeObservers(viewLifecycleOwner)
         viewModel.currencyRequestResult.removeObservers(viewLifecycleOwner)

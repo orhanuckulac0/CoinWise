@@ -11,10 +11,8 @@ class CurrencyRepositoryImpl(
     private val currencyLocalDataSource: CurrencyLocalDataSource,
     private val currencyRemoteDataSource: CurrencyRemoteDataSource): CurrencyRepository {
 
-    override suspend fun convertCurrencies(
-        base: String,
-    ): JsonObject {
-        return currencyRemoteDataSource.convertCurrencies(base = base)
+    override suspend fun convertCurrencies(): JsonObject {
+        return currencyRemoteDataSource.convertCurrencies()
     }
 
     override fun getCurrencyValues(currencyName: String): Flow<CurrencyModel> {

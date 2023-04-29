@@ -105,7 +105,11 @@ class SearchCoinFragment : Fragment() {
             if(binding!!.etSearchCoin.text.toString() != ""){
                 viewModel.coinSearchInputText.value = binding!!.etSearchCoin.text.toString().lowercase()
                 binding!!.etSearchCoin.setText("")
-                getCoinBySlug()
+                if (viewModel.isNetworkAvailable(requireContext())){
+                    getCoinBySlug()
+                }else{
+                    viewModel.triggerUiEvent(UiEventActions.NO_INTERNET_CONNECTION,UiEventActions.NO_INTERNET_CONNECTION)
+                }
             }else{
                 viewModel.triggerUiEvent(UiEventActions.EMPTY_INPUT, UiEventActions.EMPTY_INPUT)
             }
@@ -114,7 +118,11 @@ class SearchCoinFragment : Fragment() {
             if (binding!!.etSearchCoin.text.toString() != ""){
                 viewModel.coinSearchInputText.value = binding!!.etSearchCoin.text.toString().uppercase()
                 binding!!.etSearchCoin.setText("")
-                getCoinBySymbol()
+                if (viewModel.isNetworkAvailable(requireContext())){
+                    getCoinBySymbol()
+                }else{
+                    viewModel.triggerUiEvent(UiEventActions.NO_INTERNET_CONNECTION,UiEventActions.NO_INTERNET_CONNECTION)
+                }
             }else{
                 viewModel.triggerUiEvent(UiEventActions.EMPTY_INPUT, UiEventActions.EMPTY_INPUT)
             }
@@ -187,8 +195,6 @@ class SearchCoinFragment : Fragment() {
     // search coins by symbol, BTC - ETH
     // returns a jsonArray because symbols are not unique
     private fun getCoinBySymbol() {
-        Log.i("MYTAG", "search input onsymbol : ${viewModel.coinSearchInputText.value.toString()}")
-
         val searchInput = viewModel.coinSearchInputText.value.toString()
         viewModel.getSearchCoinBySymbol(searchInput)
 
