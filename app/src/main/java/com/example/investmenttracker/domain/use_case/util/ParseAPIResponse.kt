@@ -3,7 +3,6 @@ package com.example.investmenttracker.domain.use_case.util
 import android.util.Log
 import com.example.investmenttracker.data.model.CoinModel
 import com.google.gson.JsonArray
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.json.JSONException
 import org.json.JSONObject

@@ -208,6 +208,7 @@ class TokenDetailsFragment : Fragment() {
                         // if that coin is the last in db, set all values to default **necessary
                         if (user.userTotalCoinInvestedQuantity == 1){
                             viewModel.updateUserDB(user.copy(
+                                id = 1,
                                 userTotalInvestment = 0.0,
                                 userTotalBalanceWorth = 0.0,
                                 userTotalProfitAndLoss = 0.0,
@@ -217,13 +218,19 @@ class TokenDetailsFragment : Fragment() {
                                 userTotalCoinInvestedQuantity = 0
                             ))
                         }else{
-                            viewModel.updateUserDB(user.copy(
-                                userTotalInvestment = formatToTwoDecimal(user.userTotalInvestment - usdCoinData!!.totalInvestmentAmount),
-                                userTotalBalanceWorth = formatToTwoDecimal(user.userTotalBalanceWorth - usdCoinData!!.totalInvestmentWorth),
-                                userTotalProfitAndLoss = formatToTwoDecimal(user.userTotalBalanceWorth - user.userTotalInvestment),
-                                userTotalProfitAndLossPercentage = calculateProfitLossPercentage(user.userTotalBalanceWorth, user.userTotalInvestment).replace("%", "").toDouble(),
-                                userTotalCoinInvestedQuantity = user.userTotalCoinInvestedQuantity - 1
-                            ))
+                            if (user.userTotalInvestment == 0.0){
+                                viewModel.updateUserDB(user.copy(
+                                    userTotalCoinInvestedQuantity = user.userTotalCoinInvestedQuantity - 1
+                                ))
+                            }else{
+                                viewModel.updateUserDB(user.copy(
+                                    userTotalInvestment = formatToTwoDecimal(user.userTotalInvestment - usdCoinData!!.totalInvestmentAmount),
+                                    userTotalBalanceWorth = formatToTwoDecimal(user.userTotalBalanceWorth - usdCoinData!!.totalInvestmentWorth),
+                                    userTotalProfitAndLoss = formatToTwoDecimal(user.userTotalBalanceWorth - user.userTotalInvestment),
+                                    userTotalProfitAndLossPercentage = calculateProfitLossPercentage(user.userTotalBalanceWorth, user.userTotalInvestment).replace("%", "").toDouble(),
+                                    userTotalCoinInvestedQuantity = user.userTotalCoinInvestedQuantity - 1
+                                ))
+                            }
                         }
                         viewModel.deleteTokenFromDB(currentCoin!!)
 
