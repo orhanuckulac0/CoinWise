@@ -2,6 +2,7 @@ package com.example.investmenttracker.domain.use_case.util
 
 import com.example.investmenttracker.data.model.CoinModel
 import java.text.DecimalFormat
+import java.util.*
 import kotlin.math.abs
 
 
@@ -16,7 +17,8 @@ fun convertScientificNotationToString(number: Double): String {
         val coefficient = parts[0].replace(".", "").replace("-", "")
         val exponent = parts[1].replace("-", "").toInt()
         val coefficientWithDecimal = "0." + "0".repeat(exponent - 1) + coefficient
-        String.format("%.10f", coefficientWithDecimal.toDouble())
+        val formatter = Formatter(Locale.US)
+        formatter.format("%.10f", coefficientWithDecimal.toDouble()).toString()
     } else {
         val decimalPlaces = if (numberAsString.contains(".")) {
             numberAsString.split(".")[1].length
@@ -24,9 +26,11 @@ fun convertScientificNotationToString(number: Double): String {
             0
         }
         if (decimalPlaces > 4) {
-            String.format("%.4f", number)
+            val formatter = Formatter(Locale.US)
+            formatter.format("%.4f", number).toString()
         } else {
-            String.format("%.${decimalPlaces}f", number)
+            val formatter = Formatter(Locale.US)
+            formatter.format("%.${decimalPlaces}f", number).toString()
         }
     }
 }
@@ -43,32 +47,43 @@ fun formatTokenHeldAmount(number: Double): String {
 }
 
 fun formatTokenTotalValue(coinPrice: Double, totalInvestment: Double): String {
-    return String.format("%,.2f", coinPrice*totalInvestment)
+    val totalValue = coinPrice * totalInvestment
+    return String.format(Locale.US, "%,.2f", totalValue)
 }
 
 fun formatTotalBalanceValue(totalInvestment: Double): String {
-    return String.format("%,.2f", totalInvestment)
+    return String.format(Locale.US, "%,.2f", totalInvestment)
 }
 
-fun formatTotalProfitAmountUI(currencySymbol: String, currentCoin: CoinModel): String{
-    val profitLoss = (currentCoin.totalInvestmentWorth-currentCoin.totalInvestmentAmount).toString()
+fun formatTotalProfitAmountUI(currencySymbol: String, currentCoin: CoinModel): String {
+    val profitLoss = currentCoin.totalInvestmentWorth - currentCoin.totalInvestmentAmount
 
-    return if (currentCoin.totalInvestmentAmount == 0.0){
-        currencySymbol+currentCoin.totalInvestmentAmount
-    }else{
-        String.format("$currencySymbol%,.2f", abs(profitLoss.toDouble()))
+    return if (currentCoin.totalInvestmentAmount == 0.0) {
+        "$currencySymbol${formatTotalBalanceValue(currentCoin.totalInvestmentAmount)}"
+    } else {
+        val formattedProfitLoss = String.format(Locale.US, "%,.2f", abs(profitLoss))
+        if (profitLoss < 0) "-$currencySymbol$formattedProfitLoss" else "$currencySymbol$formattedProfitLoss"
     }
 }
 
 fun calculateProfitLossPercentage(currentWorth: Double, initialInvestment: Double): String {
     val percentage = ((currentWorth - initialInvestment) / initialInvestment) * 100
-    return String.format("%.2f", percentage)+"%"
+    val formatter = Formatter(Locale.US)
+    val formattedString = formatter.format("%.2f%%", percentage).toString()
+    formatter.close()
+    return formattedString
 }
 
 fun formatToTwoDecimal(number: Double): Double{
-    return String.format("%.2f", number).toDouble()
+    val formatter = Formatter(Locale.US)
+    val formattedString = formatter.format("%.2f", number).toString()
+    formatter.close()
+    return formattedString.toDouble()
 }
 
-fun formatToTwoDecimalWithComma(number: Double): String{
-    return String.format("%,.2f", number)
+fun formatToTwoDecimalWithComma(number: Double): String {
+    val formatter = Formatter(Locale.US)
+    val formattedString = formatter.format("%,.2f", number).toString()
+    formatter.close()
+    return formattedString
 }

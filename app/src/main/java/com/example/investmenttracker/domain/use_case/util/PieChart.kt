@@ -15,6 +15,8 @@ import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
+import java.util.*
+import kotlin.collections.ArrayList
 
 fun createPieChart(
     pieChart: PieChart,
@@ -83,12 +85,10 @@ fun createPieChart(
 
     for (coin in sortedWallet) {
         val percent = (coin.totalInvestmentAmount / totalInvestment) * 100
+        val percentString = String.format(Locale.getDefault(), "%.2f%%", percent)
         // add each coin user holds as PieEntry
         entries.add(
-            PieEntry(
-            String.format("%.2f", percent).toFloat(),
-            formatCoinNameText(coin.symbol) + " " + String.format("%.2f", percent)+"%"
-            )
+            PieEntry(percent.toFloat(), formatCoinNameText(coin.symbol) + " " + percentString)
         )
     }
 
