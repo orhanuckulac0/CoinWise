@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBar
@@ -59,7 +58,6 @@ class TokenDetailsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_token_details, container, false)
     }
 
@@ -85,7 +83,7 @@ class TokenDetailsFragment : Fragment() {
         setupMenu()
 
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
-        navigation?.selectedItemId = 0 // set the selected item to be null
+        navigation?.selectedItemId = 0
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -101,7 +99,6 @@ class TokenDetailsFragment : Fragment() {
             }
         }
 
-        // to prevent copy pasting
         binding!!.etTokenHeldAmount.setDecimalInput()
         binding!!.etTokenInvestmentAmount.setDecimalInput()
 
@@ -124,20 +121,15 @@ class TokenDetailsFragment : Fragment() {
         if (viewModel.checkEmptyInput(totalTokenHeld, totalInvestment)){
             val totalInvestmentWorth = formatTokenTotalValue(usdCoinData!!.price, totalTokenHeld.toDouble()).replace(",", "").toDouble()
 
-            if (totalTokenHeld.toDouble() == usdCoinData!!.totalTokenHeldAmount &&
-                totalInvestment.toDouble() == usdCoinData!!.totalInvestmentAmount){
-                Log.i("MYTAG", "SAME VALUES ENTERED, PASS")
-
-            }else{
+            if (!(totalTokenHeld.toDouble() == usdCoinData!!.totalTokenHeldAmount &&
+                        totalInvestment.toDouble() == usdCoinData!!.totalInvestmentAmount)) {
                 val overallTotalInvestment: Double = (userData!!.userTotalInvestment - usdCoinData!!.totalInvestmentAmount) + totalInvestment.toDouble()
                 val overallTotalInvestmentWorth: Double = (userData!!.userTotalBalanceWorth - usdCoinData!!.totalInvestmentWorth) + totalInvestmentWorth
-                // update userData first
                 viewModel.updateUserDB(userData!!.copy(
                     userTotalInvestment = overallTotalInvestment,
                     userTotalBalanceWorth = overallTotalInvestmentWorth
                 ))
 
-                // update coins
                 viewModel.updateTokenDetails(usdCoinData!!.cmcId, totalTokenHeld.toDouble(), totalInvestment.toDouble(), totalInvestmentWorth)
             }
 
@@ -190,9 +182,7 @@ class TokenDetailsFragment : Fragment() {
         menuHost = requireActivity()
         menuProvider = object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                // Add menu items here
                 menuInflater.inflate(R.menu.menu_delete_coin, menu)
-                // change icon depending on the theme
                 menuItem = menu.findItem(R.id.actionDeleteCoin)
                 if (theme) {
                     menuItem?.setIcon(R.drawable.ic_delete_24)
@@ -205,7 +195,6 @@ class TokenDetailsFragment : Fragment() {
                 when(menuItem.itemId) {
                     R.id.actionDeleteCoin -> {
                         val user = viewModel.userData!!
-                        // if that coin is the last in db, set all values to default **necessary
                         if (user.userTotalCoinInvestedQuantity == 1){
                             viewModel.updateUserDB(user.copy(
                                 id = 1,

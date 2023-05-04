@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keep class com.example.investmenttracker.data.model.CoinModel { *; }
+-keep class com.example.investmenttracker.data.model.CurrencyModel { *; }
+-keep class com.example.investmenttracker.data.model.UserData { *; }
+-keep class com.example.investmenttracker.domain.use_case.util.ParseAPIResponseKt { *; }

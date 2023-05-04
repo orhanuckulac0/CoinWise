@@ -97,12 +97,9 @@ class MainFragment : Fragment() {
         sharedPrefRefresh = requireContext().getSharedPreferences(Constants.REFRESH_STATE, MODE_PRIVATE)
         lastApiRequestTime = sharedPrefRefresh!!.getLong(Constants.LAST_API_REQUEST_TIME, 0)
 
-        //get db coins first at all times
         viewModel.getTokensFromWallet()
-        // if user data is empty, add a dummy user
         viewModel.userData.observe(viewLifecycleOwner){
             if (it == null){
-                Log.i("MYTAG", "EMPTY USER, creating a dummy data")
                 viewModel.insertUserData(
                     UserData(
                         1,
@@ -118,12 +115,10 @@ class MainFragment : Fragment() {
             }
         }
 
-        // if internet is off, populate from cache and show snackbar
         if (!viewModel.isNetworkAvailable(requireContext())){
             populateFromCache()
             viewModel.triggerUiEvent(UiEventActions.NO_INTERNET_CONNECTION, UiEventActions.NO_INTERNET_CONNECTION)
         }else{
-            // observe slug names for making api call
             viewModel.slugNames.observe(viewLifecycleOwner){resource->
                 when (resource) {
                     is Resource.Loading -> {}
@@ -135,16 +130,11 @@ class MainFragment : Fragment() {
                         }
                         triggerAppLaunch()
                     }
-                    is Resource.Error -> {
-                        Log.i("MYTAG", resource.message.toString())
-                        Log.i("MYTAG", "viewModel.getTokensFromWallet() error somehow.")
-                        // maybe show snackbar
-                    }
+                    is Resource.Error -> {}
                 }
             }
         }
 
-        // to show snackbar when internet connection is off
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.eventFlow.collect {event->
@@ -171,9 +161,7 @@ class MainFragment : Fragment() {
 
             sortGlobalLayoutListener = object: ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    // Remove the listener to avoid infinite loops
                     binding!!.rvTokens.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    // Scroll to the top of the list
                     binding!!.rvTokens.scrollToPosition(0)
                 }
             }
@@ -195,16 +183,12 @@ class MainFragment : Fragment() {
         if (shouldMakeApiRequest(lastApiRequestTime)) {
             lifecycleScope.launch(Dispatchers.IO){
 
-                // make request for currency api
                 requestCurrencyData()
 
-                // make request for coin api
                 requestNewDataForWalletCoins()
 
-                // Update lastApiRequestTime
                 lastApiRequestTime = System.currentTimeMillis()
 
-                // Save lastApiRequestTime in shared preferences
                 lifecycleScope.launch(Dispatchers.IO) {
                     val editor = sharedPrefRefresh?.edit()
                     editor?.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
@@ -238,9 +222,7 @@ class MainFragment : Fragment() {
                     false
                 )
             }
-        }catch (e: NullPointerException){
-            e.printStackTrace()
-        }
+        }catch (_: java.lang.Exception){ }
 
         if (coinsList.isEmpty() && !populated){
             populated = true
@@ -255,7 +237,6 @@ class MainFragment : Fragment() {
             binding!!.tvEmptyWalletText.visibility = View.GONE
         }
 
-        // update UI only, in 60 seconds db user data will update itself
         if (viewModel.userData.value != null){
             user = viewModel.userData.value!!
 
@@ -268,7 +249,6 @@ class MainFragment : Fragment() {
                 userTotalInvestment += coin.totalInvestmentAmount
             }
 
-            // balance text
             val currencySymbol = user.userCurrentCurrency.substringBefore(" ").trim()
             val userCurrency = user.userCurrentCurrency.substringAfter(" ").trim()
 
@@ -277,41 +257,40 @@ class MainFragment : Fragment() {
                 walletAdapter?.differ?.submitList(coinsList)
 
             }else{
-                // get currency data from db
                 viewModel.getCurrencyDataFromDB(userCurrency)
 
-                // observe the user current currency data
-                // update current wallet list with new currency data
-                // set that new list to wallet
                 try {
-                    viewModel.currencyData.observe(viewLifecycleOwner){currency->
-
-                        updatedCoinsList = coinsList.map { coin ->
-                            coin.copy(
-                                totalInvestmentAmount = formatToTwoDecimal(coin.totalInvestmentAmount*currency.currencyRate.toDouble()),
-                                totalInvestmentWorth = formatToTwoDecimal(coin.totalInvestmentWorth * currency.currencyRate.toDouble()),
-                                userCurrencySymbol = currencySymbol
-                            )
+                    viewModel.currencyData.observe(viewLifecycleOwner){currencyResult->
+                        when (currencyResult) {
+                            is Resource.Loading -> {}
+                            is Resource.Success -> {
+                                updatedCoinsList = coinsList.map { coin ->
+                                    coin.copy(
+                                        totalInvestmentAmount = formatToTwoDecimal(coin.totalInvestmentAmount* currencyResult.data!!.currencyRate.toDouble()),
+                                        totalInvestmentWorth = formatToTwoDecimal(coin.totalInvestmentWorth * currencyResult.data!!.currencyRate.toDouble()),
+                                        userCurrencySymbol = currencySymbol
+                                    )
+                                }
+                                if (userTotalBalanceWorth == 0.0){
+                                    binding!!.tvTotalBalance.text = currencySymbol+"0.00"
+                                    walletAdapter?.differ?.submitList(updatedCoinsList)
+                                }else{
+                                    binding!!.tvTotalBalance.text = currencySymbol+formatTotalBalanceValue(
+                                        user.userTotalBalanceWorth*currencyResult.data!!.currencyRate.toDouble()
+                                    )
+                                    walletAdapter?.differ?.submitList(updatedCoinsList)
+                                }
+                            }
+                            is Resource.Error ->{
+                                walletAdapter?.differ?.submitList(coinsList)
+                            }
                         }
-
-                        if (userTotalBalanceWorth == 0.0){
-                            binding!!.tvTotalBalance.text = currencySymbol+"0.00"
-                            walletAdapter?.differ?.submitList(updatedCoinsList)
-                        }else{
-                            binding!!.tvTotalBalance.text = currencySymbol+formatTotalBalanceValue(
-                                user.userTotalBalanceWorth*currency.currencyRate.toDouble()
-                            )
-                            walletAdapter?.differ?.submitList(updatedCoinsList)
-                        }
-
                     }
-                }catch (e: java.lang.NullPointerException){
-                    e.printStackTrace()
+                }catch (e: java.lang.Exception){
                     walletAdapter?.differ?.submitList(coinsList)
                 }
             }
 
-            // percentage text
             userTotalPercentageChange = calculateProfitLossPercentage(userTotalBalanceWorth, userTotalInvestment).replace("%", "").toDouble()
             if (userTotalPercentageChange == 0.0 || userTotalPercentageChange.isNaN()){
                 binding!!.tvInvestmentPercentageChange.text = "0.0%"
@@ -358,21 +337,15 @@ class MainFragment : Fragment() {
     private fun requestCurrencyData(){
         viewModel.getNewCurrencyValuesAPIRequest()
 
-        // observe api result for conversion
         lifecycleScope.launch(Dispatchers.Main){
             viewModel.currencyRequestResult.observe(viewLifecycleOwner){
                     resource->
                 when (resource) {
-                    is Resource.Success -> {
-                        Log.e("MYTAG", "Success fetching currency data: ${resource.data}")
-                    }
-                    is Resource.Error -> {
-                        Log.e("MYTAG", "Error fetching currency data: ${resource.message}")
-                    }
+                    is Resource.Success -> {}
+                    is Resource.Error -> {}
 
                     is Resource.Loading -> {
                         mProgressDialog!!.show()
-                        Log.e("MYTAG", "Currency data loading...")
                     }
                 }
             }
@@ -387,45 +360,32 @@ class MainFragment : Fragment() {
                     is Resource.Success -> {
                         val response = resource.data
                         if (response != null){
-                            // format the api response to get coins in it
                             viewModel.parseCoinAPIResponse(response)
-                            Log.i("MYTAG", "coin api call success: ${viewModel.newTokensDataResponse}")
 
                             updateDB()
 
-                        } else {
-                            Log.e("MYTAG", "Response object is null")
                         }
                     }
 
                     is Resource.Error -> {
-                        Log.e("MYTAG", "Error fetching coin data: ${resource.message}")
-                        // Update lastApiRequestTime
                         lastApiRequestTime = 60
 
-                        // Save lastApiRequestTime in shared preferences
                         lifecycleScope.launch(Dispatchers.IO) {
                             val editor = sharedPrefRefresh?.edit()
                             editor?.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
                             editor?.apply()
                         }
 
-                        // pass empty list to adapter
                         setupView(mutableListOf())
-                        // set empty user data
                         updateUserDataDB()
                     }
-                    is Resource.Loading -> {
-                        Log.e("MYTAG", "Coin data loading...")
-                        // do nothing since progress dialog is showing
-                    }
+                    is Resource.Loading -> {}
                 }
             }
         }
     }
 
     private fun updateDB(){
-        // operate on background thread for db function
         lifecycleScope.launch(Dispatchers.IO){
             viewModel.updateMultipleCoinDetails()
             delay(1000)
@@ -435,10 +395,11 @@ class MainFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun updateUserDataDB() {
-        val updatedUser = setUserValues(viewModel.userData.value!!, viewModel.temporaryTokenListToUseOnFragment)
-        viewModel.updateUserdata(updatedUser)
+        if (viewModel.userData.value != null){
+            val updatedUser = setUserValues(viewModel.userData.value!!, viewModel.temporaryTokenListToUseOnFragment)
+            viewModel.updateUserdata(updatedUser)
+        }
 
-        // switch to Main to update UI
         lifecycleScope.launch(Dispatchers.Main){
             setupView(viewModel.temporaryTokenListToUseOnFragment)
         }
@@ -456,7 +417,6 @@ class MainFragment : Fragment() {
         menuProvider = object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_settings, menu)
-                // change icon depending on the theme
                 menuItem = menu.findItem(R.id.actionSettings)
                 if (sharedPrefTheme?.getBoolean(Constants.SWITCH_STATE_KEY, true) == true) {
                     menuItem?.setIcon(R.drawable.ic_settings_gray_24)

@@ -31,7 +31,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        // Set the default night mode to follow the system's theme preference
         sharedPref = getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
         val theme = sharedPref!!.getBoolean(Constants.SWITCH_STATE_KEY, true)
         val currentTheme = AppCompatDelegate.getDefaultNightMode()

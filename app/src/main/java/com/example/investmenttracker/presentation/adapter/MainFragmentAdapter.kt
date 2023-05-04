@@ -21,8 +21,6 @@ class MainFragmentAdapter(
 
     private var onClickListener: OnClickListener? = null
 
-    //This class finds the difference between two lists and provides the updated list as an output.
-    // This class is used to notify updates to a RecyclerView Adapter.
     private val callback = object : DiffUtil.ItemCallback<CoinModel>(){
         override fun areItemsTheSame(oldItem: CoinModel, newItem: CoinModel): Boolean {
             return oldItem.cmcId == newItem.cmcId
@@ -33,8 +31,6 @@ class MainFragmentAdapter(
         }
     }
 
-    // AsyncListDiffer is a helper for computing the difference between two lists via DiffUtil on a background thread.
-    // will signal the adapter of changes between submitted lists
     val differ = AsyncListDiffer(this, callback)
 
 

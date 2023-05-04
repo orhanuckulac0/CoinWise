@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -26,7 +25,6 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -100,11 +98,7 @@ class SearchCoinViewModel(
             }
         }catch (e:java.lang.Exception){
             coinSearchedBySlug.postValue(Resource.Error("No search results. Check your spelling."))
-        }catch (e: InvocationTargetException) {
-            Log.i("MYTAG", e.cause.toString())
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        }
+        }catch (_: InvocationTargetException) { }
     }
 
     fun getSearchCoinBySymbol(symbol: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -119,11 +113,7 @@ class SearchCoinViewModel(
             }
         }catch (e:java.lang.Exception){
             coinSearchedBySymbol.postValue(Resource.Error("No search results. Check your spelling."))
-        }catch (e: InvocationTargetException) {
-            Log.i("MYTAG", e.cause.toString())
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace();
-        }
+        }catch (_: InvocationTargetException) { }
     }
 
     fun updateUserDataDB(userData: UserData){
@@ -145,14 +135,19 @@ class SearchCoinViewModel(
     }
 
     fun triggerUiEvent(message: String, action: String) = viewModelScope.launch(Dispatchers.Main) {
-        if (action == UiEventActions.COIN_ADDED) {
-            eventChannel.send(UiEvent.ShowCoinAddedSnackbar(message))
-        } else if (action == UiEventActions.NO_INTERNET_CONNECTION) {
-            eventChannel.send(UiEvent.ShowErrorSnackbar(message))
-        } else if (action == UiEventActions.EMPTY_INPUT){
-            eventChannel.send(UiEvent.ShowErrorSnackbar(message))
-        } else if (action == UiEventActions.ALREADY_IN_WALLET){
-            eventChannel.send(UiEvent.ShowErrorSnackbar(message))
+        when (action) {
+            UiEventActions.COIN_ADDED -> {
+                eventChannel.send(UiEvent.ShowCoinAddedSnackbar(message))
+            }
+            UiEventActions.NO_INTERNET_CONNECTION -> {
+                eventChannel.send(UiEvent.ShowErrorSnackbar(message))
+            }
+            UiEventActions.EMPTY_INPUT -> {
+                eventChannel.send(UiEvent.ShowErrorSnackbar(message))
+            }
+            UiEventActions.ALREADY_IN_WALLET -> {
+                eventChannel.send(UiEvent.ShowErrorSnackbar(message))
+            }
         }
     }
 }

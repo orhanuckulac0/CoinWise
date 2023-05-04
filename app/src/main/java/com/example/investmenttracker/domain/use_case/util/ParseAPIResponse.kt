@@ -1,6 +1,5 @@
 package com.example.investmenttracker.domain.use_case.util
 
-import android.util.Log
 import com.example.investmenttracker.data.model.CoinModel
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -13,7 +12,6 @@ fun parseMultipleCoinsResponseUtil(data: JsonObject): MutableList<CoinModel> {
         val jsonObject = JSONObject(data.toString())
         val dataObject = jsonObject.getJSONObject("data")
 
-        // Iterate over the keys in the data object
         val keys = dataObject.keys()
         while (keys.hasNext()) {
             val key = keys.next() as String
@@ -21,8 +19,6 @@ fun parseMultipleCoinsResponseUtil(data: JsonObject): MutableList<CoinModel> {
             val quoteObject = rowObject.getJSONObject("quote")
             val usdObject = quoteObject.getJSONObject("USD")
 
-            // Extract the desired data from the row object
-            // create a model out if it
             val coin = CoinModel(
                 id = rowObject.getInt("id"), // cmcId
                 cmcId = rowObject.getInt("id"), // cmcId
@@ -41,46 +37,42 @@ fun parseMultipleCoinsResponseUtil(data: JsonObject): MutableList<CoinModel> {
         }
         return newTokensTempHolder
 
-    } catch (e: JSONException) {
-        Log.e("MYTAG", "Error parsing JSON: ${e.message}")
-    }
+    } catch (_: JSONException) { }
     return newTokensTempHolder
 }
 
 fun parseSymbolResponseUtil(response: JsonArray?): MutableList<CoinModel>{
     val newTokensTempHolder = mutableListOf<CoinModel>()
 
-    try {
-        for (c in response!!.asJsonArray){
-            val coin = CoinModel(
-                id = c.asJsonObject.get("id").toString().toInt(),
-                cmcId = c.asJsonObject.get("id").toString().toInt(),
-                name = formatCoinNameText(c.asJsonObject.get("name").toString()),
-                slug = c.asJsonObject.get("slug").toString(),
-                symbol = c.asJsonObject.get("symbol").toString(),
-                price = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("price").toString().toDouble(),
-                marketCap = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("market_cap").toString().toDouble(),
-                percentChange24h = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_24h").toString().toDouble(),
-                totalTokenHeldAmount = 0.toDouble(),
-                totalInvestmentAmount = 0.toDouble(),
-                totalInvestmentWorth =0.toDouble(),
-                Constants.USD
-            )
-            newTokensTempHolder.add(coin)
-        }
-    } catch (e: java.lang.Exception) {
-        Log.e("MYTAG", "Error parsing JSON: ${e.message}")
+    if (response != null){
+        try {
+            for (c in response.asJsonArray){
+                val coin = CoinModel(
+                    id = c.asJsonObject.get("id").toString().toInt(),
+                    cmcId = c.asJsonObject.get("id").toString().toInt(),
+                    name = formatCoinNameText(c.asJsonObject.get("name").toString()),
+                    slug = c.asJsonObject.get("slug").toString(),
+                    symbol = c.asJsonObject.get("symbol").toString(),
+                    price = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("price").toString().toDouble(),
+                    marketCap = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("market_cap").toString().toDouble(),
+                    percentChange24h = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_24h").toString().toDouble(),
+                    totalTokenHeldAmount = 0.toDouble(),
+                    totalInvestmentAmount = 0.toDouble(),
+                    totalInvestmentWorth =0.toDouble(),
+                    Constants.USD
+                )
+                newTokensTempHolder.add(coin)
+            }
+        } catch (_: JSONException) { }
     }
     return newTokensTempHolder
 }
 
 fun parseSlugResponseUtil(result: JSONObject): CoinModel? {
     try {
-        val firstKey = result.keys().next()  // use keys().next() because each firstKey is unique
+        val firstKey = result.keys().next()
         val resultCoinObject = result.getJSONObject(firstKey)
-        Log.i("MYTAG"," resultCoinObject $resultCoinObject")
 
-        // Extract the "USD" object from the "quote" object
         val quoteObject = resultCoinObject.getJSONObject("quote")
         val usdObject = quoteObject.getJSONObject("USD")
 
@@ -98,9 +90,7 @@ fun parseSlugResponseUtil(result: JSONObject): CoinModel? {
             totalInvestmentWorth = 0.toDouble(),
             Constants.USD
         )
-    } catch (e: java.lang.Exception) {
-        Log.e("MYTAG", "Error parsing JSON: ${e.message}")
-    }
+    } catch (_: JSONException) { }
     return null
 }
 
@@ -115,13 +105,10 @@ fun parseCurrencyAPIResponse(result: JsonObject): Map<String, Float>? {
         }
 
         return rates
-    } catch (e: java.lang.Exception) {
-        Log.e("MYTAG", "Error parsing JSON: ${e.message}")
-    }
+    } catch (_: JSONException) { }
     return null
 }
 
-// to remove "" from coin symbols coming with api response
 fun formatCoinNameText(symbol: String): String {
     val regex = Regex("[^A-Za-z0-9 ]")
     return regex.replace(symbol, "")

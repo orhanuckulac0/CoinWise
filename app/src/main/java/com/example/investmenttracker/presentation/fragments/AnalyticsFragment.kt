@@ -63,7 +63,6 @@ class AnalyticsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_analytics, container, false)
     }
 
@@ -105,13 +104,11 @@ class AnalyticsFragment : Fragment() {
         }
 
 
-        // observe combined live data for both userdata and coinsWallet,
-        // this will prevent NullPointerException crashes when user tries to switch between fragments rapidly.
         viewModel.combinedLiveData.observe(viewLifecycleOwner) { (userData, coins) ->
             if (
                 userData != null &&
                 coins.isNotEmpty() &&
-                userData.userTotalInvestment != 0.0  // in case user just added the coin
+                userData.userTotalInvestment != 0.0
             ) {
                 user = userData
                 walletCoins = coins
@@ -133,9 +130,7 @@ class AnalyticsFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.Main) {
             viewModel.currencyData.observe(viewLifecycleOwner) {resource->
                 when (resource) {
-                    is Resource.Loading -> {
-                        // do nothing, progress dialog is currently showing
-                    }
+                    is Resource.Loading -> {}
                     is Resource.Success -> {
                         currencies = resource.data
                         setupView()
@@ -168,7 +163,6 @@ class AnalyticsFragment : Fragment() {
             userInvestmentWorth = user!!.userTotalBalanceWorth
         }
 
-        // setup pie chart
         if (walletCoins!!.isNotEmpty()){
             val theme = sharedPref?.getBoolean(Constants.SWITCH_STATE_KEY, true)
             createPieChart(pieChart!!, percentFormatter ,requireContext(), walletCoins!!, theme!!)
@@ -178,11 +172,9 @@ class AnalyticsFragment : Fragment() {
             binding!!.llInvestmentInsights.visibility = View.VISIBLE
             binding!!.tvEmptyWallet.visibility = View.GONE
         }
-        // setup Investment Details section
         binding!!.tvTotalUserInvestment.text = symbol + formatToTwoDecimalWithComma(userInvestment)
         binding!!.tvTotalUserInvestmentWorth.text = symbol + formatToTwoDecimalWithComma(userInvestmentWorth)
         val investmentReturnPercentage = calculateProfitLossPercentage(userInvestmentWorth, userInvestment)
-        // first check for NaN and 0.0 values to avoid crashes
         val holder = investmentReturnPercentage.replace("%","").toDouble()
         if (!holder.isNaN() || holder != 0.0){
             if (investmentReturnPercentage.contains("-")){
@@ -208,8 +200,6 @@ class AnalyticsFragment : Fragment() {
         }
         binding!!.tvInvestmentProfitLoss.text = symbol + formatToTwoDecimalWithComma(investmentProfitLoss.toDouble())
 
-        // setup Insight section
-        // most profit- loss texts
         try {
             val mostProfitByCoin = mostProfitByCoin(walletCoins!!)
             val mostProfitAmount: String = if (user!!.userCurrentCurrency != Constants.USD){
@@ -229,9 +219,7 @@ class AnalyticsFragment : Fragment() {
                 )
                 binding!!.tvMostProfitToken.text = tvMostProfitTokenText
             }
-        }catch (e: NoSuchElementException){
-            e.printStackTrace()
-        }
+        }catch (_: java.lang.Exception){ }
 
         try {
             val mostLossByCoin = mostLossByCoin(walletCoins!!)
@@ -254,12 +242,8 @@ class AnalyticsFragment : Fragment() {
             }else{
                 binding!!.tvMostLossToken.text = "${symbol}0 loss on investments."
             }
-        }catch (e: NoSuchElementException){
-            e.printStackTrace()
-        }
+        }catch (_: java.lang.Exception){ }
 
-        // most profit - loss percentage texts
-        // most profit
         try {
             val calcMPPC = mostProfitPercentageByCoin(walletCoins!!)
             if (calcMPPC.isNotEmpty()){
@@ -274,14 +258,11 @@ class AnalyticsFragment : Fragment() {
                 binding!!.tvMostProfitByPercentage.text = "0.0% profit rate."
             }
         }catch (e: NoSuchElementException){
-            e.printStackTrace()
             binding!!.tvMostProfitByPercentage.text = "0.0%"
         }catch (e: NullPointerException){
-            e.printStackTrace()
             binding!!.tvMostProfitByPercentage.text = "0.0%"
         }
 
-        // most loss
         try {
             val calcMLPC = mostLossPercentageByCoin(walletCoins!!)
             if (calcMLPC.isNotEmpty()){
@@ -297,13 +278,10 @@ class AnalyticsFragment : Fragment() {
             }
         }catch (e: NoSuchElementException){
             binding!!.tvMostLossTokenByPercentage.text = "0.0%"
-            e.printStackTrace()
         }catch (e: NullPointerException){
-            e.printStackTrace()
             binding!!.tvMostLossTokenByPercentage.text = "0.0%"
         }
 
-        // cancel progress dialog here
         cancelProgressDialog(mProgressDialog!!)
     }
 

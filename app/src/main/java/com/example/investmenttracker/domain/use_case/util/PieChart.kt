@@ -27,42 +27,32 @@ fun createPieChart(
     ){
     val legend = pieChart.legend
 
-    // set user percent value,
-    // setting description as disabled and offset for pie chart
     pieChart.setUsePercentValues(true)
     pieChart.description.isEnabled = false
     pieChart.setDrawEntryLabels(false) // hide label string on chart
     pieChart.setExtraOffsets(5f, 10f, 5f, 5f)
 
-    // set drag
     pieChart.dragDecelerationFrictionCoef = 0.95f
 
-    // set the size of the chart
     val layoutParams = pieChart.layoutParams
     layoutParams.width = 1100 // in pixels
     layoutParams.height = 1100 // in pixels
     pieChart.layoutParams = layoutParams
 
 
-    // set circle color and alpha
     pieChart.setTransparentCircleColor(Color.WHITE)
     pieChart.setTransparentCircleAlpha(110)
 
-    // set hole radius and add transparent line
     pieChart.holeRadius = 0f
     pieChart.transparentCircleRadius = 0f
 
-    // set rotation of the pie
     pieChart.rotationAngle = 0f
 
-    // enable rotation of the pieChart by touch
     pieChart.isRotationEnabled = true
     pieChart.isHighlightPerTapEnabled = true
 
-    // set animation for the pie chart
     pieChart.animateY(1400, Easing.EaseInOutQuad)
 
-    // update legend data
     if (theme){
         legend.textColor = ContextCompat.getColor(context, R.color.white)
     }else{
@@ -75,39 +65,30 @@ fun createPieChart(
     legend.isWordWrapEnabled = true
     legend.xEntrySpace = 15f
 
-    // on below line we are creating array list and
-    // adding data to it to display in pie chart
     val entries: ArrayList<PieEntry> = ArrayList()
 
-    // calculate total investment amount
     val totalInvestment = walletCoins.sumOf { it.totalInvestmentAmount }
     val sortedWallet = walletCoins.sortedByDescending { it.totalInvestmentAmount }
 
     for (coin in sortedWallet) {
         val percent = (coin.totalInvestmentAmount / totalInvestment) * 100
         val percentString = String.format(Locale.getDefault(), "%.2f%%", percent)
-        // add each coin user holds as PieEntry
         entries.add(
             PieEntry(percent.toFloat(), formatCoinNameText(coin.symbol) + " " + percentString)
         )
     }
 
-    // set pie data set, set label as empty string
     val dataSet = PieDataSet(entries, "")
 
-    // use percentFormatter obj
     dataSet.valueFormatter = percentFormatter
     dataSet.setDrawValues(true)
 
-    // set Icons to false.
     dataSet.setDrawIcons(false)
 
-    // set slice for pie, make it thinner
     dataSet.sliceSpace = 1f
     dataSet.iconsOffset = MPPointF(0f, 40f)
     dataSet.selectionShift = 5f
 
-    // set 120 colors.
     val colors = ArrayList<Int>()
     for (c in ColorTemplate.COLORFUL_COLORS) colors.add(c)
     for (c in ColorTemplate.JOYFUL_COLORS) colors.add(c)
@@ -118,7 +99,6 @@ fun createPieChart(
 
     dataSet.colors = colors
 
-    // set PieDataSet
     val data = PieData(dataSet)
     data.setValueTextSize(15F)
     data.setValueTypeface(Typeface.DEFAULT_BOLD)
@@ -126,9 +106,7 @@ fun createPieChart(
 
     pieChart.data = data
 
-    // undo all highlights
     pieChart.highlightValues(null)
 
-    // loading chart
     pieChart.invalidate()
 }

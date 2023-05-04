@@ -4,7 +4,6 @@ import android.os.Build
 import android.os.Bundle
 import java.io.Serializable
 
-// up to date approach to get serializable
 @Suppress("DEPRECATION")
 inline fun <reified T : Serializable> Bundle.customGetSerializable(key: String): T? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

@@ -61,7 +61,6 @@ class SettingsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_settings, container, false)
     }
 
@@ -77,7 +76,6 @@ class SettingsFragment : Fragment() {
         aboutAppDialog = showAboutAppDialog(requireContext())
 
         viewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
-        // set back pressed and nav
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
 
         onBackPressedCallback = object : OnBackPressedCallback(true) {
@@ -89,12 +87,10 @@ class SettingsFragment : Fragment() {
 
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, onBackPressedCallback!!)
 
-        // set the user
         arguments?.let {
             userData = it.customGetSerializable(Constants.PASSED_USER)
         }
 
-        // set sharedPref for theme
         sharedPref = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
         val theme = sharedPref!!.getBoolean(Constants.SWITCH_STATE_KEY, true)
 
@@ -164,7 +160,6 @@ class SettingsFragment : Fragment() {
                 position: Int,
                 id: Long,
             ) {
-                // update current currency of the user
                 val updatedUser = userData?.copy(
                     userCurrentCurrency = currencies[position],
                     userPreviousCurrency = currencyBeforeChange!!
@@ -173,9 +168,7 @@ class SettingsFragment : Fragment() {
 
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // do nothing
-            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
         spinner?.onItemSelectedListener = onItemSelectedListener

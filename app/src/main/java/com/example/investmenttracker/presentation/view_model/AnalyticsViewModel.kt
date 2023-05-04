@@ -13,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class AnalyticsViewModel(
-    private val app: Application,
+    app: Application,
     private val getUserDataUseCase: GetUserDataUseCase,
     private val getAllCoinsUseCase: GetAllCoinsUseCase,
     private val getAllCurrenciesUseCase: GetAllCurrenciesUseCase
@@ -44,7 +44,6 @@ class AnalyticsViewModel(
             }
         }
 
-        // Add sources to combinedLiveData
         combinedLiveData.addSource(_userDataLiveData) { userData ->
             combinedLiveData.value = Pair(userData, _walletCoins.value ?: emptyList())
         }
@@ -63,7 +62,6 @@ class AnalyticsViewModel(
                     currencyData.postValue(Resource.Success(it))
                 }
             }catch (e: java.lang.Exception){
-                e.printStackTrace()
                 currencyData.postValue(Resource.Error(e.message.toString()))
             }
         }

@@ -19,7 +19,6 @@ class SettingsViewModel(
         changeAppThemeUseCase.execute(isDark)
     }
     
-    // this is for updating user selected currency preferance for total balance value
     fun updateUser(data: UserData){
         viewModelScope.launch(Dispatchers.IO) {
             updateUserDataUseCase.execute(data)

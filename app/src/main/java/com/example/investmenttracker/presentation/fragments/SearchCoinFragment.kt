@@ -67,7 +67,6 @@ class SearchCoinFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_search_coin, container, false)
     }
 
@@ -144,14 +143,11 @@ class SearchCoinFragment : Fragment() {
 
     }
 
-    // search coins by slug, bitcoin - ethereum
-    // returns jsonObject, only 1 coin
     private fun getCoinBySlug() {
         val searchInput = viewModel.coinSearchInputText.value.toString()
         viewModel.getSearchedCoinBySlug(searchInput)
 
         viewModel.coinSearchedBySlug.observe(viewLifecycleOwner){ result ->
-            cancelProgressDialog(mProgressDialog!!)
             val responseList = arrayListOf<CoinModel>()
 
             when(result) {
@@ -166,20 +162,21 @@ class SearchCoinFragment : Fragment() {
 
                         setupView(responseList)
                         result.data?.asMap()?.clear()
-                    }catch (e: JSONException){
-                        Log.e("MYTAG", "${e.cause}")
-                        Log.e("MYTAG", "${e.message}")
-                    }
+                    }catch (_: JSONException){ }
 
-                    cancelProgressDialog(mProgressDialog!!)
+                    if (mProgressDialog != null){
+                        cancelProgressDialog(mProgressDialog!!)
+                    }
                 }
 
                 is Resource.Error -> {
-                    cancelProgressDialog(mProgressDialog!!)
-                    if (result.data.toString() == "No Internet Connection Error"){
+                    if (mProgressDialog != null){
+                        cancelProgressDialog(mProgressDialog!!)
+                    }
+                    if (result.data?.toString() == "No Internet Connection Error"){
                         viewModel.triggerUiEvent(UiEventActions.NO_INTERNET_CONNECTION, UiEventActions.NO_INTERNET_CONNECTION)
                     }else {
-                        responseList.clear() // clear response here
+                        responseList.clear()
                         setupView(responseList)
                     }
                 }
@@ -189,36 +186,38 @@ class SearchCoinFragment : Fragment() {
                 }
             }
         }
-        cancelProgressDialog(mProgressDialog!!)
+        if (mProgressDialog != null){
+            cancelProgressDialog(mProgressDialog!!)
+        }
     }
 
-    // search coins by symbol, BTC - ETH
-    // returns a jsonArray because symbols are not unique
     private fun getCoinBySymbol() {
         val searchInput = viewModel.coinSearchInputText.value.toString()
         viewModel.getSearchCoinBySymbol(searchInput)
 
         viewModel.coinSearchedBySymbol.observe(requireActivity()){ result ->
-            cancelProgressDialog(mProgressDialog!!)
             val responseList = arrayListOf<CoinModel>()
 
             when(result) {
                 is Resource.Success -> {
                     val response = result.data?.getAsJsonObject("data")?.get(searchInput)?.asJsonArray
-                    println(response)
 
                     viewModel.parseSymbolResponse(response)
 
                     setupView(viewModel.symbolCoinsListParsed)
-                    cancelProgressDialog(mProgressDialog!!)
+                    if (mProgressDialog != null){
+                        cancelProgressDialog(mProgressDialog!!)
+                    }
                 }
 
                 is Resource.Error -> {
-                    cancelProgressDialog(mProgressDialog!!)
-                    if (result.data.toString() == "No Internet Connection Error"){
+                    if (mProgressDialog != null){
+                        cancelProgressDialog(mProgressDialog!!)
+                    }
+                    if (result.data?.toString() == "No Internet Connection Error"){
                         viewModel.triggerUiEvent(UiEventActions.NO_INTERNET_CONNECTION, UiEventActions.NO_INTERNET_CONNECTION)
                     }else {
-                        responseList.clear() // clear response here
+                        responseList.clear()
                         setupView(responseList)
                     }
                 }
@@ -228,13 +227,14 @@ class SearchCoinFragment : Fragment() {
                 }
             }
         }
-        cancelProgressDialog(mProgressDialog!!)
+        if (mProgressDialog != null){
+            cancelProgressDialog(mProgressDialog!!)
+        }
     }
 
     private fun setupView(coinList: MutableList<CoinModel>) {
 
         if (coinList.isNotEmpty()){
-            // first set the currentList to null to avoid showing previous list on the UI
             adapter?.differ?.submitList(null)
             adapter?.differ?.submitList(coinList)
 
@@ -260,22 +260,16 @@ class SearchCoinFragment : Fragment() {
 
                     if (userData != null){
                         if (isAlreadyInWallet){
-                            // if coin is already in db and user not null, just trigger snackbar
                             viewModel.triggerUiEvent("${coinModel.name} is already in wallet.", UiEventActions.ALREADY_IN_WALLET)
                         }else{
-                            // if coin is not already in db and user data not null
-                            // update db accordingly
                             updateUserAndCoinData(userData!!, coinModel)
 
-                            // remove that coin from adapter list
                             coinList.removeAt(position)
                             adapter?.notifyItemRemoved(position)
 
-                            // trigger snackbar
                             viewModel.triggerUiEvent("${coinModel.name} added successfully!", UiEventActions.COIN_ADDED)
                         }
                     }else{
-                        // if user data is null
                         val dummyUser = UserData(
                             1,
                             0.0,
@@ -287,18 +281,14 @@ class SearchCoinFragment : Fragment() {
                             0,
                             )
 
-                        // update database with empty user and current selected coin
                         updateUserAndCoinData(dummyUser, coinModel)
 
                         coinList.removeAt(position)
                         adapter?.notifyItemRemoved(position)
 
-                        // trigger snackbar
                         viewModel.triggerUiEvent("${coinModel.name} added successfully!", UiEventActions.COIN_ADDED)
                     }
 
-
-                    // refresh UI
                     binding!!.etSearchCoin.setText("")
                     if (coinList.isEmpty()){
                         binding!!.rvCoinSearchResults.visibility = View.INVISIBLE
@@ -341,7 +331,6 @@ class SearchCoinFragment : Fragment() {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_information, menu)
 
-                // change icon depending on the theme
                 menuItem = menu.findItem(R.id.actionAddCoinInformation)
 
                 val theme = sharedPref?.getBoolean(Constants.SWITCH_STATE_KEY, true)

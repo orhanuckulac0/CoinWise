@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
 import androidx.lifecycle.*
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.model.CurrencyModel
@@ -51,13 +50,12 @@ class MainViewModel(
     var slugNames: MutableLiveData<Resource<String>> = MutableLiveData()
 
     var currencyRequestResult: MutableLiveData<Resource<Map<String, Float>>> = MutableLiveData()
-    var currencyData: MutableLiveData<CurrencyModel> = MutableLiveData()
+    var currencyData: MutableLiveData<Resource<CurrencyModel>> = MutableLiveData()
 
     private val eventChannel = Channel<UiEvent>()
     val eventFlow = eventChannel.receiveAsFlow()
 
     init {
-        // get current user and set it in viewModel to later use in Fragment
         viewModelScope.launch(Dispatchers.IO) {
             getUserDataUseCase.execute(1).collect {
                 userData.postValue(it)
@@ -101,23 +99,17 @@ class MainViewModel(
                 getAllCoinsUseCase.execute()
                     .distinctUntilChanged()
                     .collect { walletCoins ->
-                    Log.i("MYTAG", "db tokens $walletCoins")
 
                         currentWalletCoins.clear()
                         currentWalletCoins.addAll(walletCoins)
-                        Log.i("MYTAG", "currentWalletCoins $currentWalletCoins")
 
-                        // to send API get request with ["slug1,slug2,slug3"] query
                         val walletTokenNames = currentWalletCoins.map { coin -> coin.slug.replace("\"", "") }
                         val joinedNames = walletTokenNames.joinToString(",")
                         slugNames.postValue(Resource.Success(joinedNames))
-                        Log.i("MYTAG", "joined names for api request: -> ${slugNames.value?.data}")
                     }
             }catch (e: ConcurrentModificationException){
-                e.printStackTrace()
-                Log.i("MYTAG", "${e.stackTrace}")
                 slugNames.postValue(Resource.Error(e.stackTrace.toString()))
-            }
+            }catch (_: java.lang.Exception){}
         }
     }
 
@@ -125,8 +117,6 @@ class MainViewModel(
         multipleCoinsListResponse.postValue(Resource.Loading())
         try {
             if (isNetworkAvailable(app)){
-                // validate the list first before making an api request
-                // prevent making api request with empty query, resulting HTTP 400
                 if (slugList.isNotEmpty()){
                     val slugListResponse = getMultipleCoinsUseCase.execute(slugList)
                     multipleCoinsListResponse.postValue(Resource.Success(slugListResponse))
@@ -142,10 +132,6 @@ class MainViewModel(
     }
 
     suspend fun updateMultipleCoinDetails() = viewModelScope.launch(Dispatchers.IO) {
-        // this will loop through each lists
-        // and update tokens in currentWalletCoins with the coins the latest api request returns
-        // some values of the tokens will remain the same, such as token held amount investment amount etc.
-        // copy creates a new obj but I wont use it so I just applied it to the current walletTokensToUpdateDB.
         for (walletCoin in currentWalletCoins){
             for (coin in newTokensDataResponse){
                 if (walletCoin.cmcId == coin.cmcId){
@@ -160,7 +146,6 @@ class MainViewModel(
             }
         }
 
-        Log.i("MYTAG", "new wallet: $newTokensDataResponse")
         temporaryTokenListToUseOnFragment.addAll(walletTokensToUpdateDB)
         updateCoinDetailsUseCase.execute(walletTokensToUpdateDB)
     }
@@ -193,7 +178,6 @@ class MainViewModel(
 
     private fun insertDataToCurrencyDB(data: Map<String, Float>){
         viewModelScope.launch(Dispatchers.IO) {
-            // use count as key to trigger OnConflict
             var count = 1
             data.forEach {
                 addCurrencyDataToDBUseCase.execute(CurrencyModel(
@@ -208,8 +192,13 @@ class MainViewModel(
 
     fun getCurrencyDataFromDB(currencyName: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            getCurrencyValueFromDBUseCase.execute(currencyName).collect {
-                currencyData.postValue(it)
+            currencyData.postValue(Resource.Loading())
+            try {
+                getCurrencyValueFromDBUseCase.execute(currencyName).collect {
+                    currencyData.postValue(Resource.Success(it))
+                }
+            }catch (e:Exception){
+                currencyData.postValue(Resource.Error("Null API Request"))
             }
         }
     }

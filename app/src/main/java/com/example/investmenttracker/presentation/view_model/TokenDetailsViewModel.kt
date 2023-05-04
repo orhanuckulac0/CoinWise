@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class TokenDetailsViewModel(
-    private val app: Application,
+    app: Application,
     private val updateInvestmentUseCase: UpdateInvestmentUseCase,
     private val deleteCoinUseCase: DeleteCoinUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,

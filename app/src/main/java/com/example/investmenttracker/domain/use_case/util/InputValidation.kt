@@ -4,7 +4,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
 
-// to prevent copy pasting to editText
 fun EditText.setDecimalInput() {
 
     addTextChangedListener(object : TextWatcher {
