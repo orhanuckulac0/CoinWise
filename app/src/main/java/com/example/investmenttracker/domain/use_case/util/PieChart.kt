@@ -34,9 +34,13 @@ fun createPieChart(
 
     pieChart.dragDecelerationFrictionCoef = 0.95f
 
+    val displayMetrics = context.resources.displayMetrics
+    val screenWidth = displayMetrics.widthPixels
+
+    val size = (screenWidth * 0.9  ).toInt()
     val layoutParams = pieChart.layoutParams
-    layoutParams.width = 1100 // in pixels
-    layoutParams.height = 1100 // in pixels
+    layoutParams.width = size
+    layoutParams.height = size
     pieChart.layoutParams = layoutParams
 
 

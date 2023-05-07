@@ -22,304 +22,321 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        android:paddingStart="10dp"
-        android:paddingEnd="5dp"
-        android:paddingTop="15dp"
-        android:paddingBottom="10dp"
-        >
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/ivTokenDetailImage"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src="@drawable/coin_place_holder" />
-
-        <TextView
-            android:id="@+id/tvCoinName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/TITLE_COLOR"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginStart="10dp"
-            android:layout_gravity="center_vertical"
-            tools:text="Bitcoin" />
-
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/ANALYTICS_FRAGMENT_LLs"
-        android:elevation="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginTop="10dp"
-        android:orientation="vertical"
-        android:padding="15dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/investment_details"
-            style="@style/TITLE_COLOR"
-            android:textSize="22sp"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="25dp"
-            />
-
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
+            android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/total_token_held_detail"
-                android:textStyle="bold"
-                android:textColor="@color/token_detail_page_title_color"
-                />
-
-            <TextView
-                android:id="@+id/tvTotalHeldAmount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/TITLE_COLOR"
-                android:layout_marginStart="15dp"
-                />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/total_investment_detail"
-                android:textStyle="bold"
-                android:textColor="@color/token_detail_page_title_color"
-                />
-
-            <TextView
-                android:id="@+id/tvTotalInvestment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/TITLE_COLOR"
-                android:layout_marginStart="15dp"
-                />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/current_investment_value"
-                android:textStyle="bold"
-                android:textColor="@color/token_detail_page_title_color"
-                />
-
-            <TextView
-                android:id="@+id/tvCurrentInvestmentValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/TITLE_COLOR"
-                android:layout_marginStart="15dp"
-                />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/profit_loss_amount"
-                android:textStyle="bold"
-                android:textColor="@color/token_detail_page_title_color"
-                />
-
-            <TextView
-                android:id="@+id/tvProfitLossAmount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="@color/green_color_percentage"
-                android:layout_marginStart="15dp"
-                />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/profit_loss_percentage"
-                android:textStyle="bold"
-                android:textColor="@color/token_detail_page_title_color"
-                />
-
-            <TextView
-                android:id="@+id/tvProfitLossPercentage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="@color/green_color_percentage"
-                android:layout_marginStart="15dp"
-                />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/ANALYTICS_FRAGMENT_LLs"
-        android:elevation="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginTop="25dp"
-        android:orientation="vertical"
-        android:padding="15dp">
-
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/update_investment"
-            android:textSize="22sp"
-            android:layout_marginBottom="25dp"
-            android:layout_gravity="center_horizontal"
-            style="@style/TITLE_COLOR"
-            />
-
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/total_token_held"
-                android:textSize="16sp"
-                style="@style/TITLE_COLOR"
-                />
-
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/etTokenHeldAmount"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:layout_marginStart="20dp"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
                 android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:maxLength="20"
-                android:ems="10"
-                android:textColor="@color/black"
-                android:autofillHints="number"
-                android:background="@drawable/custom_edittext"
-                android:inputType="numberDecimal"
-                />
+                android:paddingEnd="5dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="10dp"
+                >
 
-        </LinearLayout>
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/ivTokenDetailImage"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/coin_place_holder" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:orientation="horizontal"
-            android:layout_marginTop="20dp"
-            >
+                <TextView
+                    android:id="@+id/tvCoinName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/TITLE_COLOR"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="10dp"
+                    android:layout_gravity="center_vertical"
+                    tools:text="Bitcoin" />
 
-            <TextView
-                android:layout_width="wrap_content"
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/total_investment"
-                android:textSize="16sp"
-                style="@style/TITLE_COLOR"
-                />
+                style="@style/ANALYTICS_FRAGMENT_LLs"
+                android:elevation="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                android:padding="15dp">
 
-            <EditText
-                android:id="@+id/etTokenInvestmentAmount"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:layout_marginStart="20dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:maxLength="10"
-                android:ems="10"
-                android:textColor="@color/black"
-                android:hint="@string/dollar_warning"
-                android:textColorHint="@color/black"
-                android:autofillHints="number"
-                android:background="@drawable/custom_edittext"
-                android:inputType="numberDecimal"
-                />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/investment_details"
+                    style="@style/TITLE_COLOR"
+                    android:textSize="22sp"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
+                    android:layout_marginBottom="25dp"
+                    />
 
-        </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center"
-            >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/tokenDetailUpdateBtn"
-                android:layout_width="wrap_content"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/total_token_held_detail"
+                        android:textStyle="bold"
+                        android:textColor="@color/token_detail_page_title_color"
+                        />
+
+                    <TextView
+                        android:id="@+id/tvTotalHeldAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/TITLE_COLOR"
+                        android:layout_marginStart="15dp"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/total_investment_detail"
+                        android:textStyle="bold"
+                        android:textColor="@color/token_detail_page_title_color"
+                        />
+
+                    <TextView
+                        android:id="@+id/tvTotalInvestment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/TITLE_COLOR"
+                        android:layout_marginStart="15dp"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/current_investment_value"
+                        android:textStyle="bold"
+                        android:textColor="@color/token_detail_page_title_color"
+                        />
+
+                    <TextView
+                        android:id="@+id/tvCurrentInvestmentValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/TITLE_COLOR"
+                        android:layout_marginStart="15dp"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/profit_loss_amount"
+                        android:textStyle="bold"
+                        android:textColor="@color/token_detail_page_title_color"
+                        />
+
+                    <TextView
+                        android:id="@+id/tvProfitLossAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/green_color_percentage"
+                        android:layout_marginStart="15dp"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/profit_loss_percentage"
+                        android:textStyle="bold"
+                        android:textColor="@color/token_detail_page_title_color"
+                        />
+
+                    <TextView
+                        android:id="@+id/tvProfitLossPercentage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/green_color_percentage"
+                        android:layout_marginStart="15dp"
+                        />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/save"
-                android:background="@drawable/rounded_button"
-                android:gravity="center"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:textColor="@android:color/white"
-                android:textSize="14sp" />
+                style="@style/ANALYTICS_FRAGMENT_LLs"
+                android:elevation="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginBottom="50dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginTop="25dp"
+                android:orientation="vertical"
+                android:padding="15dp">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/update_investment"
+                    android:textSize="22sp"
+                    android:layout_marginBottom="25dp"
+                    android:layout_gravity="center_horizontal"
+                    style="@style/TITLE_COLOR"
+                    />
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/total_token_held"
+                        android:textSize="16sp"
+                        style="@style/TITLE_COLOR"
+                        />
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/etTokenHeldAmount"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="20dp"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:maxLength="20"
+                        android:ems="10"
+                        android:textColor="@color/black"
+                        android:autofillHints="number"
+                        android:background="@drawable/custom_edittext"
+                        android:inputType="numberDecimal"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="20dp"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/total_investment"
+                        android:textSize="16sp"
+                        style="@style/TITLE_COLOR"
+                        />
+
+                    <EditText
+                        android:id="@+id/etTokenInvestmentAmount"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="20dp"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:maxLength="10"
+                        android:ems="10"
+                        android:textColor="@color/black"
+                        android:hint="@string/dollar_warning"
+                        android:textColorHint="@color/black"
+                        android:autofillHints="number"
+                        android:background="@drawable/custom_edittext"
+                        android:inputType="numberDecimal"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center"
+                    >
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/tokenDetailUpdateBtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="@string/save"
+                        android:background="@drawable/rounded_button"
+                        android:gravity="center"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="20dp"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
 
         </LinearLayout>
 
-    </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

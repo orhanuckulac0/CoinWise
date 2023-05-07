@@ -7,7 +7,6 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBar
@@ -368,8 +367,7 @@ class MainFragment : Fragment() {
                     }
 
                     is Resource.Error -> {
-                        lastApiRequestTime = 60
-
+                        lastApiRequestTime = 30
                         lifecycleScope.launch(Dispatchers.IO) {
                             val editor = sharedPrefRefresh?.edit()
                             editor?.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
