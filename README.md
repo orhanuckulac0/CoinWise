@@ -1,7 +1,13 @@
 ![logo](https://user-images.githubusercontent.com/101017069/235486524-32d73858-c062-4c45-b881-ffe161d85d3e.png)
--App Launch is in review -
 
-This is an investment tracking app for crpyto currency investments. No WEB3 wallet connection is required. Users can keep track of their investment values, the price changes of their coins and get investment anaylsis. 
+## 🔗 Links
+
+[**Google Play Link**](https://play.google.com/store/apps/details?id=coinwise.investmenttracker "Google Play")
+
+
+## About App
+
+This is an investment tracking app for crpyto currency investments. No WEB3 wallet connection is required. Users can keep track of their investment values, the price changes of their coins and get investment anaylsis. Eliminates the need to logging in to multiple dex or cex to check the current value of the investment.
 
 In this app, I am using Hilt, Room, Remote API and following MVVM Clean Architecture pattern. 
 
@@ -83,6 +89,3 @@ CoinWise uses the Glide library, which is distributed under the BSD 3-Clause Lic
 
 ### Gson Library
 The source code of CoinWise uses the Google Gson library, which is distributed under the Apache License 2.0. See the LICENSE file in the root directory of this project for the full text of the license.
-
-## Attribution
-<a href="https://www.flaticon.com/free-icons/crypto-wallet" title="crypto wallet icons">Crypto wallet icons created by photo3idea_studio - Flaticon</a>
