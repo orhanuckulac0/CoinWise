@@ -7,6 +7,7 @@
         <item name="colorOnPrimary">@color/main_color_dark_theme</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/main_color_dark_theme</item>
+        <item name="android:windowLightStatusBar">false</item>
         <!-- Customize your theme here. -->
         <item name="itemIconTint">@color/bottom_nav_item_color_dark_theme</item>
         <item name="itemTextColor">@color/bottom_nav_item_color_dark_theme</item>
@@ -54,9 +55,6 @@
         <item name="background">@color/divider_color</item>
     </style>
 
-    <style name="BOTTOM_NAV_BACKGROUND">
-        <item name="background">@color/black</item>
-    </style>
 
     <style name="ADD_COIN_PLUS_BUTTON">
         <item name="android:src">@drawable/ic_plus_white_24</item>

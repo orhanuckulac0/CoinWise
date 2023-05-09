@@ -3,7 +3,6 @@ package com.example.investmenttracker.presentation.fragments
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context.MODE_PRIVATE
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -22,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.*
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.model.UserData
@@ -37,6 +37,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -61,11 +62,8 @@ class MainFragment : Fragment() {
     private var sortGlobalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
     private var mProgressDialog: Dialog? = null
-    private var sharedPrefRefresh: SharedPreferences? = null
-    private var sharedPrefTheme: SharedPreferences? = null
 
     private var onBackPressedCallback: OnBackPressedCallback? = null
-    private var lastApiRequestTime: Long = 0
     private var populated = false
     private var sorted = false
 
@@ -88,13 +86,8 @@ class MainFragment : Fragment() {
         viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
         walletAdapter = MainFragmentAdapter(requireContext())
 
-        sharedPrefTheme = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
-
         mProgressDialog = showProgressDialog(requireContext())
         navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
-
-        sharedPrefRefresh = requireContext().getSharedPreferences(Constants.REFRESH_STATE, MODE_PRIVATE)
-        lastApiRequestTime = sharedPrefRefresh!!.getLong(Constants.LAST_API_REQUEST_TIME, 0)
 
         viewModel.getTokensFromWallet()
         viewModel.userData.observe(viewLifecycleOwner){
@@ -127,7 +120,6 @@ class MainFragment : Fragment() {
                         }else{
                             viewModel.getMultipleCoinsBySlug(listOf(resource.data))
                         }
-                        triggerAppLaunch()
                     }
                     is Resource.Error -> {}
                 }
@@ -178,25 +170,45 @@ class MainFragment : Fragment() {
         setupMenu()
     }
 
-    private fun triggerAppLaunch() {
-        if (shouldMakeApiRequest(lastApiRequestTime)) {
+    override fun onResume() {
+        super.onResume()
+        startWorker()
+
+        val sharedPrefIsFinished = requireContext().getSharedPreferences(Constants.PREF_WORKER_RESULT, MODE_PRIVATE)
+        val result = sharedPrefIsFinished.getBoolean(Constants.WORKER_RESULT, true)
+
+        val countPref = requireContext().getSharedPreferences(Constants.PREF_WORKER, MODE_PRIVATE)
+        val count = countPref.getInt(Constants.WORKER_COUNT, 100)
+
+        if (count < 101 && result) {
             lifecycleScope.launch(Dispatchers.IO){
+                sharedPrefIsFinished.edit().putBoolean(Constants.WORKER_RESULT, false).apply()
+                countPref.edit().putInt(Constants.WORKER_COUNT, 1000).apply()
 
                 requestCurrencyData()
 
                 requestNewDataForWalletCoins()
-
-                lastApiRequestTime = System.currentTimeMillis()
-
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val editor = sharedPrefRefresh?.edit()
-                    editor?.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
-                    editor?.apply()
-                }
             }
         }else{
             populateFromCache()
         }
+    }
+
+    private fun startWorker(){
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val countWorkerRequest = OneTimeWorkRequestBuilder<CountWorker>()
+            .setConstraints(constraints)
+            .setInitialDelay(1, TimeUnit.SECONDS)
+            .build()
+
+        WorkManager.getInstance(requireContext()).enqueueUniqueWork(
+            Constants.WORKER_NAME,
+            ExistingWorkPolicy.KEEP,
+            countWorkerRequest
+        )
     }
 
     private fun populateFromCache(){
@@ -253,7 +265,7 @@ class MainFragment : Fragment() {
 
             if (user.userCurrentCurrency == Constants.USD){
                 binding!!.tvTotalBalance.text = currencySymbol+formatTotalBalanceValue(user.userTotalBalanceWorth)
-                walletAdapter?.differ?.submitList(coinsList)
+                walletAdapter?.differ?.submitList(coinsList.distinct().toMutableList())
 
             }else{
                 viewModel.getCurrencyDataFromDB(userCurrency)
@@ -277,16 +289,16 @@ class MainFragment : Fragment() {
                                     binding!!.tvTotalBalance.text = currencySymbol+formatTotalBalanceValue(
                                         user.userTotalBalanceWorth*currencyResult.data!!.currencyRate.toDouble()
                                     )
-                                    walletAdapter?.differ?.submitList(updatedCoinsList)
+                                    walletAdapter?.differ?.submitList(updatedCoinsList.distinct().toMutableList())
                                 }
                             }
                             is Resource.Error ->{
-                                walletAdapter?.differ?.submitList(coinsList)
+                                walletAdapter?.differ?.submitList(coinsList.distinct().toMutableList())
                             }
                         }
                     }
                 }catch (e: java.lang.Exception){
-                    walletAdapter?.differ?.submitList(coinsList)
+                    walletAdapter?.differ?.submitList(coinsList.distinct().toMutableList())
                 }
             }
 
@@ -367,13 +379,6 @@ class MainFragment : Fragment() {
                     }
 
                     is Resource.Error -> {
-                        lastApiRequestTime = 30
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            val editor = sharedPrefRefresh?.edit()
-                            editor?.putLong(Constants.LAST_API_REQUEST_TIME, lastApiRequestTime)
-                            editor?.apply()
-                        }
-
                         setupView(mutableListOf())
                         updateUserDataDB()
                     }
@@ -416,6 +421,8 @@ class MainFragment : Fragment() {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_settings, menu)
                 menuItem = menu.findItem(R.id.actionSettings)
+                val sharedPrefTheme = requireContext().getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
+
                 if (sharedPrefTheme?.getBoolean(Constants.SWITCH_STATE_KEY, true) == true) {
                     menuItem?.setIcon(R.drawable.ic_settings_gray_24)
                 } else {
@@ -465,8 +472,6 @@ class MainFragment : Fragment() {
         binding!!.tvSortTokensByValue.setOnClickListener(null)
         binding!!.rvTokens.viewTreeObserver.removeOnGlobalLayoutListener(sortGlobalLayoutListener)
         sortGlobalLayoutListener = null
-        sharedPrefTheme = null
-        sharedPrefRefresh = null
         mProgressDialog?.dismiss()
         mProgressDialog = null
         onBackPressedCallback?.remove()

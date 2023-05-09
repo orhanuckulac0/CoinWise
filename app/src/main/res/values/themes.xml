@@ -56,9 +56,6 @@
         <item name="background">@color/black</item>
     </style>
 
-    <style name="BOTTOM_NAV_BACKGROUND">
-        <item name="background">@color/white</item>
-    </style>
 
     <style name="ADD_COIN_PLUS_BUTTON">
         <item name="android:src">@drawable/ic_plus_black_24</item>

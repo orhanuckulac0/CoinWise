@@ -1,12 +1,11 @@
 package com.example.investmenttracker.presentation
 
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.investmenttracker.R
@@ -14,13 +13,14 @@ import com.example.investmenttracker.databinding.ActivityMainBinding
 import com.example.investmenttracker.domain.use_case.util.Constants
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private var binding: ActivityMainBinding? = null
     private var navController: NavController? = null
     private var lastMenuItem: MenuItem? = null
-    private var sharedPref: SharedPreferences? = null
 
     private var navHostFragment: NavHostFragment? = null
     private var bottomNavigationView: BottomNavigationView? = null
@@ -31,15 +31,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        sharedPref = getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
+        val sharedPref = getSharedPreferences(Constants.THEME_PREF, MODE_PRIVATE)
         val theme = sharedPref!!.getBoolean(Constants.SWITCH_STATE_KEY, true)
-        val currentTheme = AppCompatDelegate.getDefaultNightMode()
-        val newTheme = if (theme) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-
-        if (currentTheme != newTheme) {
-            AppCompatDelegate.setDefaultNightMode(newTheme)
-        }
-
 
         navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         navController = navHostFragment?.navController
@@ -50,7 +43,6 @@ class MainActivity : AppCompatActivity() {
         }else{
             bottomNavigationView?.setBackgroundColor(ContextCompat.getColor(this, R.color.white))
         }
-
         bottomNavigationView?.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.home -> {
@@ -91,9 +83,30 @@ class MainActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback!!)
     }
 
-        override fun onDestroy() {
+    private fun updateSharedPrefValues(){
+        lifecycleScope.launch(Dispatchers.IO) {
+            val sharedPrefIsFinished = applicationContext.getSharedPreferences(Constants.PREF_WORKER_RESULT, MODE_PRIVATE)
+            val sharedPrefCount = applicationContext.getSharedPreferences(Constants.PREF_WORKER, MODE_PRIVATE)
+            val isThemeChangedSharedPref = applicationContext.getSharedPreferences(Constants.IS_THEME_CHANGED, MODE_PRIVATE)
+
+            sharedPrefIsFinished?.edit()?.putBoolean(Constants.WORKER_RESULT, true)?.apply()
+
+            val isChanged = isThemeChangedSharedPref!!.getBoolean(Constants.THEME_CHANGED_PREF, false)
+            if (isChanged){
+                isThemeChangedSharedPref.edit().remove(Constants.THEME_CHANGED_PREF).apply()
+            }else{
+                sharedPrefCount?.edit()?.putInt(Constants.WORKER_COUNT, 100)?.apply()
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        updateSharedPrefValues()
+    }
+
+    override fun onDestroy() {
         super.onDestroy()
-        sharedPref = null
         lastMenuItem = null
         navHostFragment = null
         navController = null
