@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.investmenttracker.R
@@ -13,8 +12,6 @@ import com.example.investmenttracker.databinding.ActivityMainBinding
 import com.example.investmenttracker.domain.use_case.util.Constants
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -81,28 +78,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback!!)
-    }
-
-    private fun updateSharedPrefValues(){
-        lifecycleScope.launch(Dispatchers.IO) {
-            val sharedPrefIsFinished = applicationContext.getSharedPreferences(Constants.PREF_WORKER_RESULT, MODE_PRIVATE)
-            val sharedPrefCount = applicationContext.getSharedPreferences(Constants.PREF_WORKER, MODE_PRIVATE)
-            val isThemeChangedSharedPref = applicationContext.getSharedPreferences(Constants.IS_THEME_CHANGED, MODE_PRIVATE)
-
-            sharedPrefIsFinished?.edit()?.putBoolean(Constants.WORKER_RESULT, true)?.apply()
-
-            val isChanged = isThemeChangedSharedPref!!.getBoolean(Constants.THEME_CHANGED_PREF, false)
-            if (isChanged){
-                isThemeChangedSharedPref.edit().remove(Constants.THEME_CHANGED_PREF).apply()
-            }else{
-                sharedPrefCount?.edit()?.putInt(Constants.WORKER_COUNT, 100)?.apply()
-            }
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        updateSharedPrefValues()
     }
 
     override fun onDestroy() {

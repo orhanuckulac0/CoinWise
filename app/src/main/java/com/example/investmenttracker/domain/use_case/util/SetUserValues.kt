@@ -24,5 +24,6 @@ fun setUserValues(currentUser: UserData, coinsList: List<CoinModel>): UserData {
     currentUser.userCurrentCurrency = currentUser.userCurrentCurrency
     currentUser.userPreviousCurrency = currentUser.userPreviousCurrency
     currentUser.userTotalCoinInvestedQuantity = coinsList.size
+    currentUser.lastApiRequestMade = System.currentTimeMillis()
     return currentUser
 }

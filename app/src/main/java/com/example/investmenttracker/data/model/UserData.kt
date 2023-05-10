@@ -13,5 +13,6 @@ data class UserData(
     var userTotalProfitAndLossPercentage: Double,
     var userCurrentCurrency: String,
     var userPreviousCurrency: String,
-    var userTotalCoinInvestedQuantity: Int
+    var userTotalCoinInvestedQuantity: Int,
+    var lastApiRequestMade: Long
 ): java.io.Serializable

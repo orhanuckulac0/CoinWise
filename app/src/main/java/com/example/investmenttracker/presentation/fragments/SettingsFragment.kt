@@ -103,9 +103,6 @@ class SettingsFragment : Fragment() {
                 editor?.putBoolean(Constants.SWITCH_STATE_KEY, isChecked)
                 editor?.apply()
 
-                val themeChangedSharedPref = requireContext().getSharedPreferences(Constants.IS_THEME_CHANGED, MODE_PRIVATE)
-                themeChangedSharedPref.edit().putBoolean(Constants.THEME_CHANGED_PREF, true).apply()
-
                 viewModel.changeTheme(isChecked)
             }
         }

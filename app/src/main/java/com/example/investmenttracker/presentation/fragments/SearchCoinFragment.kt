@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBar
@@ -279,6 +278,7 @@ class SearchCoinFragment : Fragment() {
                             Constants.USD,
                             Constants.USD,
                             0,
+                            0L
                             )
 
                         updateUserAndCoinData(dummyUser, coinModel)

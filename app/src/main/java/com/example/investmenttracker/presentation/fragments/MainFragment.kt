@@ -37,7 +37,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -102,6 +101,7 @@ class MainFragment : Fragment() {
                         Constants.USD,
                         Constants.USD,
                         0,
+                        0L
                     )
                 )
             }
@@ -168,47 +168,6 @@ class MainFragment : Fragment() {
 
         setupActionBar()
         setupMenu()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        startWorker()
-
-        val sharedPrefIsFinished = requireContext().getSharedPreferences(Constants.PREF_WORKER_RESULT, MODE_PRIVATE)
-        val result = sharedPrefIsFinished.getBoolean(Constants.WORKER_RESULT, true)
-
-        val countPref = requireContext().getSharedPreferences(Constants.PREF_WORKER, MODE_PRIVATE)
-        val count = countPref.getInt(Constants.WORKER_COUNT, 100)
-
-        if (count < 101 && result) {
-            lifecycleScope.launch(Dispatchers.IO){
-                sharedPrefIsFinished.edit().putBoolean(Constants.WORKER_RESULT, false).apply()
-                countPref.edit().putInt(Constants.WORKER_COUNT, 1000).apply()
-
-                requestCurrencyData()
-
-                requestNewDataForWalletCoins()
-            }
-        }else{
-            populateFromCache()
-        }
-    }
-
-    private fun startWorker(){
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val countWorkerRequest = OneTimeWorkRequestBuilder<CountWorker>()
-            .setConstraints(constraints)
-            .setInitialDelay(1, TimeUnit.SECONDS)
-            .build()
-
-        WorkManager.getInstance(requireContext()).enqueueUniqueWork(
-            Constants.WORKER_NAME,
-            ExistingWorkPolicy.KEEP,
-            countWorkerRequest
-        )
     }
 
     private fun populateFromCache(){
@@ -447,6 +406,34 @@ class MainFragment : Fragment() {
             }
         }
         menuHost?.addMenuProvider(menuProvider!!, viewLifecycleOwner, Lifecycle.State.STARTED)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        var hasPopulatedFromCache = false
+
+        viewModel.userData.observe(viewLifecycleOwner){user->
+            if (user != null) {
+                if (viewModel.isAvailableToMakeApiRequest()) {
+                    lifecycleScope.launch(Dispatchers.IO) {
+
+                        requestCurrencyData()
+
+                        requestNewDataForWalletCoins()
+
+                        hasPopulatedFromCache = false
+                    }
+                } else if (!hasPopulatedFromCache) {
+                    populateFromCache()
+                    hasPopulatedFromCache = true
+                }
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.userData.removeObservers(viewLifecycleOwner)
     }
 
     override fun onDestroyView() {

@@ -83,6 +83,7 @@ class MainViewModel(
     fun updateUserdata(data: UserData){
         viewModelScope.launch(Dispatchers.IO) {
             updateUserDataUseCase.execute(data)
+            userData.postValue(data)
         }
     }
 
@@ -90,6 +91,16 @@ class MainViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             insertUserDataUseCase.execute(data)
         }
+    }
+
+    fun isAvailableToMakeApiRequest(): Boolean {
+        val currentTime = System.currentTimeMillis()
+        val previousTime = userData.value!!.lastApiRequestMade
+
+        val timeDiff = currentTime - previousTime
+        val minutesPassed = timeDiff / (1000 * 60)
+
+        return minutesPassed >= 5
     }
 
     fun getTokensFromWallet() {

@@ -204,7 +204,8 @@ class TokenDetailsFragment : Fragment() {
                                 userCurrentCurrency = Constants.USD,
                                 userPreviousCurrency = Constants.USD,
                                 userTotalProfitAndLossPercentage = 0.0,
-                                userTotalCoinInvestedQuantity = 0
+                                userTotalCoinInvestedQuantity = 0,
+                                lastApiRequestMade = 0L
                             ))
                         }else{
                             if (user.userTotalInvestment == 0.0){
@@ -217,7 +218,8 @@ class TokenDetailsFragment : Fragment() {
                                     userTotalBalanceWorth = formatToTwoDecimal(user.userTotalBalanceWorth - usdCoinData!!.totalInvestmentWorth),
                                     userTotalProfitAndLoss = formatToTwoDecimal(user.userTotalBalanceWorth - user.userTotalInvestment),
                                     userTotalProfitAndLossPercentage = calculateProfitLossPercentage(user.userTotalBalanceWorth, user.userTotalInvestment).replace("%", "").toDouble(),
-                                    userTotalCoinInvestedQuantity = user.userTotalCoinInvestedQuantity - 1
+                                    userTotalCoinInvestedQuantity = user.userTotalCoinInvestedQuantity - 1,
+                                    lastApiRequestMade = user.lastApiRequestMade
                                 ))
                             }
                         }
