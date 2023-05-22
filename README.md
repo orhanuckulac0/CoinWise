@@ -1,9 +1,8 @@
 ![logo](https://user-images.githubusercontent.com/101017069/235486524-32d73858-c062-4c45-b881-ffe161d85d3e.png)
 
-## 🔗 Links
+## 🔗 Link
 
-[**Google Play Link**](https://play.google.com/store/apps/details?id=coinwise.investmenttracker "Google Play")
-
+[![Google Play](/app/src/main/res/drawable/googleplay.png)](https://play.google.com/store/apps/details?id=coinwise.investmenttracker)
 
 ## About App
 
