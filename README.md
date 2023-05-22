@@ -2,7 +2,7 @@
 
 ## 🔗 Link
 
-[![Google Play](/app/src/main/res/drawable/google play icon.png)](https://play.google.com/store/apps/details?id=coinwise.investmenttracker)
+[![Google Play](/app/src/main/res/drawable/google_play_icon.png)](https://play.google.com/store/apps/details?id=coinwise.investmenttracker)
 
 ## About App
 
