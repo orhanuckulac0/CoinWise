@@ -9,14 +9,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.model.UserData
-import com.example.investmenttracker.domain.use_case.util.Resource
-import com.example.investmenttracker.domain.use_case.*
 import com.example.investmenttracker.domain.use_case.coin.GetAllCoinsUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetCoinBySlugUseCase
 import com.example.investmenttracker.domain.use_case.coin.GetCoinBySymbolUseCase
 import com.example.investmenttracker.domain.use_case.coin.SaveCoinUseCase
 import com.example.investmenttracker.domain.use_case.user.GetUserDataUseCase
 import com.example.investmenttracker.domain.use_case.user.UpdateUserDataUseCase
+import com.example.investmenttracker.domain.use_case.util.Resource
 import com.example.investmenttracker.domain.use_case.util.parseSlugResponseUtil
 import com.example.investmenttracker.domain.use_case.util.parseSymbolResponseUtil
 import com.example.investmenttracker.presentation.events.UiEvent
@@ -63,13 +62,12 @@ class SearchCoinViewModel(
             }
         }
         viewModelScope.launch(Dispatchers.IO) {
-            getUserDataUseCase.execute(1).collect(){
+            getUserDataUseCase.execute(1).collect {
                 userData.postValue(it)
             }
         }
     }
 
-    @Suppress("DEPRECATION")
     fun isNetworkAvailable(context: Context): Boolean {
         var result = false
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?

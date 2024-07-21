@@ -14,6 +14,7 @@ import com.example.investmenttracker.domain.use_case.util.formatPrice
 import com.example.investmenttracker.domain.use_case.util.formatTokenHeldAmount
 import com.example.investmenttracker.databinding.WalletTokenSingleItemBinding
 import com.example.investmenttracker.domain.use_case.util.formatTotalBalanceValue
+import java.util.Locale
 
 class MainFragmentAdapter(
     private val context: Context,
@@ -66,10 +67,10 @@ class MainFragmentAdapter(
 
             if (coinModel.percentChange24h.toString().contains("-")){
                 binding.tvCoinPriceChangeDaily.setTextColor(context.getColor(R.color.red_color_percentage))
-                binding.tvCoinPriceChangeDaily.text = String.format("%.2f", coinModel.percentChange24h)+"%"
+                binding.tvCoinPriceChangeDaily.text = String.format(Locale.getDefault(), "%.2f", coinModel.percentChange24h) + "%"
             }else {
                 binding.tvCoinPriceChangeDaily.setTextColor(context.getColor(R.color.green_color_percentage))
-                binding.tvCoinPriceChangeDaily.text = "+"+String.format("%.2f", coinModel.percentChange24h)+"%"
+                binding.tvCoinPriceChangeDaily.text = "+" + String.format(Locale.getDefault(), "%.2f", coinModel.percentChange24h) + "%"
             }
 
             Glide

@@ -39,7 +39,7 @@ class AnalyticsViewModel(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            getAllCoinsUseCase.execute().collect(){
+            getAllCoinsUseCase.execute().collect {
                 _walletCoins.postValue(it)
             }
         }
@@ -58,7 +58,7 @@ class AnalyticsViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             currencyData.postValue(Resource.Loading())
             try {
-                getAllCurrenciesUseCase.execute().collect() {
+                getAllCurrenciesUseCase.execute().collect {
                     currencyData.postValue(Resource.Success(it))
                 }
             }catch (e: java.lang.Exception){

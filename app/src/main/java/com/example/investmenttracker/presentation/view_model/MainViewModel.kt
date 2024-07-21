@@ -44,9 +44,9 @@ class MainViewModel(
 
     val multipleCoinsListResponse: MutableLiveData<Resource<JsonObject>> = MutableLiveData()
     var currentWalletCoins = mutableListOf<CoinModel>()
-    var newTokensDataResponse = mutableListOf<CoinModel>()
+    private var newTokensDataResponse = mutableListOf<CoinModel>()
     var temporaryTokenListToUseOnFragment = mutableListOf<CoinModel>()
-    var walletTokensToUpdateDB = mutableListOf<CoinModel>()
+    private var walletTokensToUpdateDB = mutableListOf<CoinModel>()
     var slugNames: MutableLiveData<Resource<String>> = MutableLiveData()
 
     var currencyRequestResult: MutableLiveData<Resource<Map<String, Float>>> = MutableLiveData()
@@ -63,21 +63,16 @@ class MainViewModel(
         }
     }
 
-    @Suppress("DEPRECATION")
     fun isNetworkAvailable(context: Context): Boolean {
-        var result = false
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
-        connectivityManager?.run {
-            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)?.run {
-                result = when {
-                    hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                    hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                    hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-                    else -> false
-                }
-            }
+        connectivityManager?.let {
+            val network = it.activeNetwork
+            val networkCapabilities = it.getNetworkCapabilities(network)
+            return networkCapabilities?.run {
+                hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+            } ?: false
         }
-        return result
+        return false
     }
 
     fun updateUserdata(data: UserData){

@@ -10,7 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
-    private val app: Application,
+    app: Application,
     private val changeAppThemeUseCase: ChangeAppThemeUseCase,
     private val updateUserDataUseCase: UpdateUserDataUseCase
 ): AndroidViewModel(app) {

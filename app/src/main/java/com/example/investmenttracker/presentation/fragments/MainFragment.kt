@@ -6,27 +6,41 @@ import android.content.Context.MODE_PRIVATE
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBar
-import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.work.*
 import com.example.investmenttracker.R
 import com.example.investmenttracker.data.model.CoinModel
 import com.example.investmenttracker.data.model.UserData
 import com.example.investmenttracker.databinding.FragmentMainBinding
-import com.example.investmenttracker.domain.use_case.util.*
+import com.example.investmenttracker.domain.use_case.util.Constants
+import com.example.investmenttracker.domain.use_case.util.Resource
+import com.example.investmenttracker.domain.use_case.util.calculateProfitLossPercentage
+import com.example.investmenttracker.domain.use_case.util.cancelProgressDialog
+import com.example.investmenttracker.domain.use_case.util.formatToTwoDecimal
+import com.example.investmenttracker.domain.use_case.util.formatTotalBalanceValue
+import com.example.investmenttracker.domain.use_case.util.setUserValues
+import com.example.investmenttracker.domain.use_case.util.showProgressDialog
+import com.example.investmenttracker.domain.use_case.util.sortCoinsByAscending
+import com.example.investmenttracker.domain.use_case.util.sortCoinsByDescending
 import com.example.investmenttracker.presentation.adapter.MainFragmentAdapter
 import com.example.investmenttracker.presentation.events.UiEvent
 import com.example.investmenttracker.presentation.events.UiEventActions
@@ -36,7 +50,9 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -86,7 +102,7 @@ class MainFragment : Fragment() {
         walletAdapter = MainFragmentAdapter(requireContext())
 
         mProgressDialog = showProgressDialog(requireContext())
-        navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
+        navigation = activity?.findViewById(R.id.bottom_navigation)!!
 
         viewModel.getTokensFromWallet()
         viewModel.userData.observe(viewLifecycleOwner){
@@ -237,7 +253,7 @@ class MainFragment : Fragment() {
                                 updatedCoinsList = coinsList.map { coin ->
                                     coin.copy(
                                         totalInvestmentAmount = formatToTwoDecimal(coin.totalInvestmentAmount* currencyResult.data!!.currencyRate.toDouble()),
-                                        totalInvestmentWorth = formatToTwoDecimal(coin.totalInvestmentWorth * currencyResult.data!!.currencyRate.toDouble()),
+                                        totalInvestmentWorth = formatToTwoDecimal(coin.totalInvestmentWorth * currencyResult.data.currencyRate.toDouble()),
                                         userCurrencySymbol = currencySymbol
                                     )
                                 }

@@ -82,7 +82,7 @@ class TokenDetailsFragment : Fragment() {
         setupView()
         setupMenu()
 
-        navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
+        navigation = activity?.findViewById(R.id.bottom_navigation)!!
         navigation?.selectedItemId = 0
 
         lifecycleScope.launch {

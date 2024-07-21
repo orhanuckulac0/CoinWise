@@ -1,7 +1,9 @@
 package com.example.investmenttracker.domain.use_case.util
 
+import android.util.Log
 import com.example.investmenttracker.data.model.CoinModel
 import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.json.JSONException
 import org.json.JSONObject
@@ -43,6 +45,7 @@ fun parseMultipleCoinsResponseUtil(data: JsonObject): MutableList<CoinModel> {
 
 fun parseSymbolResponseUtil(response: JsonArray?): MutableList<CoinModel>{
     val newTokensTempHolder = mutableListOf<CoinModel>()
+    Log.i("MYTAG","RESPONSE $response")
 
     if (response != null){
         try {
@@ -53,9 +56,9 @@ fun parseSymbolResponseUtil(response: JsonArray?): MutableList<CoinModel>{
                     name = formatCoinNameText(c.asJsonObject.get("name").toString()),
                     slug = c.asJsonObject.get("slug").toString(),
                     symbol = c.asJsonObject.get("symbol").toString(),
-                    price = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("price").toString().toDouble(),
-                    marketCap = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("market_cap").toString().toDouble(),
-                    percentChange24h = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_24h").toString().toDouble(),
+                    price = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("price")?.asDoubleOrNull() ?: 0.0,
+                    marketCap = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("market_cap")?.asDoubleOrNull() ?: 0.0,
+                    percentChange24h = c.asJsonObject.get("quote").asJsonObject.get("USD").asJsonObject.get("percent_change_24h")?.asDoubleOrNull() ?: 0.0,
                     totalTokenHeldAmount = 0.toDouble(),
                     totalInvestmentAmount = 0.toDouble(),
                     totalInvestmentWorth =0.toDouble(),
@@ -112,4 +115,14 @@ fun parseCurrencyAPIResponse(result: JsonObject): Map<String, Float>? {
 fun formatCoinNameText(symbol: String): String {
     val regex = Regex("[^A-Za-z0-9 ]")
     return regex.replace(symbol, "")
+}
+
+fun JsonElement.asDoubleOrNull(): Double? {
+    return try {
+        this.asDouble
+    } catch (e: NumberFormatException) {
+        null
+    } catch (e: UnsupportedOperationException) {
+        null
+    }
 }

@@ -83,7 +83,7 @@ class AnalyticsFragment : Fragment() {
             Context.MODE_PRIVATE
         )
 
-        navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
+        navigation = activity?.findViewById(R.id.bottom_navigation)!!
 
         onBackPressedCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {

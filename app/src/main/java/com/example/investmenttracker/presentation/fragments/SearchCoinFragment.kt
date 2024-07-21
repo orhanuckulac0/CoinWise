@@ -1,5 +1,6 @@
 package com.example.investmenttracker.presentation.fragments
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
@@ -69,6 +70,7 @@ class SearchCoinFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_search_coin, container, false)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSearchCoinBinding.bind(view)
@@ -126,7 +128,7 @@ class SearchCoinFragment : Fragment() {
             }
         }
 
-        navigation = activity?.findViewById(R.id.bottom_navigation) as BottomNavigationView
+        navigation = activity?.findViewById(R.id.bottom_navigation)!!
 
         onBackPressedCallback = object : OnBackPressedCallback(true){
             override fun handleOnBackPressed() {
@@ -247,6 +249,7 @@ class SearchCoinFragment : Fragment() {
             rvCoinSearchResults.setHasFixedSize(true)
 
             adapter?.setOnClickListener(object: SearchCoinAdapter.OnClickListener {
+                @SuppressLint("SetTextI18n")
                 override fun onClick(position: Int, coinModel: CoinModel) {
 
                     var isAlreadyInWallet = false
